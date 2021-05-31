@@ -42,6 +42,7 @@ class knowledge_action():
 
     file_name = ""
     file_data = {}
+    #catalogo = OrderedDict()
 
     def import_file(self):
         logging.warning("import CSV")
@@ -56,9 +57,11 @@ class knowledge_action():
             print("Il file non esiste, prova a ricaricare il file con la directory corretta.\n")
 
     def read_exel_file(self, template_file):
-        df = pd.read_excel(template_file, '0', converters={'question_number': str}).replace(np.nan, '', regex=True)
+        df = pd.read_excel(template_file, 0, converters={'question_number': str}).replace(np.nan, '', regex=True)
         #print ("print JSON")
         #print(sh)
+        catalogo = pd.read_excel("c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls")
+        print(type(catalogo))
         data_list = {'question_number': {}}
         
         for index, row in df.iterrows():
@@ -81,9 +84,27 @@ class knowledge_action():
 
         print('Start analisys:\n', template_file)
 
+        self.check_qd()
+        self.check_metodiche()
+        self.check_distretti()
+        self.check_priorita()
+
         parsed_intent_templates = []
 
         self.__build_examples(parsed_intent_templates)
+
+    def check_qd(self):
+        print("start checking QD")
+
+    def check_metodiche(self):
+        print("start checking Metodiche")
+
+    def check_distretti(self):
+        print("start checking Distretti")
+    
+    def check_priorita(self):
+        print("start checking priorità e tipologie di accesso")
+
 
  
     def __build_examples(self, intent_templates: Dict[str, List[PhraseTemplate]]) -> List[str]:
@@ -100,7 +121,7 @@ class knowledge_action():
                         "note" : []
                     }
 
-        for intent_name, phrase_templates in intent_templates.items():
+        '''for intent_name, phrase_templates in intent_templates.items():
                 logger.info(f"Generating examples of intent '{intent_name}' ...")
                 for template in phrase_templates:
                     #output_file.write(f"<!-- {template.original_line} -->\n")
@@ -126,7 +147,7 @@ class knowledge_action():
 
         df = pd.DataFrame(rows_list)
         with pd.ExcelWriter(self.file_name, engine='openpyxl', mode='a') as writer:
-            df.to_excel(writer, sheet_name='new_mapping', index=False)
+            df.to_excel(writer, sheet_name='new_mapping', index=False)'''
 
 
 k = knowledge_action()
