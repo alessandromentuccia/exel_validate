@@ -22,3 +22,8 @@ A partire dal file di mapping compilato dalla struttura (che di solito contiene 
 - prime visite
 - controlli
 - esami strumentali
+
+aggiungerei per QD metodiche e distretti anche l'assenza di spazi dopo il separatore e l'aggiunta dei codici qualora l'ente inserisse le descrizioni.
+
+a me è capitato di trovare anche codici o descrizioni duplicati nella stessa cella.
+aggiungerei il controlli dei casi 1:n con abilitazione esposizione siss "S"
