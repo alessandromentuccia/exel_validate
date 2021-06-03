@@ -148,10 +148,10 @@ class knowledge_action():
         print("error_list: %s", error_list)
         return error_list
 
-    def ck_QD_disciplina_agenda(self, df_mapping):
+    def ck_QD_disciplina_agenda(self, df_mapping, sheet_):
         print("start checking if foreach agenda there is the same Disciplina for all the QD")
         error_list = []
-        
+
         return error_list
             
     def ck_QD_separatore(self, df_mapping):
