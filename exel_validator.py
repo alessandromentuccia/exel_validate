@@ -42,10 +42,11 @@ class knowledge_action():
 
     file_name = ""
     file_data = {}
-    #catalogo = OrderedDict()
+    catalogo = OrderedDict()
+    flag_check_list = []
 
     def import_file(self):
-        logging.warning("import CSV")
+        logging.warning("import excel")
 
         template_file = input("Enter your mapping file.xlsx: ") ##insert mapping file
         print(template_file) 
@@ -57,57 +58,109 @@ class knowledge_action():
             print("Il file non esiste, prova a ricaricare il file con la directory corretta.\n")
 
     def read_exel_file(self, template_file):
-        df = pd.read_excel(template_file, 0, converters={'question_number': str}).replace(np.nan, '', regex=True)
+        #pd.set_option("display.max_rows", None, "display.max_columns", None)
+        df_mapping = pd.read_excel(template_file, 0, converters={'question_number': str}).replace(np.nan, '', regex=True)
         #print ("print JSON")
         #print(sh)
-        catalogo = pd.read_excel("c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls")
-        print(type(catalogo))
-        data_list = {'question_number': {}}
         
-        for index, row in df.iterrows():
-            data = OrderedDict()
-            if row["question_number"] not in data_list["question_number"]:
-                data[row[1]] = [row["question_template"]]
-                self.file_data.update({ row["question_number"]: [row["question_type"], row["question_number"], row["question_template"], row["answer"], row["note"]]})
-                data_list["question_number"].update(data)
-                print("data_list: %s", data_list)
-            else: 
-                data_list["question_number"][row["question_number"]].append(row["question_template"])
-                self.file_data.update({ row["question_number"]: [row["question_type"], row["question_number"], row["question_template"], row["answer"], row["note"]]})
+        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
 
-        #with open("RulesJson.json", "w", encoding="utf-8") as writeJsonfile:
-        #    json.dump(data_list, writeJsonfile, indent=4,default=str) 
-        logging.warning("initiate generation")
-        self.analizer(data_list)
+        sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD' )
+        sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE' )
+        sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI' )
+        
+        print("sheet_QD caricato\n")
+        #print(sheet_QD)
+        print("sheet_Metodiche caricato\n")
+        #print(sheet_Metodiche)
+        print("sheet_Distretti caricato\n")
+        #print(sheet_Distretti)
 
-    def analizer(self, template_file):
+        self.analizer(df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti)
 
-        print('Start analisys:\n', template_file)
+    def analizer(self, df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti):
 
-        self.check_qd()
-        self.check_metodiche()
-        self.check_distretti()
-        self.check_priorita()
+        print('Start analisys:\n', df_mapping)
 
-        parsed_intent_templates = []
+        print("Fase 1") #FASE 1: CONTROLLO I QUESITI DIAGNOSTICI
+        QD_error = self.check_qd(df_mapping, sheet_QD)
+        print("Fase 2") #FASE 2: CONTROLLO LE METODICHE
+        metodiche_error = self.check_metodiche(df_mapping)
+        print("Fase 3") #FASE 3: CONTROLLO I DISTRETTI
+        distretti_error = self.check_distretti(df_mapping)
+        print("Fase 4") #FASE 4: CONTROLLO LE PRIORITA'
+        priorita_error = self.check_priorita(df_mapping)
 
-        self.__build_examples(parsed_intent_templates)
+        error_dict = {
+            "QD_error": QD_error,
+            "metodiche_error": metodiche_error,
+            "distretti_error": distretti_error,
+            "priorita_error": priorita_error,    
+        }
 
-    def check_qd(self):
-        print("start checking QD")
+        self._validation(error_dict)
 
-    def check_metodiche(self):
+    def check_qd(self, df_mapping, sheet_QD):
+        print("start checking QD") #Codice Quesito Diagnostico
+        #controllo se per ogni Agenda sono inseriti gli stessi QD
+        
+        error_QD_agenda = self.ck_QD_agenda(df_mapping)
+        error_QD_disciplina_agenda = self.ck_QD_disciplina_agenda(df_mapping, sheet_QD)
+        error_QD_separatore = self.ck_QD_separatore(df_mapping)
+
+        error_list = {
+            "error_QD_agenda": error_QD_agenda,
+            "error_QD_disciplina_agenda": error_QD_disciplina_agenda,
+            "error_QD_separatore": error_QD_separatore
+        }
+
+        return error_list
+
+    def check_metodiche(self, df_mapping):
         print("start checking Metodiche")
 
-    def check_distretti(self):
+    def check_distretti(self, df_mapping):
         print("start checking Distretti")
     
-    def check_priorita(self):
+    def check_priorita(self, df_mapping):
         print("start checking priorità e tipologie di accesso")
 
+    def ck_QD_agenda(self, df_mapping):
+        print("start checking if foreach agenda there are the same QD")
 
- 
-    def __build_examples(self, intent_templates: Dict[str, List[PhraseTemplate]]) -> List[str]:
+        error_list = []
+        
+        agenda = df_mapping['Codice SISS Agenda'].iloc[2]
+        last_QD = df_mapping['Codice Quesito Diagnostico'].iloc[2]
+        for index, row in df_mapping.iterrows():
+            if row["Codice SISS Agenda"] is agenda:
+                print("- same agenda -")
+                if row["Codice Quesito Diagnostico"] is last_QD:
+                    print("correct QD")
+                else: 
+                    print("error QD")
+                    error_list.append(str(index))
+            else:
+                print("- the agenda is changed -")
+                agenda = row["Codice SISS Agenda"]
+                last_QD = row["Codice Quesito Diagnostico"]
+
+        print("error_list: %s", error_list)
+        return error_list
+
+    def ck_QD_disciplina_agenda(self, df_mapping):
+        print("start checking if foreach agenda there is the same Disciplina for all the QD")
+        error_list = []
+        
+        return error_list
+            
+    def ck_QD_separatore(self, df_mapping):
+        print("start checking if there is ',' separator between each QD defined")
+        error_list = []
+
+        return error_list
+
+    def _validation(self):
         # reproducible randomization in future runs
         reproducible_random = random.Random(1)
         examples_count = 0

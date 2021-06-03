@@ -27,3 +27,21 @@ aggiungerei per QD metodiche e distretti anche l'assenza di spazi dopo il separa
 
 a me è capitato di trovare anche codici o descrizioni duplicati nella stessa cella.
 aggiungerei il controlli dei casi 1:n con abilitazione esposizione siss "S"
+
+### domande da fare:
+
+- che ordinamento ha il mapping? au che campo è ordinato? 
+- l'ordinamento è sempre lo stesso?
+- il campo agenda da considerare è Codice SISS Agenda?
+
+
+data = OrderedDict()
+if row["question_number"] not in data_list["question_number"]:
+    data[row[1]] = [row["question_template"]]
+    self.file_data.update({ row["question_number"]: [row["question_type"], row["question_number"], row["question_template"], row["answer"], row["note"]]})
+    data_list["question_number"].update(data)
+    print("data_list: %s", data_list)
+else: 
+    data_list["question_number"][row["question_number"]].append(row["question_template"])
+    self.file_data.update({ row["question_number"]: [row["question_type"], row["question_number"], row["question_template"], row["answer"], row["note"]]})
+
