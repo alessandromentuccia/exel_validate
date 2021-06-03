@@ -118,12 +118,21 @@ class knowledge_action():
 
     def check_metodiche(self, df_mapping):
         print("start checking Metodiche")
+        error_list = []
+        print("error_list: %s", error_list)
+        return error_list
 
     def check_distretti(self, df_mapping):
         print("start checking Distretti")
-    
+        error_list = []
+        print("error_list: %s", error_list)
+        return error_list
+
     def check_priorita(self, df_mapping):
         print("start checking priorità e tipologie di accesso")
+        error_list = []
+        print("error_list: %s", error_list)
+        return error_list
 
     def ck_QD_agenda(self, df_mapping):
         print("start checking if foreach agenda there are the same QD")
@@ -148,9 +157,23 @@ class knowledge_action():
         print("error_list: %s", error_list)
         return error_list
 
-    def ck_QD_disciplina_agenda(self, df_mapping, sheet_):
+    def ck_QD_disciplina_agenda(self, df_mapping, sheet_QD):
         print("start checking if foreach agenda there is the same Disciplina for all the QD")
-        error_list = []
+        error_list = [] 
+        disciplina_QD_column = sheet_QD[['Cod Disciplina','Codice Quesito']]
+
+        for index, row in df_mapping.iterrows():
+            QD_string = row["Codice Quesito Diagnostico"].split(",")
+            if QD_string is not None:
+                disci = ""
+                for QD in QD_string:
+                    disciplina = disciplina_QD_column.loc[disciplina_QD_column["Codice Quesito"] == QD]
+                    if disciplina == row["Disciplina Agenda"] and disciplina == disci: # controllo se disciplina è uguale a quella precedente
+                        print("correct Disciplina")
+                    else: # se non è uguale è errore
+                        print("error QD on index:" + str(index))
+                        error_list.append(str(index))
+                    disci = disciplina
 
         return error_list
             
@@ -160,9 +183,9 @@ class knowledge_action():
 
         return error_list
 
-    def _validation(self):
+    def _validation(self, error_list):
         # reproducible randomization in future runs
-        reproducible_random = random.Random(1)
+        '''reproducible_random = random.Random(1)
         examples_count = 0
 
         #define the first raw
@@ -172,7 +195,7 @@ class knowledge_action():
                         "question" : [], 
                         "answer" : [], 
                         "note" : []
-                    }
+                    }'''
 
         '''for intent_name, phrase_templates in intent_templates.items():
                 logger.info(f"Generating examples of intent '{intent_name}' ...")
