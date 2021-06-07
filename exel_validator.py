@@ -59,7 +59,7 @@ class knowledge_action():
 
     def read_exel_file(self, template_file):
         #pd.set_option("display.max_rows", None, "display.max_columns", None)
-        df_mapping = pd.read_excel(template_file, 0, converters={'question_number': str}).replace(np.nan, '', regex=True)
+        df_mapping = pd.read_excel(template_file, 0, converters={'Disciplina Agenda': str}).replace(np.nan, '', regex=True)
         #print ("print JSON")
         #print(sh)
         
@@ -105,8 +105,9 @@ class knowledge_action():
         #controllo se per ogni Agenda sono inseriti gli stessi QD
         
         error_QD_agenda = self.ck_QD_agenda(df_mapping)
-        error_QD_disciplina_agenda = self.ck_QD_disciplina_agenda(df_mapping, sheet_QD)
         error_QD_separatore = self.ck_QD_separatore(df_mapping)
+        error_QD_disciplina_agenda = self.ck_QD_disciplina_agenda(df_mapping, sheet_QD)
+        
 
         error_list = {
             "error_QD_agenda": error_QD_agenda,
@@ -143,14 +144,14 @@ class knowledge_action():
         last_QD = df_mapping['Codice Quesito Diagnostico'].iloc[2]
         for index, row in df_mapping.iterrows():
             if row["Codice SISS Agenda"] is agenda:
-                print("- same agenda -")
-                if row["Codice Quesito Diagnostico"] is last_QD:
-                    print("correct QD")
-                else: 
+                #print("- same agenda -")
+                if row["Codice Quesito Diagnostico"] is not last_QD:
                     print("error QD")
                     error_list.append(str(index))
-            else:
-                print("- the agenda is changed -")
+                #else: 
+                #    print("correct QD")
+            else: 
+                #print("- the agenda is changed -")
                 agenda = row["Codice SISS Agenda"]
                 last_QD = row["Codice Quesito Diagnostico"]
 
@@ -160,30 +161,62 @@ class knowledge_action():
     def ck_QD_disciplina_agenda(self, df_mapping, sheet_QD):
         print("start checking if foreach agenda there is the same Disciplina for all the QD")
         error_list = [] 
-        disciplina_QD_column = sheet_QD[['Cod Disciplina','Codice Quesito']]
-
+        
+        #disciplina_QD_column = sheet_QD[['Cod Disciplina','Codice Quesito']]
+        #print("disciplina_QD_column: %s", disciplina_QD_column)
         for index, row in df_mapping.iterrows():
             QD_string = row["Codice Quesito Diagnostico"].split(",")
+            disci = ""
+            disci_flag = False
             if QD_string is not None:
-                disci = ""
                 for QD in QD_string:
-                    disciplina = disciplina_QD_column.loc[disciplina_QD_column["Codice Quesito"] == QD]
-                    if disciplina == row["Disciplina Agenda"] and disciplina == disci: # controllo se disciplina è uguale a quella precedente
-                        print("correct Disciplina")
-                    else: # se non è uguale è errore
-                        print("error QD on index:" + str(index))
-                        error_list.append(str(index))
-                    disci = disciplina
+                    if QD != "":
+                        disciplina = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD]  #[str(i) for i in                      
+                        #print("QD: " + QD)
+                        #print("disciplina " + str(disciplina["Cod Disciplina"]) + " " + str(disciplina["Codice Quesito"]))
+                        print("disciplina in catalogo disciplina 11:" + row["Disciplina Agenda"] + " + " + disci)
+                        for d in disciplina["Cod Disciplina"]: 
+                            if row["Disciplina Agenda"] == d: 
+                                disci_flag = True
+                                print("disciplina in catalogo disciplina 22:" + str(row["Disciplina Agenda"]) + " + " + disci)
+                                if str(row["Disciplina Agenda"]) == disci or disci == "": # controllo se disciplina è uguale a quella precedente
+                                    print("correct Disciplina")
+                                else: # se non è uguale è errore
+                                    print("error QD on index:" + str(int(index)+2))
+                                    error_list.append(str(int(index)+2))
+                            else:
+                                print("disciplina diversa da quella di QD: " + str(d))
+                    else:
+                        disci_flag = True
+
+            if disci_flag == False: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
+                error_list.append(str(int(index)+2))
+            disci = str(row["Disciplina Agenda"])
 
         return error_list
             
     def ck_QD_separatore(self, df_mapping):
         print("start checking if there is ',' separator between each QD defined")
         error_list = []
+        string_check = re.compile('1234567890,Q')
+
+        for index, row in df_mapping.iterrows():
+            print("QD: " + row["Codice Quesito Diagnostico"])
+            flag_error = False
+            if row["Codice Quesito Diagnostico"] is not None:
+                if(string_check.search(row["Codice Quesito Diagnostico"]) == None):
+                    print("String does not contain other characters") 
+                else: 
+                    print("String contains other Characters.")
+                    flag_error = True
+
+            if flag_error == True:
+                error_list.append(str(int(index)+2))
 
         return error_list
 
     def _validation(self, error_list):
+        print("questi sono gli errori indivuduati e separati per categoria:\n %s", error_list)
         # reproducible randomization in future runs
         '''reproducible_random = random.Random(1)
         examples_count = 0
