@@ -33,6 +33,7 @@ aggiungerei il controlli dei casi 1:n con abilitazione esposizione siss "S"
 - che ordinamento ha il mapping? au che campo è ordinato? 
 - l'ordinamento è sempre lo stesso?
 - il campo agenda da considerare è Codice SISS Agenda?
+- i campi codice distretto e descrizione distretto 
 
 
 data = OrderedDict()
