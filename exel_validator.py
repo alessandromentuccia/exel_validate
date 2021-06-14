@@ -29,7 +29,6 @@ c_handler.setFormatter(formatter)
 logger.addHandler(f_handler)
 logger.addHandler(c_handler)
 
-EXAMPLE_FILE_PATH = 'generated_examples.md'
 
 class PhraseTemplate(object):
     def __init__(self, original_line: str, string_to_fill: str, slot_list: List[List[str]]):
@@ -44,6 +43,7 @@ class knowledge_action():
     file_data = {}
     catalogo = OrderedDict()
     flag_check_list = []
+    error_list = {}
 
     def import_file(self):
         logging.warning("import excel")
@@ -90,6 +90,8 @@ class knowledge_action():
         distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
         print("Fase 4") #FASE 4: CONTROLLO LE PRIORITA'
         priorita_error = self.check_priorita(df_mapping)
+        print("Fase 5") #FASE 4: CONTROLLO LE PRIORITA'
+        priorita_error = self.check_univocita_prestazione(df_mapping)
 
         error_dict = {
             "QD_error": QD_error,
@@ -103,74 +105,85 @@ class knowledge_action():
     def check_qd(self, df_mapping, sheet_QD):
         print("start checking QD") #Codice Quesito Diagnostico
         #controllo se per ogni Agenda sono inseriti gli stessi QD
+        error_dict = {}
         
-        error_QD_agenda = self.ck_QD_agenda(df_mapping)
-        error_QD_separatore = self.ck_QD_separatore(df_mapping)
-        error_QD_disciplina_agenda = self.ck_QD_disciplina_agenda(df_mapping, sheet_QD)
-        error_QD_disciplina_descrizione = self.ck_QD_disciplina_descrizione(df_mapping, sheet_QD)
+        error_QD_sintassi = self.ck_QD_sintassi(df_mapping, error_dict)
+        error_QD_agenda = self.ck_QD_agenda(df_mapping, error_QD_sintassi)
+        error_QD_disciplina_agenda = self.ck_QD_disciplina_agenda(df_mapping, sheet_QD, error_QD_agenda)
+        error_QD_disciplina_descrizione = self.ck_QD_disciplina_descrizione(df_mapping, sheet_QD, error_QD_disciplina_agenda)
         
-
-        error_list = {
+        error_dict = error_QD_disciplina_descrizione
+        '''error_list = {
             "error_QD_agenda": error_QD_agenda,
             "error_QD_disciplina_agenda": error_QD_disciplina_agenda,
-            "error_QD_separatore": error_QD_separatore,
+            "error_QD_sintassi": error_QD_sintassi,
             "error_QD_disciplina_descrizione": error_QD_disciplina_descrizione
-        }
+        }'''
 
-        return error_list
+        return error_dict
 
     def check_metodiche(self, df_mapping, sheet_Metodiche):
         print("start checking Metodiche")
+        error_dict = {}
 
-        error_metodica_inprestazione = self.ck_metodica_inprestazione(df_mapping, sheet_Metodiche)
-        error_metodica_separatore = self.ck_metodica_separatore(df_mapping)
-        error_metodica_descrizione = self.ck_metodica_descrizione(df_mapping, sheet_Metodiche)
-
-        error_list = {
+        error_metodica_sintassi = self.ck_metodica_sintassi(df_mapping, error_dict)
+        error_metodica_inprestazione = self.ck_metodica_inprestazione(df_mapping, sheet_Metodiche, error_metodica_sintassi)
+        error_metodica_descrizione = self.ck_metodica_descrizione(df_mapping, sheet_Metodiche, error_metodica_inprestazione)
+        
+        error_dict = error_metodica_descrizione
+        '''error_dict = {
             "error_metodica_inprestazione": error_metodica_inprestazione,
             "error_metodica_separatore": error_metodica_separatore,
             "error_metodica_descrizione": error_metodica_descrizione
-        }
+        }'''
 
-        print("error_list: %s", error_list)
-        return error_list
+        #print("error_dict: %s", error_dict)
+        return error_dict
 
     def check_distretti(self, df_mapping, sheet_Distretti):
         print("start checking Distretti")
+        error_dict = {}
 
-        error_distretti_inprestazione = self.ck_distretti_inprestazione(df_mapping, sheet_Distretti)
-        error_distretti_separatore = self.ck_distretti_separatore(df_mapping)
-        error_distretti_descrizione = self.ck_distretti_descrizione(df_mapping, sheet_Distretti)
-
-        error_list = {
+        error_distretti_sintassi = self.ck_distretti_sintassi(df_mapping, error_dict)
+        error_distretti_inprestazione = self.ck_distretti_inprestazione(df_mapping, sheet_Distretti, error_distretti_sintassi)
+        error_distretti_descrizione = self.ck_distretti_descrizione(df_mapping, sheet_Distretti, error_distretti_inprestazione)
+        
+        error_dict = error_distretti_descrizione
+        '''error_dict = {
             "error_distretti_inprestazione": error_distretti_inprestazione,
             "error_distretti_separatore": error_distretti_separatore,
             "error_distretti_descrizione": error_distretti_descrizione
-        }
+        }'''
 
-        print("error_list: %s", error_list)
-        return error_list
+        return error_dict
 
     def check_priorita(self, df_mapping):
         print("start checking priorità e tipologie di accesso")
+        error_dict = {}
 
-        error_prime_visite = self.ck_prime_visite(df_mapping)
-        error_controlli = self.ck_controlli(df_mapping)
-        error_esami_strumentali =self.ck_esami_strumentali(df_mapping)
+        error_prime_visite = self.ck_prime_visite(df_mapping, error_dict)
+        error_controlli = self.ck_controlli(df_mapping, error_prime_visite)
+        error_esami_strumentali =self.ck_esami_strumentali(df_mapping, error_controlli)
 
-        error_list = {
+        error_dict = error_esami_strumentali
+        '''error_list = {
             "error_prime_visite": error_prime_visite,
             "error_controlli": error_controlli,
             "error_esami_strumentali": error_esami_strumentali
-        }
+        }'''
 
-        print("error_list: %s", error_list)
-        return error_list
+        return error_dict
 
-    def ck_QD_agenda(self, df_mapping):
+    def check_univocita_prestazione(self, df_mapping):
+        print("start checking univocità delle prestazioni")
+        error_dict = self.ck_casi_1n(df_mapping, error_dict)
+
+        return error_dict
+
+    def ck_QD_agenda(self, df_mapping, error_dict):
         print("start checking if foreach agenda there are the same QD")
-
-        error_list = []
+        
+        error_dict.update({'error_QD_agenda': []})
         
         agenda = df_mapping['Codice SISS Agenda'].iloc[2]
         last_QD = df_mapping['Codice Quesito Diagnostico'].iloc[2]
@@ -178,8 +191,9 @@ class knowledge_action():
             if row["Codice SISS Agenda"] is agenda:
                 #print("- same agenda -")
                 if row["Codice Quesito Diagnostico"] is not last_QD:
-                    print("error QD")
-                    error_list.append(str(index))
+                    print("error QD at index:" +  str(int(index)+2))
+                    #error_list.append(str(int(index)+2))
+                    error_dict['error_QD_agenda'].append(str(int(index)+2))
                 #else: 
                 #    print("correct QD")
             else: 
@@ -187,12 +201,13 @@ class knowledge_action():
                 agenda = row["Codice SISS Agenda"]
                 last_QD = row["Codice Quesito Diagnostico"]
 
-        print("error_list: %s", error_list)
-        return error_list
+        print("error_dict: %s", error_dict)
+        return error_dict
 
-    def ck_QD_disciplina_agenda(self, df_mapping, sheet_QD):
+    def ck_QD_disciplina_agenda(self, df_mapping, sheet_QD, error_dict):
         print("start checking if foreach agenda there is the same Disciplina for all the QD")
-        error_list = [] 
+
+        error_dict.update({'error_QD_disciplina_agenda': []}) 
         
         #disciplina_QD_column = sheet_QD[['Cod Disciplina','Codice Quesito']]
         #print("disciplina_QD_column: %s", disciplina_QD_column)
@@ -215,41 +230,50 @@ class knowledge_action():
                                     print("correct Disciplina")
                                 else: # se non è uguale è errore
                                     print("error QD on index:" + str(int(index)+2))
-                                    error_list.append(str(int(index)+2))
-                            else:
+                                    #error_list.append(str(int(index)+2))
+                                    error_dict['error_QD_disciplina_agenda'].append(str(int(index)+2))
+                            else: 
                                 print("disciplina diversa da quella di QD: " + str(d))
                     else:
                         disci_flag = True
 
             if disci_flag == False: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
-                error_list.append(str(int(index)+2))
+                error_dict['error_QD_disciplina_agenda'].append(str(int(index)+2))
             disci = str(row["Disciplina Agenda"])
 
-        return error_list
+        return error_dict
             
-    def ck_QD_separatore(self, df_mapping):
+    def ck_QD_sintassi(self, df_mapping, error_dict):
         print("start checking if there is ',' separator between each QD defined")
-        error_list = []
+        error_dict.update({
+            'error_QD_caratteri_non_consentiti': [],
+            'error_QD_trovato_spazio': []
+        })
         string_check = re.compile('1234567890,Q')
 
         for index, row in df_mapping.iterrows():
             print("QD: " + row["Codice Quesito Diagnostico"])
             flag_error = False
             if row["Codice Quesito Diagnostico"] is not None:
-                if(string_check.search(row["Codice Quesito Diagnostico"]) == None):
-                    print("String does not contain other characters") 
-                else: 
+                r = row["Codice Quesito Diagnostico"].strip()
+                if(string_check.search(row["Codice Quesito Diagnostico"]) != None):
                     print("String contains other Characters.")
+                    error_dict['error_QD_caratteri_non_consentiti'].append(str(int(index)+2))
                     flag_error = True
+                elif " " in r:
+                    print("string contain space")
+                    error_dict['error_QD_trovato_spazio'].append(str(int(index)+2))
+                #else: 
+                #    print("String does not contain other characters") 
 
-            if flag_error == True:
-                error_list.append(str(int(index)+2))
+            #if flag_error == True:
+            #    error_dict['error_QD_caratteri_non_consentiti'].append(str(int(index)+2))
 
-        return error_list
+        return error_dict
 
-    def ck_QD_disciplina_descrizione(self, df_mapping, sheet_QD):
+    def ck_QD_disciplina_descrizione(self, df_mapping, sheet_QD, error_dict):
         print("start checking if there are the relative QD description")
-        error_list = []
+        error_dict.update({'error_QD_disciplina_descrizione': []})
         
         for index, row in df_mapping.iterrows():
             QD_string = row["Codice Quesito Diagnostico"].split(",")
@@ -263,7 +287,6 @@ class knowledge_action():
                 for QD in QD_string:
                     if QD != "":
                         QD_catalogo = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD]  
-                        
                         #print("QD: " + str(QD)) 
                         try:
                             if QD_catalogo["Quesiti Diagnostici"].values[0] not in Description_list:
@@ -274,20 +297,18 @@ class knowledge_action():
                                 print("print QD_catalogo2:" + QD_catalogo)
                                 print("controllare manualmente qual'è il problema")
                                 logging.error("controllare manualmente il QD: " + QD + " all'indice: " + str(int(index)+2))
-
-                        
+                                flag_error = True
                         #print("QD_catalogo: " + QD_catalogo["Quesiti Diagnostici"].values[0])     
                         #print("Description_list: %s", Description_list)            
                         
-
             if flag_error == True:
-                error_list.append(str(int(index)+2))
+                error_dict['error_QD_disciplina_descrizione'].append(str(int(index)+2))
 
-        return error_list
+        return error_dict
 
-    def ck_metodica_inprestazione(self, df_mapping, sheet_Metodiche):
+    def ck_metodica_inprestazione(self, df_mapping, sheet_Metodiche, error_dict):
         print("start checking if metodica are correct")
-        error_list = []
+        error_dict.update({'error_metodica_inprestazione': []})
         
         for index, row in df_mapping.iterrows():
             Metodica_string = row["Codice Metodica"].split(",")
@@ -309,41 +330,46 @@ class knowledge_action():
                                     print("correct Disciplina")
                                 else: # se non è uguale è errore
                                     print("error metodica on index:" + str(int(index)+2))
-                                    error_list.append(str(int(index)+2))
+                                    error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
                             else:
                                 print("disciplina diversa da quella di metodica: " + str(d))
                     else:
                         disci_flag = True
 
             if disci_flag == False: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
-                error_list.append(str(int(index)+2))
+                error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
             disci = str(row["Disciplina Agenda"])
 
-        return error_list
+        return error_dict
 
-    def ck_metodica_separatore(self, df_mapping):
+    def ck_metodica_sintassi(self, df_mapping, error_dict):
         print("start checking if there is ',' separator between each metodiche defined")
-        error_list = []
+        error_dict.update({
+            'error_metodica_caratteri_non_consentiti': [],
+            'error_metodica_trovato_spazio': []
+        })
         string_check = re.compile('1234567890,M')
 
         for index, row in df_mapping.iterrows():
             print("Metodica: " + row["Codice Metodica"])
-            flag_error = False
+            #flag_error = False
             if row["Codice Metodica"] is not None:
-                if(string_check.search(row["Codice Metodica"]) == None):
-                    print("String does not contain other characters") 
-                else: 
+                r = row["Codice Metodica"].strip()
+                if(string_check.search(row["Codice Metodica"]) != None):
                     print("String contains other Characters.")
-                    flag_error = True
+                    #flag_error = True
+                    error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
+                elif " " in r:
+                    print("string contain space")
+                    error_dict['error_metodica_trovato_spazio'].append(str(int(index)+2))
 
-            if flag_error == True:
-                error_list.append(str(int(index)+2))
+            #if flag_error == True:
+            #    error_dict['error_metodica_separatore'].append(str(int(index)+2))
+        return error_dict
 
-        return error_list
-
-    def ck_metodica_descrizione(self, df_mapping, sheet_Metodiche):
+    def ck_metodica_descrizione(self, df_mapping, sheet_Metodiche, error_dict):
         print("start checking if metodica have the correct description")
-        error_list = []
+        error_dict.update({'error_metodica_descrizione': []})
         
         for index, row in df_mapping.iterrows():
             Metodica_string = row["Codice Metodica"].split(",")
@@ -357,18 +383,25 @@ class knowledge_action():
                 for metodica in Metodica_string:
                     if metodica != "":
                         metodica_catalogo = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                    
-                        if metodica_catalogo["Metodica Rilevata"].values[0] not in Description_list:
-                            print("la descrizione metodica non è presente all'indice " + str(index))
-                            flag_error = True
-
+                        
+                        try:
+                            if metodica_catalogo["Metodica Rilevata"].values[0] not in Description_list:
+                                print("la descrizione metodica non è presente all'indice " + str(int(index)+2))
+                                flag_error = True
+                        except:
+                            if metodica_catalogo.size == 0:
+                                print("print metodica_catalogo2:" + metodica_catalogo)
+                                print("controllare manualmente qual'è il problema")
+                                logging.error("controllare manualmente la metodica: " + metodica + " all'indice: " + str(int(index)+2))
+                                flag_error = True
             if flag_error == True:
-                error_list.append(str(int(index)+2))
+                error_dict['error_metodica_separatore'].append(str(int(index)+2))
 
-        return error_list
+        return error_dict
 
-    def ck_distretti_inprestazione(self, df_mapping, sheet_Distretti):
+    def ck_distretti_inprestazione(self, df_mapping, sheet_Distretti, error_dict):
         print("start checking if distretti are correct")
-        error_list = []
+        error_dict.update({'error_distretti_inprestazione': []})
 
         for index, row in df_mapping.iterrows():
             Distretto_string = row["Codice Distretto"].split(",")
@@ -390,41 +423,42 @@ class knowledge_action():
                                     print("correct Disciplina")
                                 else: # se non è uguale è errore
                                     print("error distretto on index:" + str(int(index)+2))
-                                    error_list.append(str(int(index)+2))
+                                    error_dict['error_distretti_inprestazione'].append(str(int(index)+2))
                             else:
                                 print("disciplina diversa da quella di distretto: " + str(d))
                     else:
                         disci_flag = True
 
             if disci_flag == False: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
-                error_list.append(str(int(index)+2))
+                error_dict['error_distretti_inprestazione'].append(str(int(index)+2))
             disci = str(row["Disciplina Agenda"])
 
-        return error_list
+        return error_dict
 
-    def ck_distretti_separatore(self, df_mapping):
+    def ck_distretti_sintassi(self, df_mapping, error_dict):
         print("start checking if there is ',' separator between each distretti defined")
-        error_list = []
+        error_dict.update({
+            'error_distretti_caratteri_non_consentiti': [],
+            'error_distretti_trovato_spazio': []
+        })
         string_check = re.compile('1234567890,M')
 
         for index, row in df_mapping.iterrows():
-            print("Distretto: " + row["Codice Distretto"])
-            flag_error = False
+            #print("Distretto: " + row["Codice Distretto"])
             if row["Codice Distretto"] is not None:
-                if(string_check.search(row["Codice Distretto"]) == None):
-                    print("String does not contain other characters") 
-                else: 
+                r = row["Codice Distretto"].strip()
+                if(string_check.search(row["Codice Distretto"]) != None):
                     print("String contains other Characters.")
-                    flag_error = True
+                    error_dict['error_distretti_caratteri_non_consentiti'].append(str(int(index)+2))
+                elif " " in r: 
+                    print("string contain space")
+                    error_dict['error_distretti_trovato_spazio'].append(str(int(index)+2))
+    
+        return error_dict
 
-            if flag_error == True:
-                error_list.append(str(int(index)+2))
-
-        return error_list
-
-    def ck_distretti_descrizione(self, df_mapping, sheet_Distretti):
+    def ck_distretti_descrizione(self, df_mapping, sheet_Distretti, error_dict):
         print("start checking if distretti have the correct description")
-        error_list = []
+        error_dict.update({'error_distretti_descrizione': []})
 
         for index, row in df_mapping.iterrows():
             Distretto_string = row["Codice Distretto"].split(",")
@@ -438,29 +472,65 @@ class knowledge_action():
                 for distretto in Distretto_string:
                     if distretto != "":
                         distretto_catalogo = sheet_Distretti.loc[sheet_Distretti["Codice Distretto"] == distretto]                    
-                        if distretto_catalogo["Distretti"].values[0] not in Description_list:
-                            print("la descrizione distretto non è presente all'indice " + str(index))
-                            flag_error = True
-
+                        
+                        try:
+                            if distretto_catalogo["Distretti"].values[0] not in Description_list:
+                                print("la descrizione distretto non è presente all'indice " + str(int(index)+2))
+                                flag_error = True
+                        except:
+                            if distretto_catalogo.size == 0:
+                                print("print distretto_catalogo2:" + distretto_catalogo)
+                                print("controllare manualmente qual'è il problema")
+                                logging.error("controllare manualmente il distretto: " + distretto + " all'indice: " + str(int(index)+2))
+                                flag_error = True
             if flag_error == True:
-                error_list.append(str(int(index)+2))
+                error_dict['error_distretti_descrizione'].append(str(int(index)+2))
 
-        return error_list
+        return error_dict
 
-    def ck_prime_visite(self, df_mapping):
-        error_list = []
-        return error_list
+    '''Nel caso di prestazioni prime visite, controllare se è definita almeno una priorità'''
+    def ck_prime_visite(self, df_mapping, error_dict): 
+        #Descrizione Prestazione SISS
+        print("start checking if prestazione prime visite is correct")
+        error_dict.update({'error_prime_visite': []})
+        
+        str_check = "PRIMA VISITA"
+        for index, row in df_mapping.iterrows():
+            if str_check in row["Descrizione Prestazione SISS"]:
+                logging.info("Prestazione PRIMA VISITA da controllare all'indice: " + str(int(index)+2))
+                if row["Priorità U"] == "N" and row["Priorità Primo Accesso D"] == "N" and row["Priorità Primo Accesso P"] == "N" and row["Priorità Primo Accesso B"] == "N": 
+                    logging.error("trovato anomalia in check prime visite all'indice: " + str(int(index)+2))
+                    error_dict["error_prime_visite"].append(str(int(index)+2))
+        return error_dict
 
-    def ck_controlli(self, df_mapping):
-        error_list = []
-        return error_list
+    '''Nel caso di prestazione visita di controllo, verificare se è presente il campo Accesso programmabile ZP'''
+    def ck_controlli(self, df_mapping, error_dict):
+        print("start checking if prestazione controlli is correct")
+        error_dict.update({'error_controlli': []})
 
-    def ck_esami_strumentali(self, df_mapping):
-        error_list = []
-        return error_list
+        str_check = "CONTROLLO"
+        for index, row in df_mapping.iterrows():
+            if str_check in row["Descrizione Prestazione SISS"]:
+                logging.info("Prestazione CONTROLLO da controllare all'indice: " + str(int(index)+2))
+                if row["Accesso Programmabile ZP"] == "N": 
+                    logging.error("trovato anomalia in check prestazione controllo all'indice: " + str(int(index)+2))
+                    error_dict["error_controlli"].append(str(int(index)+2))
+        return error_dict
 
-    def _validation(self, error_list):
-        print("questi sono gli errori indivuduati e separati per categoria:\n %s", error_list)
+    '''Nel caso di prestazioni per esami strumentale, controllare se le priorità sono definite'''
+    def ck_esami_strumentali(self, df_mapping, error_dict):
+        print("start checking if prestazione esami is correct")
+        error_dict.update({'error_esami_strumentali': []})
+
+        return error_dict
+
+    def ck_casi_1n(self, df_mapping, error_dict):
+        print("start checking if casi 1:n is correct")
+        error_dict.update({'error_casi_1n': []})
+        return error_dict
+
+    def _validation(self, error_dict):
+        print("questi sono gli errori indivuduati e separati per categoria:\n %s", error_dict)
         
         '''df = pd.DataFrame(rows_list)
         with pd.ExcelWriter(self.file_name, engine='openpyxl', mode='a') as writer:
