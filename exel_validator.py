@@ -86,17 +86,17 @@ class Check_action():
         QD_error = self.check_qd(df_mapping, sheet_QD)
         #QD_error = {}
         print("Fase 2") #FASE 2: CONTROLLO LE METODICHE
-        metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
-        #metodiche_error = {}
+        #metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
+        metodiche_error = {}
         print("Fase 3") #FASE 3: CONTROLLO I DISTRETTI
-        distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
-        #distretti_error = {}
+        #distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
+        distretti_error = {}
         print("Fase 4") #FASE 4: CONTROLLO LE PRIORITA'
-        priorita_error = self.check_priorita(df_mapping)
-        #priorita_error = {}
+        #priorita_error = self.check_priorita(df_mapping)
+        priorita_error = {}
         print("Fase 5") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
-        univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
-        #univocita_prestazione_error = {}
+        #univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
+        univocita_prestazione_error = {}
 
         error_dict = {
             "QD_error": QD_error,
@@ -255,23 +255,31 @@ class Check_action():
         print("start checking if there is ',' separator between each QD defined")
         error_dict.update({
             'error_QD_caratteri_non_consentiti': [],
-            'error_QD_trovato_spazio': []
+            'error_QD_spazio_bordi': [],
+            'error_QD_spazio_internamente': [],
         })
         string_check = re.compile('1234567890,Q')
 
         for index, row in df_mapping.iterrows():
             print("QD: " + row["Codice Quesito Diagnostico"])
             if row["Abilititazione Esposizione SISS"] == "S": 
-                flag_error = False
+                #flag_error = False
                 if row["Codice Quesito Diagnostico"] is not None:
-                    r = row["Codice Quesito Diagnostico"].strip()
-                    if(string_check.search(row["Codice Quesito Diagnostico"]) != None):
+                    row_replace = row["Codice Quesito Diagnostico"].replace(" ", "")
+                    if " " in row["Codice Quesito Diagnostico"]:
+                        if " " in row_replace.strip():
+                            print("string contain space inside the string")
+                            error_dict['error_QD_spazio_internamente'].append(str(int(index)+2))
+                        else:
+                            print("string contain space in the border")
+                            error_dict['error_QD_spazio_bordi'].append(str(int(index)+2))
+                    elif(string_check.search(row_replace) != None):
                         print("String contains other Characters.")
                         error_dict['error_QD_caratteri_non_consentiti'].append(str(int(index)+2))
-                        flag_error = True
-                    elif " " in r:
-                        print("string contain space")
-                        error_dict['error_QD_trovato_spazio'].append(str(int(index)+2))
+                        #flag_error = True
+                    #elif " " in r:
+                    #    print("string contain space")
+                    #    error_dict['error_QD_trovato_spazio'].append(str(int(index)+2))
                     #else: 
                     #    print("String does not contain other characters") 
 
@@ -282,37 +290,57 @@ class Check_action():
 
     def ck_QD_disciplina_descrizione(self, df_mapping, sheet_QD, error_dict):
         print("start checking if there are the relative QD description")
-        error_dict.update({'error_QD_disciplina_descrizione': []})
+        error_dict.update({
+            'error_QD_disciplina_descrizione': [],
+            'error_QD_descrizione_space_bordo': [],
+            'error_QD_descrizione_space_interno': []
+        })
         
         for index, row in df_mapping.iterrows():
             if row["Abilititazione Esposizione SISS"] == "S":
                 QD_string = row["Codice Quesito Diagnostico"].split(",")
-                Description_list = row["Descrizione Quesito Diagnostico"].split(",")
+                description_list = row["Descrizione Quesito Diagnostico"]#.split(",")
                 flag_error = False
-                if len(QD_string) != len(Description_list):
+                if len(QD_string) != len(description_list):
                     print("il numero di descrizioni è diverso dal numero di QD all'indice " + str(index))
                     flag_error = True
 
                 if QD_string is not None:
                     for QD in QD_string:
                         if QD != "":
+                            QD.replace(" ", "")
                             QD_catalogo = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD]  
                             #print("QD: " + str(QD)) 
+                            #try:
+                            
+
+                            if description_list != description_list.strip(): #there is a space in the beginning or in the end
+                                error_dict['error_QD_descrizione_space_bordo'].append(str(int(index)+2))
+                                description_list = description_list.strip()
+
+                            if " ," in description_list or ", " in description_list:
+                                #print("print QD_catalogo2:" + QD_catalogo)
+                                #print("controllare manualmente qual'è il problema")
+                                print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", description_list: %s", description_list)
+                                logging.error("controllare QD: " + QD + " all'indice: " + str(int(index)+2))
+                                error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))
+                                description_list.replace(", ", ",")
+                                description_list.replace(" ,", ",")
                             try:
-                                if QD_catalogo["Quesiti Diagnostici"].values[0] not in Description_list:
+                                if QD_catalogo["Quesiti Diagnostici"].values[0] not in description_list:
                                     print("la descrizione QD non è presente all'indice " + str(int(index)+2))
+                                    print("QD: " + QD + ", Quesiti Diagnostici: " + QD_catalogo["Quesiti Diagnostici"].values[0] + ", Description_list: %s", Description_list)
                                     flag_error = True
-                            except:
-                                if QD_catalogo.size == 0:
-                                    print("print QD_catalogo2:" + QD_catalogo)
-                                    print("controllare manualmente qual'è il problema")
-                                    logging.error("controllare manualmente il QD: " + QD + " all'indice: " + str(int(index)+2))
-                                    flag_error = True
-                            #print("QD_catalogo: " + QD_catalogo["Quesiti Diagnostici"].values[0])     
-                            #print("Description_list: %s", Description_list)            
+                            except: #togliere try/catch e gestire gli spazi nell'if sopra
+                                print("print QD_catalogo2:" + QD_catalogo)
+                                print("controllare manualmente qual'è il problema")
+                                print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", Description_list: %s", Description_list)
+                                #logging.error("controllare manualmente il QD: " + QD + " all'indice: " + str(int(index)+2))
+                                #error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))  
+                                      
                             
                 if flag_error == True:
-                    error_dict['error_QD_disciplina_descrizione'].append(str(int(index)+2))
+                   error_dict['error_QD_disciplina_descrizione'].append(str(int(index)+2))  
 
         return error_dict
 
