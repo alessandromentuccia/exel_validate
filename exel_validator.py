@@ -117,8 +117,9 @@ class Check_action():
         error_QD_agenda = self.ck_QD_agenda(df_mapping, error_QD_sintassi)
         error_QD_disciplina_agenda = self.ck_QD_disciplina_agenda(df_mapping, sheet_QD, error_QD_agenda)
         error_QD_disciplina_descrizione = self.ck_QD_disciplina_descrizione(df_mapping, sheet_QD, error_QD_disciplina_agenda)
-        
-        error_dict = error_QD_disciplina_descrizione
+        error_QD_operatori_logici = self.ck_QD_operatori_logici(df_mapping, error_QD_disciplina_descrizione)
+
+        error_dict = error_QD_operatori_logici
         '''error_list = {
             "error_QD_agenda": error_QD_agenda,
             "error_QD_disciplina_agenda": error_QD_disciplina_agenda,
@@ -135,8 +136,9 @@ class Check_action():
         error_metodica_sintassi = self.ck_metodica_sintassi(df_mapping, error_dict)
         error_metodica_inprestazione = self.ck_metodica_inprestazione(df_mapping, sheet_Metodiche, error_metodica_sintassi)
         error_metodica_descrizione = self.ck_metodica_descrizione(df_mapping, sheet_Metodiche, error_metodica_inprestazione)
-        
-        error_dict = error_metodica_descrizione
+        error_metodica_operatori_logici = self.ck_metodica_operatori_logici(df_mapping, error_metodica_descrizione)
+
+        error_dict = error_metodica_operatori_logici
         '''error_dict = {
             "error_metodica_inprestazione": error_metodica_inprestazione,
             "error_metodica_separatore": error_metodica_separatore,
@@ -153,8 +155,9 @@ class Check_action():
         error_distretti_sintassi = self.ck_distretti_sintassi(df_mapping, error_dict)
         error_distretti_inprestazione = self.ck_distretti_inprestazione(df_mapping, sheet_Distretti, error_distretti_sintassi)
         error_distretti_descrizione = self.ck_distretti_descrizione(df_mapping, sheet_Distretti, error_distretti_inprestazione)
-        
-        error_dict = error_distretti_descrizione
+        error_distretti_operatori_logici = self.ck_distretti_operatori_logici(df_mapping, error_distretti_descrizione)
+
+        error_dict = error_distretti_operatori_logici
         '''error_dict = {
             "error_distretti_inprestazione": error_distretti_inprestazione,
             "error_distretti_separatore": error_distretti_separatore,
@@ -301,14 +304,14 @@ class Check_action():
                 QD_string = row["Codice Quesito Diagnostico"].split(",")
                 description_list = row["Descrizione Quesito Diagnostico"]#.split(",")
                 flag_error = False
-                if len(QD_string) != len(description_list):
+                if len(QD_string) != len(row["Descrizione Quesito Diagnostico"].split(",")):
                     print("il numero di descrizioni è diverso dal numero di QD all'indice " + str(index))
                     flag_error = True
 
                 if QD_string is not None:
                     for QD in QD_string:
                         if QD != "":
-                            QD.replace(" ", "")
+                            QD = QD.strip()
                             QD_catalogo = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD]  
                             #print("QD: " + str(QD)) 
                             #try:
@@ -316,25 +319,27 @@ class Check_action():
 
                             if description_list != description_list.strip(): #there is a space in the beginning or in the end
                                 error_dict['error_QD_descrizione_space_bordo'].append(str(int(index)+2))
+                                logging.error("ERROR SPACE BORDI: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
                                 description_list = description_list.strip()
 
                             if " ," in description_list or ", " in description_list:
                                 #print("print QD_catalogo2:" + QD_catalogo)
                                 #print("controllare manualmente qual'è il problema")
                                 print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", description_list: %s", description_list)
-                                logging.error("controllare QD: " + QD + " all'indice: " + str(int(index)+2))
+                                logging.error("ERROR SPACE INTERNO: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
                                 error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))
-                                description_list.replace(", ", ",")
-                                description_list.replace(" ,", ",")
+                                description_list = description_list.replace(", ", ",")
+                                description_list = description_list.replace(" ,", ",")
                             try:
-                                if QD_catalogo["Quesiti Diagnostici"].values[0] not in description_list:
+                                if QD_catalogo["Quesiti Diagnostici"].values[0] not in description_list.split(","):
                                     print("la descrizione QD non è presente all'indice " + str(int(index)+2))
                                     print("QD: " + QD + ", Quesiti Diagnostici: " + QD_catalogo["Quesiti Diagnostici"].values[0] + ", Description_list: %s", Description_list)
+                                    logging.error("ERROR DESCRIZIONE: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
                                     flag_error = True
                             except: #togliere try/catch e gestire gli spazi nell'if sopra
-                                print("print QD_catalogo2:" + QD_catalogo)
-                                print("controllare manualmente qual'è il problema")
-                                print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", Description_list: %s", Description_list)
+                                #print("print QD_catalogo2:" + QD_catalogo)
+                                print("controllare manualmente qual'è il problema all'indice: " + str(int(index)+2))
+                                print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", Description_list: %s", description_list)
                                 #logging.error("controllare manualmente il QD: " + QD + " all'indice: " + str(int(index)+2))
                                 #error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))  
                                       
@@ -343,6 +348,26 @@ class Check_action():
                    error_dict['error_QD_disciplina_descrizione'].append(str(int(index)+2))  
 
         return error_dict
+
+    def ck_QD_operatori_logici(self, df_mapping, error_dict):
+        print("start checking if there are the same logic op. for each agenda")
+        error_dict.update({'error_QD_operatori_logici': []})
+        
+        agenda = df_mapping['Codice SISS Agenda'].iloc[2]
+        last_OP = df_mapping['Operatore Logico Quesito Diagnostico'].iloc[2]
+        for index, row in df_mapping.iterrows():
+            if row["Abilititazione Esposizione SISS"] == "S":
+                if row["Codice SISS Agenda"] == agenda:
+                    if row["Operatore Logico Quesito Diagnostico"] != last_OP:
+                        print("error OP at index:" +  str(int(index)+2))
+                        error_dict['error_QD_operatori_logici'].append(str(int(index)+2))
+                else: 
+                    agenda = row["Codice SISS Agenda"]
+                    last_OP = row["Operatore Logico Quesito Diagnostico"]
+
+        print("error_dict: %s", error_dict)
+        return error_dict
+
 
     def ck_metodica_inprestazione(self, df_mapping, sheet_Metodiche, error_dict):
         print("start checking if metodica are correct")
@@ -385,7 +410,8 @@ class Check_action():
         print("start checking if there is ',' separator between each metodiche defined")
         error_dict.update({
             'error_metodica_caratteri_non_consentiti': [],
-            'error_metodica_trovato_spazio': []
+            'error_metodica_spazio_bordi': [],
+            'error_metodica_spazio_internamente': []
         })
         string_check = re.compile('1234567890,M')
 
@@ -394,7 +420,7 @@ class Check_action():
                 print("Metodica: " + row["Codice Metodica"])
                 #flag_error = False
                 if row["Codice Metodica"] is not None:
-                    r = row["Codice Metodica"].strip()
+                    '''r = row["Codice Metodica"].strip()
                     if(string_check.search(row["Codice Metodica"]) != None):
                         print("String contains other Characters.")
                         #flag_error = True
@@ -402,6 +428,19 @@ class Check_action():
                     elif " " in r:
                         print("string contain space")
                         error_dict['error_metodica_trovato_spazio'].append(str(int(index)+2))
+                    '''
+                    row_replace = row["Codice Metodica"].replace(" ", "")
+                    if " " in row["Codice Metodica"]:
+                        if " " in row_replace.strip():
+                            print("string contain space inside the string")
+                            error_dict['error_metodica_spazio_internamente'].append(str(int(index)+2))
+                        else:
+                            print("string contain space in the border")
+                            error_dict['error_metodica_spazio_bordi'].append(str(int(index)+2))
+                    elif(string_check.search(row_replace) != None):
+                        print("String contains other Characters.")
+                        error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
+                    
 
             #if flag_error == True:
             #    error_dict['error_metodica_separatore'].append(str(int(index)+2))
@@ -438,6 +477,28 @@ class Check_action():
                 if flag_error == True:
                     error_dict['error_metodica_separatore'].append(str(int(index)+2))
 
+        return error_dict
+
+    def ck_metodica_operatori_logici(self, df_mapping, error_dict):
+        print("start checking if there are the same logic op. for each prestazione")
+        error_dict.update({'error_metodica_operatori_logici': []})
+        #problema: dovrei ordinare il file con la colonna prestazioni, ma così mi perderei 
+        # l'ordine per mostrare i risultati. Stesso problema se andassi a filtrarmi le prestazioni nel file.
+        # Possibile soluzione: filtro su prestazione, check OP, se è errore vado a ricercare 
+        # l'indice del record.
+        last_prestazione = df_mapping['Codice Prestazione SISS'].iloc[2]
+        last_OP = df_mapping['Operatore Logico Quesito Diagnostico'].iloc[2]
+        for index, row in df_mapping.iterrows():
+            if row["Abilititazione Esposizione SISS"] == "S":
+                if row["Codice SISS Agenda"] == last_prestazione:
+                    if row["Operatore Logico Quesito Diagnostico"] != last_OP:
+                        print("error OP at index:" +  str(int(index)+2))
+                        error_dict['error_QD_operatori_logici'].append(str(int(index)+2))
+                else: 
+                    agenda = row["Codice SISS Agenda"]
+                    last_OP = row["Operatore Logico Quesito Diagnostico"]
+
+        print("error_dict: %s", error_dict)
         return error_dict
 
     def ck_distretti_inprestazione(self, df_mapping, sheet_Distretti, error_dict):
@@ -531,6 +592,9 @@ class Check_action():
                     error_dict['error_distretti_descrizione'].append(str(int(index)+2))
 
         return error_dict
+
+    def ck_distretti_operatori_logici(self, df_mapping, error_dict):
+        return error_dict   
 
     '''Nel caso di prestazioni prime visite, controllare se è definita almeno una priorità'''
     def ck_prime_visite(self, df_mapping, error_dict): 

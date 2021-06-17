@@ -72,8 +72,9 @@ controllo colonna 1:n e filtrare su una agenda e una prestazione e controllare c
 18. definire i check per gli operatori logici per QD, metodiche e distretti 
 19. definire un container docker
 
-fare piano ferie
+fare piano ferie $$
 mandare mail provisiong
-call alle 10
+call alle 10 $$
 chiedere del lettore carta
 chiedere come avere la vpn bvtech per 
+stima progetto
