@@ -52,7 +52,7 @@ controllo colonna 1:n e filtrare su una agenda e una prestazione e controllare c
 
 
 - COSE DA FARE:
-1. check ck_esami_strumentali
+1. check ck_esami_strumentali $OK$
 2. controllare se posso separare dei check in ck_QD_disciplina_agenda
 3. check ck_casi_1n $OK$
 4. studiare come mostrare i risultati in modo più pulito
@@ -69,8 +69,13 @@ controllo colonna 1:n e filtrare su una agenda e una prestazione e controllare c
 15. problemi in ck_QD_discplina_descrizione nel caso QD presenta uno spazio alla fine e nel caso la descrizione presenta uno spazio dopo la virgola. eseguire quindi un controllo sugli spazi in eccesso definendo un errore, di seguito eliminare gli spazi e verificare che le descrizioni riportate sono corrette
 16. modificare ck_QD_sintatti e gli altri check sintassi in modo che prima si verifica che non ci siano spazi in cima e in fondo, poi controllare che non ci siano spazi in mezzo o caratteri speciali. Deve fornire 3 tipologie
 17. creare una documentazione per il rilascio
-18. definire i check per gli operatori logici per QD, metodiche e distretti 
+18. definire i check per gli operatori logici per QD e distretti $OK$
 19. definire un container docker
+20. modificare controllo 1:n mettendo il filtro sui distretti che siano diversi $OK$
+21. definire un controllo a monte per riuscire ad identificare che ogni colonna sia nominata in modo corretto
+22. controllare che per le discipline siano presenti due colonne: cod disciplina e descrizione disciplina
+23. in prestazione check verificare i codici SISS e non i codici disciplina $OK$
+24. modificare da dove prendo la disciplina...codice disciplina da catalogo $Ok$
 
 fare piano ferie $$
 mandare mail provisiong
@@ -78,3 +83,4 @@ call alle 10 $$
 chiedere del lettore carta
 chiedere come avere la vpn bvtech per 
 stima progetto
+

@@ -128,3 +128,19 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .vscode/launch.json
+
+venv/
+
+*.pyc
+__pycache__/
+
+instance/
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+dist/
+build/
+*.egg-info/
+CCM-estrazione tracciato ARIA-GP-20210611_NOTE ARIA.xlsx
