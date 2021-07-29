@@ -13,7 +13,6 @@ A partire dal file di mapping compilato dalla struttura (che di solito contiene 
 - per ogni prestazione sono inserite le Metodiche di pertinenza
 - tutte le metodiche hanno lo stesso separatore
 - se non ci sono le descrizioni corrispondenti vengono inserite
-- operatore logico coerente con prestazione
 
 ### AMBITO DISTRETTI
 - per ogni prestazione sono inserite i Distretti di pertinenza
@@ -84,3 +83,11 @@ chiedere del lettore carta
 chiedere come avere la vpn bvtech per 
 stima progetto
 
+
+VERIFICATE:
+index: "error_distretti_descrizione": ["721", "724", "726", "727", "728", "733", "735", "736", "737", "741", "742", "743", "745", "748"] -> distretto D00197 inesistente per la prestazione
+
+"error_controlli": ["1192", "1203", "1214", "1228"]
+"error_casi_1n": ["17"] -> index 16 e 17
+DESCRIZIONISISSAGENDA valorizzate a "."
+DESCRIZIONISISSAGENDA "1 VISITA + ECG": è combinata?

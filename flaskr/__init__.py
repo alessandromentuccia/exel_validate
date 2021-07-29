@@ -7,7 +7,7 @@ from time import sleep
 from flask import Flask, flash, request, redirect, url_for, jsonify, send_file, render_template
 from flask import send_from_directory
 # local imports
-import exel_validator
+from exel_validator import Check_action
 # flask global vars
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
