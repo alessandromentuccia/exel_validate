@@ -21,6 +21,7 @@ import yaml
 #from openpyxl.utils import get_column_letter
 
 from Vale_validator_check.Vale_validator import Validator
+from check.check_QD import check_QD
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -84,7 +85,7 @@ class Check_action():
     def __init__(self):
 
         self.output_message = ""
-        with open("./flaskr/config_validator_metodiche_vale.yml", "rt", encoding='utf8') as yamlfile:
+        with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
             data = yaml.load(yamlfile, Loader=yaml.FullLoader)
         logger.debug(data)
         self.work_sheet = data[0]["work_column"]["work_sheet"] 
@@ -132,14 +133,14 @@ class Check_action():
 
     def read_exel_file(self, template_file):
         #pd.set_option("display.max_rows", None, "display.max_columns", None)
-        df_mapping = pd.read_excel(template_file, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str}).replace(np.nan, '', regex=True)
+        df_mapping = pd.read_excel(template_file, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str}).replace(np.nan, '', regex=True)
         #print ("print JSON")
         #print(sh)
         
         catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD' )
-        sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE' )
+        sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
         sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI' )
         
         print("sheet_QD caricato\n")
@@ -159,17 +160,17 @@ class Check_action():
         print('Start analisys:\n', df_mapping)
 
         print("Fase 1") #FASE 1: CONTROLLO I QUESITI DIAGNOSTICI
-        #QD_error = self.check_qd(df_mapping, sheet_QD)
-        QD_error = {}
+        QD_error = self.check_qd(df_mapping, sheet_QD)
+        #QD_error = {}
         print("Fase 2") #FASE 2: CONTROLLO LE METODICHE
         metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
         #metodiche_error = {}
         print("Fase 3") #FASE 3: CONTROLLO I DISTRETTI
-        #distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
-        distretti_error = {}
+        distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
+        #distretti_error = {}
         print("Fase 4") #FASE 4: CONTROLLO LE PRIORITA'
-        #priorita_error = self.check_priorita(df_mapping)
-        priorita_error = {}
+        priorita_error = self.check_priorita(df_mapping)
+        #priorita_error = {}
         print("Fase 5") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
         #univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
         univocita_prestazione_error = {}
@@ -289,25 +290,27 @@ class Check_action():
         print("start checking if foreach agenda there are the same QD")
         
         error_dict.update({'error_QD_agenda': []})
+        QD_dict_error = {}
         
         agenda = df_mapping[self.work_codice_agenda_siss].iloc[2]
         last_QD = df_mapping[self.work_codice_QD].iloc[2]
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
                 if row[self.work_codice_agenda_siss] == agenda:
-                    #print("- same agenda -")
                     if row[self.work_codice_QD] != last_QD:
                         print("error QD at index:" +  str(int(index)+2))
                         #error_list.append(str(int(index)+2))
                         error_dict['error_QD_agenda'].append(str(int(index)+2))
-                    #else: 
-                    #    print("correct QD")
+                        QD_dict_error = self.update_list_in_dict(QD_dict_error, str(int(index)+2), "il QD: "+ row[self.work_codice_QD] + "è diverso per la stessa agenda")
                 else: 
-                    #print("- the agenda is changed -")
                     agenda = row[self.work_codice_agenda_siss]
                     last_QD = row[self.work_codice_QD]
 
-        #print("error_dict: %s", error_dict)
+        out1 = ""
+        for ind in error_dict['error_QD_agenda']:
+            out1 = out1 + "at index: " + ind + ", ".join(QD_dict_error[ind]) + ", \n"
+        self.output_message = self.output_message + "\nerror_QD_agenda: \n" + out1
+
         return error_dict
 
     def ck_QD_disciplina_agenda(self, df_mapping, sheet_QD, error_dict):
@@ -318,6 +321,8 @@ class Check_action():
             'error_disciplina_mancante' : [],
             'error_discipline_agende_diverse': []
         }) 
+        QD_disci_dict_error = {}
+        agenda_disci_dict_error = {}
 
         wb = xlrd.open_workbook(self.file_name)
         sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
@@ -352,6 +357,7 @@ class Check_action():
                                         disci_flag_QD = True
                                         if str(int(r)+1) not in agende_error_list:
                                             agende_error_list.append(str(int(r)+1))
+                                            QD_disci_dict_error[str(int(r)+1)] = "per il QD: "+ QD + " non c'è la disciplina: " + disciplina_mapping_row
                                         print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
 
 
@@ -361,6 +367,7 @@ class Check_action():
                                 if result_disciplina != result_disciplina_last:
                                     disci_flag_agenda = True
                                     discipline_error_list.append(str(int(r)+1))
+                                    agenda_disci_dict_error = self.update_list_in_dict(agenda_disci_dict_error, str(int(r)+1), "agenda con discipline diverse: "+ result_disciplina + " e " + result_disciplina_last)
                                     print("result_disciplina: " + result_disciplina + ", result_disciplina_last: " + result_disciplina_last)
                                 else: 
                                     result_disciplina_last = result_disciplina    
@@ -368,55 +375,27 @@ class Check_action():
                     if disci_flag_QD == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
                         for age in agende_error_list:
                             error_dict['error_QD_disciplina_agenda'].append(age)
-
+                            
                     if disci_flag_agenda == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
                         for age in discipline_error_list:
                             error_dict['error_discipline_agende_diverse'].append(age)
                 else:
                     error_dict['error_disciplina_mancante'].append(str(int(index)+2))     #inserisco la riga senza disciplina negli errori
 
-                
-
-        '''for index, row in df_mapping.iterrows():
-            QD_list = row["Codice Quesito Diagnostico"].split(",")
-            disci = ""
-            if row["Abilititazione Esposizione SISS"] == "S": 
-                disci_flag = 0
-                if QD_list is not None:
-
-                    for QD in QD_list:
-                        if QD != "":
-                            short_sheet = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD.strip()]  #[str(i) for i in                      
-                            try:
-                                disciplina_mapping_row = row[self.work_codici_disciplina_catalogo]
-                            except:    
-                                disciplina_mapping_row = ""
-                                disci_flag = -1
-
-                            if disciplina_mapping_row != "":
-                                print("disciplina in catalogo disciplina 11:" + disciplina_mapping_row + " + " + disci)
-                                
-                                for d in short_sheet["Cod Disciplina"]: 
-                                    if disciplina_mapping_row == d: 
-                                        disci_flag = 1
-                                        print("disciplina in catalogo disciplina 22:" + str(disciplina_mapping_row) + " + " + disci)
-                                        if str(disciplina_mapping_row) == disci or disci == "": # controllo se disciplina è uguale a quella precedente
-                                            print("correct Disciplina")
-                                        else: # se non è uguale è errore
-                                            print("error QD on index:" + str(int(index)+2))
-                                            error_dict['error_QD_disciplina_agenda'].append(str(int(index)+2))
-                                    else: 
-                                        print("disciplina diversa da quella di QD: " + str(d))
-                            else:
-                                disci_flag = -1
-                        else:
-                            disci_flag = 1
-
-                if disci_flag == 0: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
-                    error_dict['error_QD_disciplina_agenda'].append(str(int(index)+2))
-                elif disci_flag == -1:
-                    error_dict['error_disciplina_mancante'].append(str(int(index)+2))
-                disci = str(disciplina_mapping_row)'''
+        out1 = ""
+        for ind in error_dict['error_QD_disciplina_agenda']:
+            out1 = out1 + "at index: " + ind + ", error: " + QD_disci_dict_error[ind] + ", \n"
+        out2 = ""
+        for ind in error_dict['error_discipline_agende_diverse']:
+            out2 = out2 + "at index: " + ind + ", error: " + ", ".join(agenda_disci_dict_error[ind]) + ", \n"
+        out3 = ""
+        for ind in error_dict['error_disciplina_mancante']:
+            out3 = out3 + "at index: " + ind + "disciplina mancante, \n"
+    
+        self.output_message = self.output_message + "\nerror_QD_disciplina_agenda: \n" + out1
+        self.output_message = self.output_message + "\nerror_discipline_agende_diverse: \n" + out2
+        self.output_message = self.output_message + "\nerror_disciplina_mancante: \n" + out3
+        
 
         return error_dict
             
@@ -539,7 +518,7 @@ class Check_action():
         print("start checking if metodica are correct")
         error_dict.update({'error_metodica_inprestazione': []})
         #self.output_message = self.output_message + "\nerror_metodica_inprestazione: "
-         
+        metodica_dict_error = {}
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
                 Metodica_string = row[self.work_codice_metodica].split(",")
@@ -557,11 +536,13 @@ class Check_action():
                             
                             if cod_pre_siss not in short_sheet["Codice SISS"].values:
                                 siss_flag = True
+                                metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
                                 print("error metodica on index:" + str(int(index)+2))
                             else:
                                 if cod_pre_siss != siss and siss != "":
                                     print("error metodica on index:" + str(int(index)+2))
                                     siss_flag = True
+                                    metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
 
                             '''for cod_SISS_cat in short_sheet["Codice SISS"]: 
                                 if row[self.work_codice_prestazione_siss] == cod_SISS_cat: 
@@ -580,8 +561,10 @@ class Check_action():
                 if siss_flag == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
                     error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
                 siss = str(row[self.work_codice_prestazione_siss])
-
-        out1 = ", \n".join(error_dict['error_metodica_inprestazione'])
+        out1 = ""
+        for ind in error_dict['error_metodica_inprestazione']:
+            out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
+        
         self.output_message = self.output_message + "\nerror_metodica_inprestazione: \n" + out1
             
         return error_dict
@@ -593,6 +576,7 @@ class Check_action():
             'error_metodica_spazio_bordi': [],
             'error_metodica_spazio_internamente': []
         })
+        
         string_check = re.compile('1234567890,M')
 
         for index, row in df_mapping.iterrows():
@@ -622,11 +606,11 @@ class Check_action():
                         error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
 
         out1 = ", \n".join(error_dict['error_metodica_spazio_internamente'])
-        self.output_message = self.output_message + "\nerror_metodica_caratteri_non_consentiti: \n" + out1
+        self.output_message = self.output_message + "\nerror_metodica_caratteri_non_consentiti: \n" + "at index: \n" + out1
         out2 = ", \n".join(error_dict['error_metodica_spazio_bordi'])
-        self.output_message = self.output_message + "\nerror_metodica_spazio_bordi: \n" + out2
+        self.output_message = self.output_message + "\nerror_metodica_spazio_bordi: \n" + "at index: \n" + out2
         out3 = ", \n".join(error_dict['error_metodica_spazio_internamente'])
-        self.output_message = self.output_message + "\nerror_metodica_spazio_internamente: \n" + out3
+        self.output_message = self.output_message + "\nerror_metodica_spazio_internamente: \n" + "at index: \n" + out3
             
         return error_dict
 
@@ -636,6 +620,7 @@ class Check_action():
             'error_metodica_descrizione': [],
             'error_metodica_separatore': []
             })
+        metodica_dict_error = {}
         
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -645,6 +630,7 @@ class Check_action():
                 if len(Metodica_string) != len(Description_list):
                     print("il numero di descrizioni è diverso dal numero di metodiche all'indice " + str(index))
                     flag_error = True
+                    metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), "Manca un Codice Metodica o una Descrizione")
 
                 if Metodica_string is not None:
                     for metodica in Metodica_string:
@@ -655,16 +641,22 @@ class Check_action():
                                 if metodica_catalogo["Metodica Rilevata"].values[0] not in Description_list:
                                     print("la descrizione metodica non è presente all'indice " + str(int(index)+2))
                                     flag_error = True
+                                    metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
                             except:
                                 if metodica_catalogo.size == 0:
                                     #print("print metodica_catalogo2:" + metodica_catalogo)
                                     print("exception avvennuta: controllare manualmente qual'è il problema")
                                     logging.error("controllare manualmente la metodica: " + metodica + " all'indice: " + str(int(index)+2))
                                     flag_error = True
+                                    metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
                 if flag_error == True:
-                    error_dict['error_metodica_separatore'].append(str(int(index)+2))
+                    error_dict['error_metodica_descrizione'].append(str(int(index)+2))
 
-        out1 = ", \n".join(error_dict['error_metodica_descrizione'])
+        out1 = ""
+        for ind in error_dict['error_metodica_descrizione']:
+            out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
+        
+        #out1 = ", \n".join(error_dict['error_metodica_descrizione'])
         self.output_message = self.output_message + "\nerror_metodica_descrizione: \n" + out1
         out2 = ", \n".join(error_dict['error_metodica_separatore'])
         self.output_message = self.output_message + "\nerror_metodica_separatore: \n" + out2
@@ -675,6 +667,7 @@ class Check_action():
     def ck_distretti_inprestazione(self, df_mapping, sheet_Distretti, error_dict):
         print("start checking if distretti are correct")
         error_dict.update({'error_distretti_inprestazione': []})
+        distretto_dict_error = {}
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -694,16 +687,20 @@ class Check_action():
                             if cod_pre_siss not in short_sheet["Codice SISS"].values:
                                 siss_flag = True
                                 print("error distretto on index:" + str(int(index)+2))
+                                distretto_dict_error = self.update_list_in_dict(distretto_dict_error, str(int(index)+2), distretto)
                             else:
                                 if cod_pre_siss != siss and siss != "":
                                     print("error distretto on index:" + str(int(index)+2))
                                     siss_flag = True
+                                    distretto_dict_error = self.update_list_in_dict(distretto_dict_error, str(int(index)+2), distretto)
 
                 if siss_flag == True: #se durante il mapping con la sua prestazione, questa non viene rilevata, allora è errore
                     error_dict['error_distretti_inprestazione'].append(str(int(index)+2))
                 siss = cod_pre_siss
 
-        out1 = ", \n".join(error_dict['error_distretti_inprestazione'])
+        out1 = ""
+        for ind in error_dict['error_distretti_inprestazione']:
+            out1 = out1 + "at index: " + ind + ", on distretti: " + ", ".join(distretto_dict_error[ind]) + ", \n"
         self.output_message = self.output_message + "\nerror_distretti_inprestazione: \n" + out1
             
         return error_dict
@@ -895,7 +892,7 @@ class Check_action():
         print("\nPer osservare i risultati ottenuti, controllare il file prodotto: check_excel_result.txt")
         file = open("check_excel_result.txt", "w") 
         #file.write(json.dumps(error_dict)) 
-        file.write(self.output_message)
+        file.write(self.output_message + "\n" + json.dumps(error_dict))
         file.close() 
 
     def findCell(self, sh, searchedValue, start_col):
@@ -933,6 +930,13 @@ class Check_action():
         if result_coord == []:
             return -1
         return result_coord#, result_value
+
+    def update_list_in_dict(self, dictio, index, element):
+        if index in dictio.keys():
+            dictio[index].append(element)
+        else:
+            dictio[index] = [element]
+        return dictio
 
 k = Check_action()
 
