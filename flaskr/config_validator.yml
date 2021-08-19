@@ -22,6 +22,7 @@
     work_accesso_programmabile_ZP: "PRIORITA_PP"
     
 - work_index:
+    work_index_sheet: 0
     work_index_codice_QD: 34
     work_index_op_logic_distretto: 47
     work_index_codice_SISS_agenda: 14
