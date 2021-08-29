@@ -30,7 +30,7 @@ logger.addHandler(f_handler)
 logger.addHandler(c_handler)
 
 
-class Validator():
+class Validator_v():
 
     file_name = ""
     file_data = {}

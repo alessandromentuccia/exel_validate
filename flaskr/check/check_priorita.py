@@ -104,6 +104,10 @@ class Check_priorita():
                     if row[self.work_priorita_U] == "N" and row[self.work_priorita_primo_accesso_D] == "N" and row[self.work_priorita_primo_accesso_P] == "N" and row[self.work_priorita_primo_accesso_B] == "N": 
                         logging.error("trovato anomalia in check prime visite all'indice: " + str(int(index)+2))
                         error_dict["error_prime_visite"].append(str(int(index)+2))
+        
+        out1 = ", \n".join(error_dict['error_prime_visite'])
+        self.output_message = self.output_message + "\nerror_prime_visite: \n" + "at index: \n" + out1
+        
         return error_dict
 
     '''Nel caso di prestazione visita di controllo, verificare se è presente il campo Accesso programmabile ZP'''
@@ -119,6 +123,10 @@ class Check_priorita():
                     if row[self.work_accesso_programmabile_ZP] == "N": 
                         logging.error("trovato anomalia in check prestazione controllo all'indice: " + str(int(index)+2))
                         error_dict["error_controlli"].append(str(int(index)+2))
+        
+        out1 = ", \n".join(error_dict['error_controlli'])
+        self.output_message = self.output_message + "\nerror_controlli: \n" + "at index: \n" + out1
+        
         return error_dict
 
     '''Nel caso di prestazioni per esami strumentale, controllare se le priorità sono definite'''
@@ -133,5 +141,8 @@ class Check_priorita():
                     if row[self.work_accesso_programmabile_ZP] == "N": 
                         logging.error("trovato anomalia in check esami strumentali all'indice: " + str(int(index)+2))
                         error_dict["error_esami_strumentali"].append(str(int(index)+2))
+        
+        out1 = ", \n".join(error_dict['error_esami_strumentali'])
+        self.output_message = self.output_message + "\nerror_esami_strumentali: \n" + "at index: \n" + out1
         
         return error_dict

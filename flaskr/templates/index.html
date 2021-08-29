@@ -6,18 +6,21 @@
 
 <body>
     <title>Mapping checker</title>
-    <h2>Controlla la coerenza del tuofile di mapping</h2>
-    <form method=post enctype=multipart/form-data> <input type=file name=file>
-        <button formaction="/generate">Generate</button>
+    <h2>Controlla la coerenza del tuo file di mapping</h2>
+    <h3>inserisci nel primo box il file di configurazione e nel secondo il file di mapping da validare</h3>
+    <form method=post enctype=multipart/form-data> 
+        <input type=file name=file1>
+        <input type=file name=file2>
+        <button formaction="/generate">Avvio validazione</button>
     </form>
-    <h2>Download json template file example - MINI version</h2>
+    <h2>Download YAML template configuration file example</h2>
     <form method=post>
-        <button formaction="/send-mini-example">Download mini template example</button>
+        <button formaction="/send-example">Download mini template example</button>
     </form>
-    <h2>Download json template file example - WORKING version</h2>
-    <h3>Remember to insert user and pass inside the file before testing it</h3>
-    <form method=post>
-        <button formaction="/send-working-example">Download working template example</button>
+    <h2>Upload configuration file before the validation</h2>
+    <form method=post enctype=multipart/form-data> 
+        <input type=file name=file>
+        <button formaction="/config">Upload configuration file</button>
     </form>
     <h2>LOG</h2>
     <pre id="output"></pre>

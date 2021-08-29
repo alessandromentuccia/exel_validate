@@ -7,16 +7,16 @@ from time import sleep
 from flask import Flask, flash, request, redirect, url_for, jsonify, send_file, render_template
 from flask import send_from_directory
 # local imports
-from exel_validator import Check_action
+import flaskr.validator
 # flask global vars
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-TEMPLATE_MINI_EXAMPLE = 'mini_example.json'
+TEMPLATE_MINI_EXAMPLE = 'config_validator_SUZZARA.yml'
 TEMPLATE_WORK_EXAMPLE = 'working_example.json'
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-f_handler = logging.FileHandler('generator_web_api.log', 'a+', 'utf-8')
+f_handler = logging.FileHandler('validator.log', 'a+', 'utf-8')
 c_handler = logging.StreamHandler()
 formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -33,7 +33,7 @@ def upload_file():
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
     try:
-        template_file_dict = _read_json_file(request, 'json')
+        template_file_dict = request
     except ValueError as e:
         logger.error(e)
         return str(e), 400
@@ -44,19 +44,26 @@ def generate():
         logger.error(e)
         return str(e), 400
     
-@app.route('/send-mini-example', methods=['GET', 'POST'])
-def send_mini_example():
+@app.route('/sendexample', methods=['GET', 'POST'])
+def send_example():
     try:
         return send_file(TEMPLATE_MINI_EXAMPLE,as_attachment = True, attachment_filename=TEMPLATE_MINI_EXAMPLE), 200
     except FileNotFoundError as e:
         logger.error(e)
         return str(e), 400
 
-@app.route('/send-working-example', methods=['GET', 'POST'])
-def send_working_example():
+@app.route('/config', methods=['GET', 'POST'])
+def config():
     try:
-        return send_file(TEMPLATE_WORK_EXAMPLE,as_attachment = True, attachment_filename=TEMPLATE_WORK_EXAMPLE), 200
-    except FileNotFoundError as e:
+        template_file_dict = request
+    except ValueError as e:
+        logger.error(e)
+        return str(e), 400
+    try:
+        check_action = validator.Check_action()
+        generated_validation = check_action.config(template_file_dict)
+        return send_file(generated_validation, as_attachment = True, attachment_filename=generated_validation), 200
+    except Exception as e:
         logger.error(e)
         return str(e), 400
 
@@ -73,7 +80,7 @@ def stream():
     
 
 
-def _read_json_file(request, extension):
+def _read_yml_file(request, extension):
     if 'file' not in request.files:
         raise ValueError('No file in the request')
     file = request.files['file']

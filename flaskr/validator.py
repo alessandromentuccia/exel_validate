@@ -20,12 +20,12 @@ import yaml
 #import xlsxwriter
 #from openpyxl.utils import get_column_letter
 
-from Vale_validator_check.Vale_validator import Validator
-from check.check_QD import Check_QD
-from check.check_metodiche import Check_metodiche
-from check.check_distretti import Check_distretti
-from check.check_priorita import Check_priorita
-from check.check_univocita_prestazione import Check_univocita_prestazione
+from flaskr.Vale_validator_check.Vale_validator import Validator_v
+from flaskr.check.check_QD import Check_QD
+from flaskr.check.check_metodiche import Check_metodiche
+from flaskr.check.check_distretti import Check_distretti
+from flaskr.check.check_priorita import Check_priorita
+from flaskr.check.check_univocita_prestazione import Check_univocita_prestazione
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -78,12 +78,14 @@ class Check_action():
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
 
-
     def __init__(self):
-        self.output_message = ""
-        with open("./flaskr/config_validator.yml", "rt", encoding='utf8') as yamlfile:
-            data = yaml.load(yamlfile, Loader=yaml.FullLoader)
-        logger.debug(data)
+        super().__init__()
+
+    def config(self, data):
+        #self.output_message = ""
+        #with open("./flaskr/config_validator.yml", "rt", encoding='utf8') as yamlfile:
+        #    data = yaml.load(yamlfile, Loader=yaml.FullLoader)
+        #logger.debug(data)
         self.work_sheet = data[0]["work_column"]["work_sheet"] 
         self.work_codice_prestazione_siss = data[0]["work_column"]["work_codice_prestazione_siss"]
         self.work_descrizione_prestazione_siss = data[0]["work_column"]["work_descrizione_prestazione_siss"]
@@ -114,6 +116,7 @@ class Check_action():
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
         self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
+        return " "
 
     def import_file(self):
         logging.warning("import excel")
@@ -345,7 +348,5 @@ class Check_action():
     def column_validator():
         return ""
 
-k = Check_action()
 
-k.import_file()
     

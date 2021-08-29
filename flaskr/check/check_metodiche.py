@@ -152,7 +152,6 @@ class Check_metodiche():
             'error_metodica_spazio_bordi': [],
             'error_metodica_spazio_internamente': []
         })
-        
         string_check = re.compile('1234567890,M')
 
         for index, row in df_mapping.iterrows():
@@ -181,7 +180,7 @@ class Check_metodiche():
                         print("String contains other Characters.")
                         error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
 
-        out1 = ", \n".join(error_dict['error_metodica_spazio_internamente'])
+        out1 = ", \n".join(error_dict['error_metodica_caratteri_non_consentiti'])
         self.output_message = self.output_message + "\nerror_metodica_caratteri_non_consentiti: \n" + "at index: \n" + out1
         out2 = ", \n".join(error_dict['error_metodica_spazio_bordi'])
         self.output_message = self.output_message + "\nerror_metodica_spazio_bordi: \n" + "at index: \n" + out2

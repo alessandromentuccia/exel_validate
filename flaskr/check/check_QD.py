@@ -53,6 +53,7 @@ class Check_QD():
     work_index_codice_prestazione_SISS = 0
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
+    work_index_codici_descri_disciplina_catalogo = 0
 
     def __init__(self):
         self.output_message = ""
@@ -89,7 +90,7 @@ class Check_QD():
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
         self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
-
+        self.work_index_codici_descri_disciplina_catalogo = data[1]["work_index"]["work_index_codici_descri_disciplina_catalogo"]
 
     def ck_QD_agenda(self, df_mapping, error_dict):
         print("start checking if foreach agenda there are the same QD")
@@ -123,10 +124,12 @@ class Check_QD():
         #tutti i QD di un agenda hanno la stessa disciplina
         error_dict.update({
             'error_QD_disciplina_agenda': [],
+            'error_QD_descrizione_disciplina_agenda': [],
             'error_disciplina_mancante' : [],
             'error_discipline_agende_diverse': []
         }) 
         QD_disci_dict_error = {}
+        QD_descri_disci_dict_error = {}
         agenda_disci_dict_error = {}
 
         wb = xlrd.open_workbook(self.file_name)
@@ -138,16 +141,19 @@ class Check_QD():
         agende_viewed = []
         for index, row in df_mapping.iterrows():
             disci_flag_QD = False
+            descri_disci_flag_QD = False
             disci_flag_agenda = False
             if row[self.work_codice_agenda_siss] not in agende_viewed and row[self.work_codice_QD] is not None:
                 searchedAgenda = row[self.work_codice_agenda_siss]
                 disciplina_mapping_row = row[self.work_codici_disciplina_catalogo]
+                descrizione_disciplina_mapping_row = row[self.work_descrizione_disciplina_catalogo]
                 #prendo tutte le agende con lo stesso codice
                 result = self.findCell_agenda(sheet_mapping, searchedAgenda, self.work_index_codice_SISS_agenda) #prendo tutte le righe con questa agenda
 
                 if result != -1:
                     result_disciplina_last = ""
                     agende_error_list = []
+                    descrizione_discipline_error_list = []
                     discipline_error_list = []
                     for res in result: #per ogni risultato controllo che ci sia la stessa disciplina
                         r = res.split("#")[0] #row agenda
@@ -164,7 +170,11 @@ class Check_QD():
                                             agende_error_list.append(str(int(r)+1))
                                             QD_disci_dict_error[str(int(r)+1)] = "per il QD: "+ QD + " non c'è la disciplina: " + disciplina_mapping_row
                                         print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
-
+                                    if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
+                                        descri_disci_flag_QD = True
+                                        if str(int(r)+1) not in descrizione_discipline_error_list:
+                                            descrizione_discipline_error_list.append(str(int(r)+1))
+                                            QD_descri_disci_dict_error[str(int(r)+1)] = "per il QD: "+ QD + " non c'è la descrizione disciplina: " + descrizione_disciplina_mapping_row
 
                         result_disciplina = sheet_mapping.cell(int(r), self.work_index_codici_disciplina_catalogo).value #disciplina da catalogo
                         if result_disciplina != "":
@@ -177,11 +187,11 @@ class Check_QD():
                                 else: 
                                     result_disciplina_last = result_disciplina    
                 
-                    if disci_flag_QD == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
+                    if disci_flag_QD == True: #se la disciplina non è rilevata nel catalogo allora è errore
                         for age in agende_error_list:
                             error_dict['error_QD_disciplina_agenda'].append(age)
                             
-                    if disci_flag_agenda == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
+                    if disci_flag_agenda == True: #se la disciplina è diversa in una stessa agenda, allora è errore
                         for age in discipline_error_list:
                             error_dict['error_discipline_agende_diverse'].append(age)
                 else:
@@ -196,11 +206,16 @@ class Check_QD():
         out3 = ""
         for ind in error_dict['error_disciplina_mancante']:
             out3 = out3 + "at index: " + ind + "disciplina mancante, \n"
+        out4 = ""
+        for ind in error_dict['error_discipline_agende_diverse']:
+            out4 = out4 + "at index: " + ind + ", error: " + QD_descri_disci_dict_error[ind] + ", \n"
+            
     
         self.output_message = self.output_message + "\nerror_QD_disciplina_agenda: \n" + out1
         self.output_message = self.output_message + "\nerror_discipline_agende_diverse: \n" + out2
         self.output_message = self.output_message + "\nerror_disciplina_mancante: \n" + out3
-        
+        self.output_message = self.output_message + "\nerror_discipline_agende_diverse: \n" + out4
+
         return error_dict
 
     def ck_QD_sintassi(self, df_mapping, error_dict):

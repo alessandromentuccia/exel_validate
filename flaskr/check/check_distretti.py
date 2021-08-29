@@ -152,11 +152,18 @@ class Check_distretti():
                         print("string contain space")
                         error_dict['error_distretti_trovato_spazio'].append(str(int(index)+2))
     
+        out1 = ", \n".join(error_dict['error_distretti_caratteri_non_consentiti'])
+        self.output_message = self.output_message + "\nerror_distretti_caratteri_non_consentiti: \n" + "at index: \n" + out1
+        out2 = ", \n".join(error_dict['error_distretti_trovato_spazio'])
+        self.output_message = self.output_message + "\nerror_distretti_trovato_spazio: \n" + "at index: \n" + out2
+        
         return error_dict
 
     def ck_distretti_descrizione(self, df_mapping, sheet_Distretti, error_dict):
         print("start checking if distretti have the correct description")
         error_dict.update({'error_distretti_descrizione': []})
+
+        distretti_dict_error = {}
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -176,21 +183,28 @@ class Check_distretti():
                                 if distretto_catalogo["Distretti"].values[0] not in Description_list:
                                     print("la descrizione distretto non è presente all'indice " + str(int(index)+2))
                                     flag_error = True
+                                    distretti_dict_error = self.update_list_in_dict(distretti_dict_error, str(int(index)+2), distretto)
                             except:
                                 if distretto_catalogo.size == 0:
                                     print("print distretto_catalogo2:" + distretto_catalogo)
                                     print("controllare manualmente qual'è il problema")
                                     logging.error("controllare manualmente il distretto: " + distretto + " all'indice: " + str(int(index)+2))
                                     flag_error = True
+                                    distretti_dict_error = self.update_list_in_dict(distretti_dict_error, str(int(index)+2), distretto)
                 if flag_error == True:
                     error_dict['error_distretti_descrizione'].append(str(int(index)+2))
 
+        out1 = ""
+        for ind in error_dict['error_distretti_descrizione']:
+            out1 = out1 + "at index: " + ind + ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
+        self.output_message = self.output_message + "\nerror_distretti_descrizione: \n" + out1
+        
         return error_dict
 
     def ck_distretti_operatori_logici(self, df_mapping, error_dict):
         print("start checking if there are the same logic op. for each prestazione")
         error_dict.update({'error_distretti_operatori_logici': []})
-
+        
         #catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
         wb = xlrd.open_workbook(self.file_name)
         sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
@@ -234,5 +248,6 @@ class Check_distretti():
                         print("error OP at index:" +  str(int(index)+2))
                     prestazione_checked.append(searchedProdotto)
 
-        #print("error_dict: %s", error_dict)
+        out1 = ", \n".join(error_dict['error_distretti_operatori_logici'])
+        self.output_message = self.output_message + "\nerror_distretti_operatori_logici: \n" + "at index: \n" + out1
         return error_dict   

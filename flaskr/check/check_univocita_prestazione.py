@@ -94,6 +94,7 @@ class Check_univocita_prestazione():
     def ck_casi_1n(self, df_mapping, error_dict):
         print("start checking if casi 1:n is correct")
         error_dict.update({'error_casi_1n': []})
+        casi_1n_dict_error = {}
 
         agende_list = [] #Codice SISS Agenda
         prestazioni_list = [] #Codice Prestazione SISS
@@ -111,9 +112,24 @@ class Check_univocita_prestazione():
                     metodica_distretti_list.append(m_d)
                 elif a_p in agenda_prestazione_list and m_d in metodica_distretti_list and row[self.work_abilitazione_esposizione_siss] == "S":
                     error_dict["error_casi_1n"].append(str(int(index)+2))
+                    casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p)
                     #print("trovato caso 1:n per la coppia agenda-prestazione, all'indice: " + str(int(index)+2))
                 else:
                     logging.info("trovato caso 1:n con abilitazione SISS a N corretta, all'indice: " + str(int(index)+2))
                     #print("trovato caso 1:n con abilitazione SISS a N corretta, all'indice: " + str(int(index)+2))
                     #print("A_P2: " + a_p + ", Abilititazione Esposizione SISS: " + row["Abilititazione Esposizione SISS"])
+        
+        out1 = ""
+        for ind in error_dict['error_casi_1n']:
+            out1 = out1 + "at index: " + ind + ", on agenda_prestazione: " + ", ".join(casi_1n_dict_error[ind]) + ", \n"
+        self.output_message = self.output_message + "\nerror_casi_1n: \n" + "at index: \n" + out1
         return error_dict
+
+    '''Metodo che aggiunge elemento in una lista esistente o crea la lista nel caso
+    non fosse presente
+    def update_list_in_dict(self, dictio, index, element):
+        if index in dictio.keys():
+            dictio[index].append(element)
+        else:
+            dictio[index] = [element]
+        return dictio'''
