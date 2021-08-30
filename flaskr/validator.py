@@ -78,10 +78,8 @@ class Check_action():
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
 
-    def __init__(self):
-        super().__init__()
 
-    def config(self, data):
+    def __init__(self, data, excel_file):
         #self.output_message = ""
         #with open("./flaskr/config_validator.yml", "rt", encoding='utf8') as yamlfile:
         #    data = yaml.load(yamlfile, Loader=yaml.FullLoader)
@@ -116,7 +114,9 @@ class Check_action():
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
         self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
-        return " "
+
+        self.file_data = excel_file
+
 
     def import_file(self):
         logging.warning("import excel")
@@ -126,13 +126,13 @@ class Check_action():
         template_file = Path(template_file)
         self.file_name = template_file
         if template_file.is_file(): #C:\Users\aless\csi-progetti\FaqBot\faqbot-09112020.xlsx
-            self.read_exel_file(template_file)
+            self.initializer(template_file)
         else:
             print("Il file non esiste, prova a ricaricare il file con la directory corretta.\n")
 
-    def read_exel_file(self, template_file):
+    def initializer(self):
         #pd.set_option("display.max_rows", None, "display.max_columns", None)
-        df_mapping = pd.read_excel(template_file, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str}).replace(np.nan, '', regex=True)
+        df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str}).replace(np.nan, '', regex=True)
         #print ("print JSON")
         #print(sh)
         

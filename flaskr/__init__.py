@@ -2,6 +2,7 @@ import os
 import glob
 import logging
 import json
+import yaml
 from time import sleep
 # third party import
 from flask import Flask, flash, request, redirect, url_for, jsonify, send_file, render_template
@@ -33,13 +34,15 @@ def upload_file():
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
     try:
-        template_file_dict = request
+        configuration_file = _read_yml_file1(request, 'yml')
+        excel_file = _read_yml_file2(request, 'yml')
     except ValueError as e:
         logger.error(e)
         return str(e), 400
     try:
-        generated_examples_path = generator_core.generate_examples(template_file_dict, 100)
-        return send_file(generated_examples_path,as_attachment = True, attachment_filename=generated_examples_path), 200
+        check_action = validator.Check_action(configuration_file, excel_file)
+        generated_validation = check_action.initializer()
+        return send_file(generated_validation,as_attachment = True, attachment_filename=generated_examples_path), 200
     except Exception as e:
         logger.error(e)
         return str(e), 400
@@ -88,3 +91,20 @@ def _read_yml_file(request, extension):
     # if not __is_filename_allowed(file.filename, extension):
     #     raise ValueError(f'File \"{file.filename}\" is not allowed, it must have {extension} extension')
     return template_file_dict
+
+def _read_yml_file1(request, extension):
+    if 'file1' not in request.files:
+        raise ValueError('No file in the request')
+    file = request.files['file1']
+    template_file_dict = yaml.load(file.read(), Loader=yaml.FullLoader)
+    # if not __is_filename_allowed(file.filename, extension):
+    #     raise ValueError(f'File \"{file.filename}\" is not allowed, it must have {extension} extension')
+    return template_file_dict
+
+def _read_yml_file2(request, extension):
+    if 'file2' not in request.files:
+        raise ValueError('No file in the request')
+    file = request.files['file2']
+    # if not __is_filename_allowed(file.filename, extension):
+    #     raise ValueError(f'File \"{file.filename}\" is not allowed, it must have {extension} extension')
+    return file
