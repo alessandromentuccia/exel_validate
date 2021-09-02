@@ -54,7 +54,7 @@ class Check_univocita_prestazione():
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
 
-    def __init__(self):
+    '''def __init__(self):
         self.output_message = ""
         with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
             data = yaml.load(yamlfile, Loader=yaml.FullLoader)
@@ -88,7 +88,7 @@ class Check_univocita_prestazione():
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
+        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]'''
 
     
     def ck_casi_1n(self, df_mapping, error_dict):
@@ -99,21 +99,34 @@ class Check_univocita_prestazione():
         agende_list = [] #Codice SISS Agenda
         prestazioni_list = [] #Codice Prestazione SISS
         agenda_prestazione_list = []
-        metodica_distretti_list = [] #lista delle metodiche e distretti delle prestazioni messe in lista
+        metodica_distretti_dict = {} #dict delle metodiche e distretti delle prestazioni messe in lista
         for index, row in df_mapping.iterrows():
             #if row["Abilititazione Esposizione SISS"] == "S":
-            if row[self.work_casi_1_n] != "OK" or row[self.work_casi_1_n] == "1:N":
+            if row[self.work_casi_1_n] != "OK" or row[self.work_casi_1_n] in "1:N":
                 a_p = str(row[self.work_codice_agenda_siss]) + "_" + str(row[self.work_codice_prestazione_siss])
                 m_d = row[self.work_codice_metodica] + "_" + row[self.work_codice_distretto]
-                if a_p not in agenda_prestazione_list and m_d not in metodica_distretti_list and row[self.work_abilitazione_esposizione_siss] == "S":
-                    #print("CASO 1:N corretto momentaneamente, all'indice:" + str(int(index)+2)) 
-                    #print("A_P1: " + a_p + ", Abilititazione Esposizione SISS: " + row["Abilititazione Esposizione SISS"])
-                    agenda_prestazione_list.append(a_p)
-                    metodica_distretti_list.append(m_d)
-                elif a_p in agenda_prestazione_list and m_d in metodica_distretti_list and row[self.work_abilitazione_esposizione_siss] == "S":
+                if a_p not in metodica_distretti_dict.keys() and row[self.work_abilitazione_esposizione_siss] == "S": 
+                    #if m_d not in metodica_distretti_dict[a_p]:
+                        #print("CASO 1:N corretto momentaneamente, all'indice:" + str(int(index)+2)) 
+                        #print("A_P1: " + a_p + ", Abilititazione Esposizione SISS: " + row["Abilititazione Esposizione SISS"])
+                        #agenda_prestazione_list.append(a_p)
+                        #metodica_distretti_list.append(m_d)
+                    metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
+                elif a_p in metodica_distretti_dict.keys() and m_d in metodica_distretti_dict[a_p] and row[self.work_abilitazione_esposizione_siss] == "S":
+                    metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
+                    for md in metodica_distretti_dict[a_p]:
+                        if md.split("_")[1] == "":
+                            error_dict["error_casi_1n"].append(str(int(index)+1))
+                            casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p + ": " + "caso 1:n con distretto vuoto")
                     error_dict["error_casi_1n"].append(str(int(index)+2))
-                    casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p)
+                    casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p + ": " + ", ".join(metodica_distretti_dict[a_p]))
                     #print("trovato caso 1:n per la coppia agenda-prestazione, all'indice: " + str(int(index)+2))
+                elif m_d.split("_")[1] == "" and a_p in metodica_distretti_dict.keys() and row[self.work_abilitazione_esposizione_siss] == "S":
+                    metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
+                    error_dict["error_casi_1n"].append(str(int(index)+2))
+                    casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p + ": " + "caso 1:n con distretto vuoto")
+                elif a_p in metodica_distretti_dict.keys() and m_d not in metodica_distretti_dict[a_p] and row[self.work_abilitazione_esposizione_siss] == "S":
+                    metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
                 else:
                     logging.info("trovato caso 1:n con abilitazione SISS a N corretta, all'indice: " + str(int(index)+2))
                     #print("trovato caso 1:n con abilitazione SISS a N corretta, all'indice: " + str(int(index)+2))

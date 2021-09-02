@@ -6,6 +6,7 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 import yaml
 import logging
 import re
+import openpyxl 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -54,7 +55,7 @@ class Check_metodiche():
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
 
-    def __init__(self):
+    '''def __init__(self):
         self.output_message = ""
         with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
             data = yaml.load(yamlfile, Loader=yaml.FullLoader)
@@ -88,12 +89,16 @@ class Check_metodiche():
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
+        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]'''
 
     def ck_metodica_inprestazione(self, df_mapping, sheet_Metodiche, error_dict):
         print("start checking if metodica are correct")
         error_dict.update({'error_metodica_inprestazione': []})
         #self.output_message = self.output_message + "\nerror_metodica_inprestazione: "
+        
+        #xfile = openpyxl.load_workbook(self.file_name) #qua diventerù file_data
+        #sheet = xfile.get_sheet_by_name(self.work_sheet) #modificare sheet name
+        
         metodica_dict_error = {}
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -107,7 +112,6 @@ class Check_metodiche():
                         if metodica != "":
                             short_sheet = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                      
                             
-                            #print("disciplina " + str(disciplina["Cod Disciplina"]) + " " + str(disciplina["Codice Quesito"]))
                             print("prestazione della metodica in mapping:" + cod_pre_siss + " + " + siss)
                             
                             if cod_pre_siss not in short_sheet["Codice SISS"].values:
@@ -120,29 +124,21 @@ class Check_metodiche():
                                     siss_flag = True
                                     metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
 
-                            '''for cod_SISS_cat in short_sheet["Codice SISS"]: 
-                                if row[self.work_codice_prestazione_siss] == cod_SISS_cat: 
-                                    siss_flag = True
-                                    print("prestazione della metodica in mapping 22:" + str(row[self.work_codice_prestazione_siss]) + " + " + siss)
-                                    if str(row[self.work_codice_prestazione_siss]) == siss or siss == "": # controllo se disciplina è uguale a quella precedente
-                                        print("correct Metodica")
-                                    else: # se non è uguale è errore
-                                        print("error metodica on index:" + str(int(index)+2))
-                                        error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
-                                else:
-                                    print("disciplina diversa da quella di metodica: " + str(cod_SISS_cat))
-                        else:
-                            siss_flag = True'''
-
                 if siss_flag == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
                     error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
                 siss = str(row[self.work_codice_prestazione_siss])
+
+            #sheet["BY"+str(int(index)+2)] = sheet["BY"+str(int(index)+2)].value + "check" #modificare colonna alert
+
         out1 = ""
         for ind in error_dict['error_metodica_inprestazione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
         
         self.output_message = self.output_message + "\nerror_metodica_inprestazione: \n" + out1
-            
+
+        
+
+        #xfile.save(self.file_name)    
         return error_dict
 
     def ck_metodica_sintassi(self, df_mapping, error_dict):
@@ -159,15 +155,7 @@ class Check_metodiche():
                 print("Metodica: " + row[self.work_codice_metodica])
                 #flag_error = False
                 if row[self.work_codice_metodica] is not None:
-                    '''r = row["Codice Metodica"].strip()
-                    if(string_check.search(row["Codice Metodica"]) != None):
-                        print("String contains other Characters.")
-                        #flag_error = True
-                        error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
-                    elif " " in r:
-                        print("string contain space")
-                        error_dict['error_metodica_trovato_spazio'].append(str(int(index)+2))
-                    '''
+                    
                     row_replace = row[self.work_codice_metodica].replace(" ", "")
                     if " " in row[self.work_codice_metodica]:
                         if " " in row_replace.strip():

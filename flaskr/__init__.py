@@ -35,14 +35,15 @@ def upload_file():
 def generate():
     try:
         configuration_file = _read_yml_file1(request, 'yml')
-        excel_file = _read_yml_file2(request, 'yml')
+        excel_file = _read_yml_file2(request, 'xlsx')
     except ValueError as e:
         logger.error(e)
         return str(e), 400
     try:
         check_action = validator.Check_action(configuration_file, excel_file)
         generated_validation = check_action.initializer()
-        return send_file(generated_validation,as_attachment = True, attachment_filename=generated_examples_path), 200
+        print(generated_validation)
+        return send_file(generated_validation,as_attachment = True, attachment_filename=generated_validation), 200
     except Exception as e:
         logger.error(e)
         return str(e), 400
@@ -52,21 +53,6 @@ def send_example():
     try:
         return send_file(TEMPLATE_MINI_EXAMPLE,as_attachment = True, attachment_filename=TEMPLATE_MINI_EXAMPLE), 200
     except FileNotFoundError as e:
-        logger.error(e)
-        return str(e), 400
-
-@app.route('/config', methods=['GET', 'POST'])
-def config():
-    try:
-        template_file_dict = request
-    except ValueError as e:
-        logger.error(e)
-        return str(e), 400
-    try:
-        check_action = validator.Check_action()
-        generated_validation = check_action.config(template_file_dict)
-        return send_file(generated_validation, as_attachment = True, attachment_filename=generated_validation), 200
-    except Exception as e:
         logger.error(e)
         return str(e), 400
 
@@ -96,7 +82,7 @@ def _read_yml_file1(request, extension):
     if 'file1' not in request.files:
         raise ValueError('No file in the request')
     file = request.files['file1']
-    template_file_dict = yaml.load(file.read(), Loader=yaml.FullLoader)
+    template_file_dict = yaml.load(file, Loader=yaml.FullLoader)
     # if not __is_filename_allowed(file.filename, extension):
     #     raise ValueError(f'File \"{file.filename}\" is not allowed, it must have {extension} extension')
     return template_file_dict
@@ -104,7 +90,7 @@ def _read_yml_file1(request, extension):
 def _read_yml_file2(request, extension):
     if 'file2' not in request.files:
         raise ValueError('No file in the request')
-    file = request.files['file2']
+    file = request.files['file2'].read()
     # if not __is_filename_allowed(file.filename, extension):
     #     raise ValueError(f'File \"{file.filename}\" is not allowed, it must have {extension} extension')
     return file

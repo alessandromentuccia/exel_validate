@@ -54,7 +54,7 @@ class Check_priorita():
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
 
-    def __init__(self):
+    '''def __init__(self):
         self.output_message = ""
         with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
             data = yaml.load(yamlfile, Loader=yaml.FullLoader)
@@ -88,7 +88,7 @@ class Check_priorita():
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
+        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]'''
 
     
     def ck_prime_visite(self, df_mapping, error_dict): 

@@ -10,6 +10,7 @@ from functools import reduce
 from pathlib import Path
 from typing import Dict, List
 
+
 #import openpyxl 
 import pandas as pd
 import numpy as np
@@ -37,6 +38,8 @@ f_handler.setFormatter(formatter)
 c_handler.setFormatter(formatter)
 logger.addHandler(f_handler)
 logger.addHandler(c_handler)
+
+RESULT_VALIDATION = "..\check_excel_result.txt"
 
 
 class Check_action():
@@ -111,7 +114,7 @@ class Check_action():
         self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"]
         self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"]
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
-        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
+        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] - 1
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
         self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
 
@@ -138,7 +141,7 @@ class Check_action():
         
         catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
 
-        sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD' )
+        sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
         sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI' )
         
@@ -149,7 +152,7 @@ class Check_action():
         print("sheet_Distretti caricato\n")
         #print(sheet_Distretti)
 
-        self.analizer(df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti)
+        return self.analizer(df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti)
 
     def analizer(self, df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti):
 
@@ -198,7 +201,7 @@ class Check_action():
             "distretti_validator_error": distretti_validator_error
         }
 
-        self._validation(error_dict)
+        return self._validation(error_dict)
 
     def check_column_name(self, df_mapping):
         print("check the used column name of the excel file")
@@ -255,11 +258,6 @@ class Check_action():
         error_distretti_operatori_logici = Check_distretti.ck_distretti_operatori_logici(self, df_mapping, error_distretti_descrizione)
 
         error_dict = error_distretti_operatori_logici
-        '''error_dict = {
-            "error_distretti_inprestazione": error_distretti_inprestazione,
-            "error_distretti_separatore": error_distretti_separatore,
-            "error_distretti_descrizione": error_distretti_descrizione
-        }'''
 
         return error_dict
 
@@ -289,15 +287,15 @@ class Check_action():
 
     def _validation(self, error_dict):
         print("questi sono gli errori indivuduati e separati per categoria:\n %s", error_dict)
-        
+        #self.output_message = self.output_message + "\n" + json.dumps(error_dict)
         '''df = pd.DataFrame(rows_list)
         with pd.ExcelWriter(self.file_name, engine='openpyxl', mode='a') as writer:
             df.to_excel(writer, sheet_name='new_mapping', index=False)'''
         print("\nPer osservare i risultati ottenuti, controllare il file prodotto: check_excel_result.txt")
-        file = open("check_excel_result.txt", "w") 
-        #file.write(json.dumps(error_dict)) 
-        file.write(self.output_message + "\n" + json.dumps(error_dict))
+        file = open(RESULT_VALIDATION, "w") 
+        file.write(self.output_message)
         file.close() 
+        return RESULT_VALIDATION
 
     def findCell(self, sh, searchedValue, start_col):
         result_coord = []
@@ -315,7 +313,7 @@ class Check_action():
 
         if result_coord == []:
             return -1
-        return result_coord, result_value
+        return result_coord#, result_value
 
     def findCell_agenda(self, sh, searchedValue, start_col):
         result_coord = []
@@ -324,7 +322,7 @@ class Check_action():
         for row in range(sh.nrows):
             for col in range(start_col-1, start_col):
                 myCell = sh.cell(row, col)
-                myValue = sh.cell(row, self.work_index_codice_SISS_agenda-1) #Codice SISS agenda 15
+                myValue = sh.cell(row, self.work_index_codice_SISS_agenda) #Codice SISS agenda 15
                 #abilita = sh.cell(row, self.work_index_abilitazione_esposizione_SISS-1) #abilitazione esposizione SISS 28
                 if myCell.value == searchedValue: # and abilita.value == "S":
                     result_coord.append(str(row) + "#" + str(col))

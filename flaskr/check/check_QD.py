@@ -6,6 +6,9 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 import yaml
 import logging
 import re
+from  io import BytesIO 
+import sys
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -23,6 +26,7 @@ class Check_QD():
     file_name = ""
     output_message = ""
     error_list = {}
+    file_data = {}
 
     work_sheet = "" #sheet di lavoro di df_mapping
     work_codice_prestazione_siss = ""
@@ -55,11 +59,11 @@ class Check_QD():
     work_index_codici_disciplina_catalogo = 0
     work_index_codici_descri_disciplina_catalogo = 0
 
-    def __init__(self):
-        self.output_message = ""
-        with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
-            data = yaml.load(yamlfile, Loader=yaml.FullLoader)
-        logger.debug(data)
+    '''def __init__(self, data, excel_file):
+        #self.output_message = ""
+        #with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
+        #    data = yaml.load(yamlfile, Loader=yaml.FullLoader)
+        #logger.debug(data)
         self.work_sheet = data[0]["work_column"]["work_sheet"] 
         self.work_codice_prestazione_siss = data[0]["work_column"]["work_codice_prestazione_siss"]
         self.work_descrizione_prestazione_siss = data[0]["work_column"]["work_descrizione_prestazione_siss"]
@@ -91,6 +95,7 @@ class Check_QD():
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
         self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
         self.work_index_codici_descri_disciplina_catalogo = data[1]["work_index"]["work_index_codici_descri_disciplina_catalogo"]
+        '''
 
     def ck_QD_agenda(self, df_mapping, error_dict):
         print("start checking if foreach agenda there are the same QD")
@@ -131,10 +136,16 @@ class Check_QD():
         QD_disci_dict_error = {}
         QD_descri_disci_dict_error = {}
         agenda_disci_dict_error = {}
-
-        wb = xlrd.open_workbook(self.file_name)
+       
+        #file_contents=self.file_data.getvalue()
+        wb = None
+        if self.file_name != "":
+            wb = xlrd.open_workbook(self.file_name)
+        else:
+            wb = xlrd.open_workbook(file_contents=self.file_data) #file_contents=self.file_data.read()
         sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
-        print("sheet caricato")
+        #for row in range(sheet_mapping.nrows):
+            #print(sheet_mapping.row_values(row))
         
         #disciplina_QD_column = sheet_QD[['Cod Disciplina','Codice Quesito']]
         #print("disciplina_QD_column: %s", disciplina_QD_column)
@@ -149,7 +160,7 @@ class Check_QD():
                 descrizione_disciplina_mapping_row = row[self.work_descrizione_disciplina_catalogo]
                 #prendo tutte le agende con lo stesso codice
                 result = self.findCell_agenda(sheet_mapping, searchedAgenda, self.work_index_codice_SISS_agenda) #prendo tutte le righe con questa agenda
-
+                #print("start iterate each excel row")
                 if result != -1:
                     result_disciplina_last = ""
                     agende_error_list = []
@@ -158,24 +169,34 @@ class Check_QD():
                     for res in result: #per ogni risultato controllo che ci sia la stessa disciplina
                         r = res.split("#")[0] #row agenda
                         c = res.split("#")[1] #column agenda
-
-                        result_QD = sheet_mapping.cell(int(r), self.work_index_codice_QD-1).value.split(",") #QD
+                        #print("start iterate result sheet_mapping")
+                        result_QD = sheet_mapping.cell(int(r), self.work_index_codice_QD).value.split(",") #QD
                         if result_QD is not None:
                             for QD in result_QD:
+                                #print("start iterate QD")
                                 if QD != "":
                                     short_sheet = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD.strip()]
-                                    if disciplina_mapping_row not in short_sheet["Cod Disciplina"].values:
+                                    di_list = []
+                                    for ss in short_sheet["Cod Disciplina"].values: #risolvo problema discipline con codici multipli
+                                        #print("start iterate cod disciplina" + ss)
+                                        if "\n" in ss:
+                                            ss = str(ss)
+                                            di_list = di_list + ss.split("\n")
+                                        else:
+                                            di_list.append(ss)
+                                    
+                                    if disciplina_mapping_row not in di_list:
                                         disci_flag_QD = True
                                         if str(int(r)+1) not in agende_error_list:
                                             agende_error_list.append(str(int(r)+1))
                                             QD_disci_dict_error[str(int(r)+1)] = "per il QD: "+ QD + " non c'è la disciplina: " + disciplina_mapping_row
-                                        print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
+                                            print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
                                     if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
                                         descri_disci_flag_QD = True
                                         if str(int(r)+1) not in descrizione_discipline_error_list:
                                             descrizione_discipline_error_list.append(str(int(r)+1))
                                             QD_descri_disci_dict_error[str(int(r)+1)] = "per il QD: "+ QD + " non c'è la descrizione disciplina: " + descrizione_disciplina_mapping_row
-
+                        
                         result_disciplina = sheet_mapping.cell(int(r), self.work_index_codici_disciplina_catalogo).value #disciplina da catalogo
                         if result_disciplina != "":
                             if result_disciplina_last != "": #se non è la prima iterazione
@@ -183,7 +204,7 @@ class Check_QD():
                                     disci_flag_agenda = True
                                     discipline_error_list.append(str(int(r)+1))
                                     agenda_disci_dict_error = self.update_list_in_dict(agenda_disci_dict_error, str(int(r)+1), "agenda con discipline diverse: "+ result_disciplina + " e " + result_disciplina_last)
-                                    print("result_disciplina: " + result_disciplina + ", result_disciplina_last: " + result_disciplina_last)
+                                    #print("result_disciplina: " + result_disciplina + ", result_disciplina_last: " + result_disciplina_last)
                                 else: 
                                     result_disciplina_last = result_disciplina    
                 
@@ -197,6 +218,8 @@ class Check_QD():
                 else:
                     error_dict['error_disciplina_mancante'].append(str(int(index)+2))     #inserisco la riga senza disciplina negli errori
 
+                agende_viewed.append(searchedAgenda)
+
         out1 = ""
         for ind in error_dict['error_QD_disciplina_agenda']:
             out1 = out1 + "at index: " + ind + ", error: " + QD_disci_dict_error[ind] + ", \n"
@@ -207,14 +230,14 @@ class Check_QD():
         for ind in error_dict['error_disciplina_mancante']:
             out3 = out3 + "at index: " + ind + "disciplina mancante, \n"
         out4 = ""
-        for ind in error_dict['error_discipline_agende_diverse']:
+        for ind in error_dict['error_QD_descrizione_disciplina_agenda']:
             out4 = out4 + "at index: " + ind + ", error: " + QD_descri_disci_dict_error[ind] + ", \n"
             
     
         self.output_message = self.output_message + "\nerror_QD_disciplina_agenda: \n" + out1
         self.output_message = self.output_message + "\nerror_discipline_agende_diverse: \n" + out2
         self.output_message = self.output_message + "\nerror_disciplina_mancante: \n" + out3
-        self.output_message = self.output_message + "\nerror_discipline_agende_diverse: \n" + out4
+        self.output_message = self.output_message + "\error_QD_descrizione_disciplina_agenda: \n" + out4
 
         return error_dict
 

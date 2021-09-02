@@ -54,7 +54,7 @@ class Check_distretti():
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
 
-    def __init__(self):
+    '''def __init__(self):
         self.output_message = ""
         with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
             data = yaml.load(yamlfile, Loader=yaml.FullLoader)
@@ -88,7 +88,7 @@ class Check_distretti():
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
+        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]'''
 
     
     def ck_distretti_inprestazione(self, df_mapping, sheet_Distretti, error_dict):
@@ -203,10 +203,16 @@ class Check_distretti():
 
     def ck_distretti_operatori_logici(self, df_mapping, error_dict):
         print("start checking if there are the same logic op. for each prestazione")
-        error_dict.update({'error_distretti_operatori_logici': []})
-        
+        error_dict.update({
+            'error_distretti_operatori_logici': [],
+            'error_distretti_operatori_logici_mancante': [] })
+        distretti_dict_error = {}
         #catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
-        wb = xlrd.open_workbook(self.file_name)
+        wb = None
+        if self.file_name != "":
+            wb = xlrd.open_workbook(self.file_name)
+        else:
+            wb = xlrd.open_workbook(file_contents=self.file_data) #file_contents=self.file_data.read()
         sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
         print("sheet caricato")
 
@@ -217,7 +223,6 @@ class Check_distretti():
         #last_prestazione = df_mapping['Codice Prestazione SISS'].iloc[2]
         #last_OP = df_mapping['Operatore Logico Distretto'].iloc[2]
         prestazione_checked = []
-        flag_error = False
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -241,13 +246,19 @@ class Check_distretti():
                                 #resultOP = df_mapping['Operatore Logico Distretto'].values[int(res[0])+1]
                                 print("resultOP: " + resultOP + ", operatore logico df_mapping: " + row[self.work_operatore_logico_distretto])
                                 if row[self.work_operatore_logico_distretto] != resultOP:
-                                    flag_error = True
-
-                    if flag_error == True:
-                        error_dict['error_distretti_operatori_logici'].append(str(int(index)+2))
-                        print("error OP at index:" +  str(int(index)+2))
+                                    distretti_dict_error = self.update_list_in_dict(distretti_dict_error, str(int(r)+1), "OP diversi per le prestazioni:" + searchedProdotto)
+                                    error_dict['error_distretti_operatori_logici'].append(str(int(r)+1))
+                                    print("error OP at index:" +  str(int(r)+1))
                     prestazione_checked.append(searchedProdotto)
 
-        out1 = ", \n".join(error_dict['error_distretti_operatori_logici'])
+                elif row[self.work_operatore_logico_distretto] is "" and row[self.work_codice_distretto] is not "": 
+                    error_dict['error_distretti_operatori_logici_mancante'].append(str(int(index)+2))
+                    
+        
+        out1 = ""
+        for ind in error_dict['error_distretti_operatori_logici']:
+            out1 = out1 + "at index: " + ind + ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
         self.output_message = self.output_message + "\nerror_distretti_operatori_logici: \n" + "at index: \n" + out1
+        out2 = ", \n".join(error_dict['error_distretti_operatori_logici_mancante'])
+        self.output_message = self.output_message + "\nerror_distretti_operatori_logici_mancante: \n" + "at index: \n" + out2
         return error_dict   

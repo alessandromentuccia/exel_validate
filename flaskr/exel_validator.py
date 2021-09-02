@@ -20,7 +20,7 @@ import yaml
 #import xlsxwriter
 #from openpyxl.utils import get_column_letter
 
-from Vale_validator_check.Vale_validator import Validator
+from Vale_validator_check.Vale_validator import Validator_v
 from check.check_QD import Check_QD
 from check.check_metodiche import Check_metodiche
 from check.check_distretti import Check_distretti
@@ -81,7 +81,7 @@ class Check_action():
 
     def __init__(self):
         self.output_message = ""
-        with open("./flaskr/config_validator.yml", "rt", encoding='utf8') as yamlfile:
+        with open("./flaskr/config_validator_x_automatismo.yml", "rt", encoding='utf8') as yamlfile:
             data = yaml.load(yamlfile, Loader=yaml.FullLoader)
         logger.debug(data)
         self.work_sheet = data[0]["work_column"]["work_sheet"] 
@@ -107,13 +107,13 @@ class Check_action():
         self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
-        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"]
-        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"]
-        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"]
-        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
-        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
-        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
+        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] -1
+        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"] -1
+        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"] -1
+        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"] -1
+        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] -1
+        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"] -1
+        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"] -1 
 
     def import_file(self):
         logging.warning("import excel")
@@ -135,7 +135,7 @@ class Check_action():
         
         catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
 
-        sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD' )
+        sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
         sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI' )
         
@@ -312,16 +312,16 @@ class Check_action():
 
         if result_coord == []:
             return -1
-        return result_coord, result_value
+        return result_coord#, result_value
 
     def findCell_agenda(self, sh, searchedValue, start_col):
         result_coord = []
         result_value = []
 
         for row in range(sh.nrows):
-            for col in range(start_col-1, start_col):
+            for col in range(start_col, start_col+1):
                 myCell = sh.cell(row, col)
-                myValue = sh.cell(row, self.work_index_codice_SISS_agenda-1) #Codice SISS agenda 15
+                myValue = sh.cell(row, self.work_index_codice_SISS_agenda) #Codice SISS agenda 15
                 #abilita = sh.cell(row, self.work_index_abilitazione_esposizione_SISS-1) #abilitazione esposizione SISS 28
                 if myCell.value == searchedValue: # and abilita.value == "S":
                     result_coord.append(str(row) + "#" + str(col))
@@ -342,9 +342,16 @@ class Check_action():
         return dictio
 
     '''Metodo per controllare il tipo di una colonna excel'''
-    def column_validator():
+    def column_validator(self):
         return ""
 
+    def get_file(self):
+        if self.file_name != "":
+            return self.file_name
+        elif self.file_data != "":
+            return self.file_data
+        else:
+            return None
 k = Check_action()
 
 k.import_file()
