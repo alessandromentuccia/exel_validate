@@ -7,10 +7,16 @@ from time import sleep
 # third party import
 from flask import Flask, flash, request, redirect, url_for, jsonify, send_file, render_template
 from flask import send_from_directory
+from werkzeug.utils import secure_filename
 # local imports
 import flaskr.validator
+from openpyxl import load_workbook
+dir = os.path.dirname(__file__)
+DOWNLOAD_FOLDER = os.path.join(dir, 'uploads/')
+
 # flask global vars
 app = Flask(__name__)
+app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 TEMPLATE_MINI_EXAMPLE = 'config_validator_SUZZARA.yml'
 TEMPLATE_WORK_EXAMPLE = 'working_example.json'
@@ -35,15 +41,26 @@ def upload_file():
 def generate():
     try:
         configuration_file = _read_yml_file1(request, 'yml')
-        excel_file = _read_yml_file2(request, 'xlsx')
+        #excel_file = _read_yml_file2(request, 'xlsx')
+
+        file = request.files['file2']
+        if file.filename == '':
+            print('no filename')
+            return redirect(request.url)
+        else:
+            filename = secure_filename(file.filename)
+            file.save(DOWNLOAD_FOLDER + filename)
+
     except ValueError as e:
         logger.error(e)
         return str(e), 400
     try:
-        check_action = validator.Check_action(configuration_file, excel_file)
-        generated_validation = check_action.initializer()
-        print(generated_validation)
-        return send_file(generated_validation,as_attachment = True, attachment_filename=generated_validation), 200
+        print(filename)
+        file_path = app.config['DOWNLOAD_FOLDER']  + filename
+        check_action = validator.Check_action(configuration_file, file_path)
+        check_action.initializer()
+                               
+        return send_file(file_path,as_attachment = True, attachment_filename=filename), 200
     except Exception as e:
         logger.error(e)
         return str(e), 400

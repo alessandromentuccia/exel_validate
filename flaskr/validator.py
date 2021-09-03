@@ -152,7 +152,7 @@ class Check_action():
         print("sheet_Distretti caricato\n")
         #print(sheet_Distretti)
 
-        return self.analizer(df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti)
+        self.analizer(df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti)
 
     def analizer(self, df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti):
 
@@ -201,7 +201,7 @@ class Check_action():
             "distretti_validator_error": distretti_validator_error
         }
 
-        return self._validation(error_dict)
+        self._validation(error_dict)
 
     def check_column_name(self, df_mapping):
         print("check the used column name of the excel file")
@@ -295,7 +295,7 @@ class Check_action():
         file = open(RESULT_VALIDATION, "w") 
         file.write(self.output_message)
         file.close() 
-        return RESULT_VALIDATION
+        
 
     def findCell(self, sh, searchedValue, start_col):
         result_coord = []

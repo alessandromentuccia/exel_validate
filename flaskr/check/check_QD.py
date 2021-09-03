@@ -138,15 +138,16 @@ class Check_QD():
         agenda_disci_dict_error = {}
        
         #file_contents=self.file_data.getvalue()
-        wb = None
+        '''wb = None
         if self.file_name != "":
             wb = xlrd.open_workbook(self.file_name)
         else:
             wb = xlrd.open_workbook(file_contents=self.file_data) #file_contents=self.file_data.read()
-        sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
+        sheet_mapping = wb.sheet_by_index(self.work_index_sheet)'''
         #for row in range(sheet_mapping.nrows):
             #print(sheet_mapping.row_values(row))
-        
+        wb = xlrd.open_workbook(self.file_data)
+        sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
         #disciplina_QD_column = sheet_QD[['Cod Disciplina','Codice Quesito']]
         #print("disciplina_QD_column: %s", disciplina_QD_column)
         agende_viewed = []

@@ -208,11 +208,13 @@ class Check_distretti():
             'error_distretti_operatori_logici_mancante': [] })
         distretti_dict_error = {}
         #catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
-        wb = None
+        '''wb = None
         if self.file_name != "":
             wb = xlrd.open_workbook(self.file_name)
         else:
             wb = xlrd.open_workbook(file_contents=self.file_data) #file_contents=self.file_data.read()
+        sheet_mapping = wb.sheet_by_index(self.work_index_sheet)'''
+        wb = xlrd.open_workbook(self.file_data)
         sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
         print("sheet caricato")
 
