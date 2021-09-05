@@ -96,10 +96,11 @@ class Check_metodiche():
         error_dict.update({'error_metodica_inprestazione': []})
         #self.output_message = self.output_message + "\nerror_metodica_inprestazione: "
         
-        #xfile = openpyxl.load_workbook(self.file_name) #qua diventerù file_data
-        #sheet = xfile.get_sheet_by_name(self.work_sheet) #modificare sheet name
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
         
         metodica_dict_error = {}
+        prestazioni_dict = {}
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
                 Metodica_string = row[self.work_codice_metodica].split(",")
@@ -117,28 +118,34 @@ class Check_metodiche():
                             if cod_pre_siss not in short_sheet["Codice SISS"].values:
                                 siss_flag = True
                                 metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
+                                prestazioni_dict[str(int(index)+2)] = cod_pre_siss
                                 print("error metodica on index:" + str(int(index)+2))
                             else:
                                 if cod_pre_siss != siss and siss != "":
                                     print("error metodica on index:" + str(int(index)+2))
                                     siss_flag = True
                                     metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
-
+                                    prestazioni_dict[str(int(index)+2)] = cod_pre_siss
                 if siss_flag == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
                     error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
                 siss = str(row[self.work_codice_prestazione_siss])
 
-            #sheet["BY"+str(int(index)+2)] = sheet["BY"+str(int(index)+2)].value + "check" #modificare colonna alert
-
+            
         out1 = ""
+        out_message = ""
         for ind in error_dict['error_metodica_inprestazione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
-        
+            out_message = "Metodiche: '{}' non previste per la prestazione: '{}'".format(", ".join(metodica_dict_error[ind]), prestazioni_dict[ind])
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n " + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
+
         self.output_message = self.output_message + "\nerror_metodica_inprestazione: \n" + out1
 
         
 
-        #xfile.save(self.file_name)    
+        xfile.save(self.file_data)    
         return error_dict
 
     def ck_metodica_sintassi(self, df_mapping, error_dict):

@@ -41,26 +41,18 @@ def upload_file():
 def generate():
     try:
         configuration_file = _read_yml_file1(request, 'yml')
-        #excel_file = _read_yml_file2(request, 'xlsx')
-
-        file = request.files['file2']
-        if file.filename == '':
-            print('no filename')
-            return redirect(request.url)
-        else:
-            filename = secure_filename(file.filename)
-            file.save(DOWNLOAD_FOLDER + filename)
+        excel_filename = _read_yml_file2(request, 'xlsx')
 
     except ValueError as e:
         logger.error(e)
         return str(e), 400
     try:
-        print(filename)
-        file_path = app.config['DOWNLOAD_FOLDER']  + filename
+        print(excel_filename)
+        file_path = app.config['DOWNLOAD_FOLDER']  + excel_filename
         check_action = validator.Check_action(configuration_file, file_path)
         check_action.initializer()
                                
-        return send_file(file_path,as_attachment = True, attachment_filename=filename), 200
+        return send_file(file_path,as_attachment = True, attachment_filename=excel_filename), 200
     except Exception as e:
         logger.error(e)
         return str(e), 400
@@ -107,7 +99,8 @@ def _read_yml_file1(request, extension):
 def _read_yml_file2(request, extension):
     if 'file2' not in request.files:
         raise ValueError('No file in the request')
-    file = request.files['file2'].read()
-    # if not __is_filename_allowed(file.filename, extension):
-    #     raise ValueError(f'File \"{file.filename}\" is not allowed, it must have {extension} extension')
-    return file
+    #file = request.files['file2'].read()
+    file = request.files['file2']
+    filename = secure_filename(file.filename)
+    file.save(DOWNLOAD_FOLDER + filename)
+    return filename
