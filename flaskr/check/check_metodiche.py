@@ -137,7 +137,7 @@ class Check_metodiche():
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
             out_message = "Metodiche: '{}' non previste per la prestazione: '{}'".format(", ".join(metodica_dict_error[ind]), prestazioni_dict[ind])
             if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n " + out_message #modificare colonna alert
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet["BY"+ind] = out_message
 
@@ -157,6 +157,9 @@ class Check_metodiche():
         })
         string_check = re.compile('1234567890,M')
 
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
+
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
                 print("Metodica: " + row[self.work_codice_metodica])
@@ -175,14 +178,37 @@ class Check_metodiche():
                         print("String contains other Characters.")
                         error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
 
+        #da eliminare start
         out1 = ", \n".join(error_dict['error_metodica_caratteri_non_consentiti'])
         self.output_message = self.output_message + "\nerror_metodica_caratteri_non_consentiti: \n" + "at index: \n" + out1
         out2 = ", \n".join(error_dict['error_metodica_spazio_bordi'])
         self.output_message = self.output_message + "\nerror_metodica_spazio_bordi: \n" + "at index: \n" + out2
         out3 = ", \n".join(error_dict['error_metodica_spazio_internamente'])
         self.output_message = self.output_message + "\nerror_metodica_spazio_internamente: \n" + "at index: \n" + out3
-            
-        return error_dict
+        #stop
+
+        out_message = ""
+        for ind in error_dict['error_metodica_caratteri_non_consentiti']:
+            out_message = "Metodiche presentano errori di sintassi: rilevati caratteri non consentiti"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
+        for ind in error_dict['error_metodica_spazio_bordi']:
+            out_message = "Metodiche presentano errori di sintassi: rilevati degli spazi alle estremità del contenuto della cella"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
+        for ind in error_dict['error_metodica_spazio_internamente']:
+            out_message = "Metodiche presentano errori di sintassi: rilevati degli spazi all'interno del contenuto della cella"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
+
+        xfile.save(self.file_data) 
+        return error_dict #da eliminare
     
     def ck_metodica_descrizione(self, df_mapping, sheet_Metodiche, error_dict):
         print("start checking if metodica have the correct description")
@@ -190,6 +216,10 @@ class Check_metodiche():
             'error_metodica_descrizione': [],
             'error_metodica_separatore': []
             })
+
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
+
         metodica_dict_error = {}
         
         for index, row in df_mapping.iterrows():
@@ -223,12 +253,23 @@ class Check_metodiche():
                     error_dict['error_metodica_descrizione'].append(str(int(index)+2))
 
         out1 = ""
+        out_message = ""
         for ind in error_dict['error_metodica_descrizione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
-        
-        #out1 = ", \n".join(error_dict['error_metodica_descrizione'])
+            out_message = "Metodiche: '{}' presentano errori nella descrizione".format(", ".join(metodica_dict_error[ind]))
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
         self.output_message = self.output_message + "\nerror_metodica_descrizione: \n" + out1
+        for ind in error_dict['error_metodica_separatore']:
+            out_message = "Le descrizioni metodiche presentano errori col separatore ','"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
         out2 = ", \n".join(error_dict['error_metodica_separatore'])
         self.output_message = self.output_message + "\nerror_metodica_separatore: \n" + out2
 
+        xfile.save(self.file_data) 
         return error_dict

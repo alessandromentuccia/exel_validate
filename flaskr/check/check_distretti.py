@@ -6,6 +6,7 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 import yaml
 import logging
 import re
+import openpyxl 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -95,6 +96,10 @@ class Check_distretti():
         print("start checking if distretti are correct")
         error_dict.update({'error_distretti_inprestazione': []})
         distretto_dict_error = {}
+        prestazioni_dict = {}
+
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -113,12 +118,14 @@ class Check_distretti():
                             
                             if cod_pre_siss not in short_sheet["Codice SISS"].values:
                                 siss_flag = True
+                                prestazioni_dict[str(int(index)+2)] = cod_pre_siss
                                 print("error distretto on index:" + str(int(index)+2))
                                 distretto_dict_error = self.update_list_in_dict(distretto_dict_error, str(int(index)+2), distretto)
                             else:
                                 if cod_pre_siss != siss and siss != "":
                                     print("error distretto on index:" + str(int(index)+2))
                                     siss_flag = True
+                                    prestazioni_dict[str(int(index)+2)] = cod_pre_siss
                                     distretto_dict_error = self.update_list_in_dict(distretto_dict_error, str(int(index)+2), distretto)
 
                 if siss_flag == True: #se durante il mapping con la sua prestazione, questa non viene rilevata, allora è errore
@@ -126,10 +133,18 @@ class Check_distretti():
                 siss = cod_pre_siss
 
         out1 = ""
+        out_message = ""
         for ind in error_dict['error_distretti_inprestazione']:
             out1 = out1 + "at index: " + ind + ", on distretti: " + ", ".join(distretto_dict_error[ind]) + ", \n"
+            out_message = "Distretti: '{}' non previsti per la prestazione: '{}'".format(", ".join(distretto_dict_error[ind]), prestazioni_dict[ind])
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
+
         self.output_message = self.output_message + "\nerror_distretti_inprestazione: \n" + out1
-            
+        
+        xfile.save(self.file_data)
         return error_dict
 
     def ck_distretti_sintassi(self, df_mapping, error_dict):
@@ -139,6 +154,9 @@ class Check_distretti():
             'error_distretti_trovato_spazio': []
         })
         string_check = re.compile('1234567890,M')
+
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -157,11 +175,30 @@ class Check_distretti():
         out2 = ", \n".join(error_dict['error_distretti_trovato_spazio'])
         self.output_message = self.output_message + "\nerror_distretti_trovato_spazio: \n" + "at index: \n" + out2
         
+        out_message = ""
+        for ind in error_dict['error_distretti_caratteri_non_consentiti']:
+            out_message = "Distretti presentano errori di sintassi: rilevati caratteri non consentiti"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
+        for ind in error_dict['error_distretti_trovato_spazio']:
+            out_message = "Distretti presentano errori di sintassi: rilevati degli spazi non consentiti nella cella"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
+
+        xfile.save(self.file_data) 
+
         return error_dict
 
     def ck_distretti_descrizione(self, df_mapping, sheet_Distretti, error_dict):
         print("start checking if distretti have the correct description")
         error_dict.update({'error_distretti_descrizione': []})
+
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
 
         distretti_dict_error = {}
 
@@ -195,10 +232,17 @@ class Check_distretti():
                     error_dict['error_distretti_descrizione'].append(str(int(index)+2))
 
         out1 = ""
+        out_message = ""
         for ind in error_dict['error_distretti_descrizione']:
             out1 = out1 + "at index: " + ind + ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
+            out_message = "Distretti: '{}' presentano errori nella descrizione".format(", ".join(distretti_dict_error[ind]))
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
         self.output_message = self.output_message + "\nerror_distretti_descrizione: \n" + out1
-        
+
+        xfile.save(self.file_data)
         return error_dict
 
     def ck_distretti_operatori_logici(self, df_mapping, error_dict):
@@ -218,12 +262,9 @@ class Check_distretti():
         sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
         print("sheet caricato")
 
-        #problema: dovrei ordinare il file con la colonna prestazioni, ma così mi perderei 
-        # l'ordine per mostrare i risultati. Stesso problema se andassi a filtrarmi le prestazioni nel file.
-        # Possibile soluzione: filtro su prestazione, check OP, se è errore vado a ricercare 
-        # l'indice del record.
-        #last_prestazione = df_mapping['Codice Prestazione SISS'].iloc[2]
-        #last_OP = df_mapping['Operatore Logico Distretto'].iloc[2]
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
+
         prestazione_checked = []
 
         for index, row in df_mapping.iterrows():
@@ -247,8 +288,8 @@ class Check_distretti():
                                 resultOP = sheet_mapping.cell(int(r), self.work_index_operatore_logico_distretto).value
                                 #resultOP = df_mapping['Operatore Logico Distretto'].values[int(res[0])+1]
                                 print("resultOP: " + resultOP + ", operatore logico df_mapping: " + row[self.work_operatore_logico_distretto])
-                                if row[self.work_operatore_logico_distretto] != resultOP:
-                                    distretti_dict_error = self.update_list_in_dict(distretti_dict_error, str(int(r)+1), "OP diversi per le prestazioni:" + searchedProdotto)
+                                if row[self.work_operatore_logico_distretto] != resultOP and (row[self.work_operatore_logico_distretto] != "" or resultOP != ""):
+                                    distretti_dict_error = self.update_list_in_dict(distretti_dict_error, str(int(r)+1), searchedProdotto)
                                     error_dict['error_distretti_operatori_logici'].append(str(int(r)+1))
                                     print("error OP at index:" +  str(int(r)+1))
                     prestazione_checked.append(searchedProdotto)
@@ -258,9 +299,24 @@ class Check_distretti():
                     
         
         out1 = ""
+        out_message = ""
         for ind in error_dict['error_distretti_operatori_logici']:
             out1 = out1 + "at index: " + ind + ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
+            out_message = "Distretti con OP diversi per le prestazioni: '{}'".format(", ".join(distretti_dict_error[ind]))
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
         self.output_message = self.output_message + "\nerror_distretti_operatori_logici: \n" + "at index: \n" + out1
+        
+        for ind in error_dict['error_distretti_operatori_logici_mancante']:
+            out_message = "Distretti con Operatore logico assente"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
         out2 = ", \n".join(error_dict['error_distretti_operatori_logici_mancante'])
         self.output_message = self.output_message + "\nerror_distretti_operatori_logici_mancante: \n" + "at index: \n" + out2
+        
+        xfile.save(self.file_data) 
         return error_dict   

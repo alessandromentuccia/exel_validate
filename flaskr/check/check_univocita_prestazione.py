@@ -6,6 +6,7 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 import yaml
 import logging
 import re
+import openpyxl 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -94,6 +95,10 @@ class Check_univocita_prestazione():
     def ck_casi_1n(self, df_mapping, error_dict):
         print("start checking if casi 1:n is correct")
         error_dict.update({'error_casi_1n': []})
+
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
+
         casi_1n_dict_error = {}
 
         agende_list = [] #Codice SISS Agenda
@@ -133,16 +138,16 @@ class Check_univocita_prestazione():
                     #print("A_P2: " + a_p + ", Abilititazione Esposizione SISS: " + row["Abilititazione Esposizione SISS"])
         
         out1 = ""
+        out_message = ""
         for ind in error_dict['error_casi_1n']:
+            out_message = "Casi 1:N: rilevato per la coppia prestazione/agenda: '{}'".format(", ".join(casi_1n_dict_error[ind]))
             out1 = out1 + "at index: " + ind + ", on agenda_prestazione: " + ", ".join(casi_1n_dict_error[ind]) + ", \n"
-        self.output_message = self.output_message + "\nerror_casi_1n: \n" + "at index: \n" + out1
-        return error_dict
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet["BY"+ind] = out_message
 
-    '''Metodo che aggiunge elemento in una lista esistente o crea la lista nel caso
-    non fosse presente
-    def update_list_in_dict(self, dictio, index, element):
-        if index in dictio.keys():
-            dictio[index].append(element)
-        else:
-            dictio[index] = [element]
-        return dictio'''
+        self.output_message = self.output_message + "\nerror_casi_1n: \n" + "at index: \n" + out1
+            
+        xfile.save(self.file_data)  
+        return error_dict

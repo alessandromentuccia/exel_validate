@@ -110,13 +110,13 @@ class Check_action():
         self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
-        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"]
-        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"]
-        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"]
-        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
+        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1
+        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"] - 1
+        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"] - 1
+        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"] - 1
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] - 1
-        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
+        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"] - 1
+        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"] - 1
 
         self.file_data = excel_file
 
@@ -320,7 +320,7 @@ class Check_action():
         result_value = []
 
         for row in range(sh.nrows):
-            for col in range(start_col-1, start_col):
+            for col in range(start_col, start_col+1):
                 myCell = sh.cell(row, col)
                 myValue = sh.cell(row, self.work_index_codice_SISS_agenda) #Codice SISS agenda 15
                 #abilita = sh.cell(row, self.work_index_abilitazione_esposizione_SISS-1) #abilitazione esposizione SISS 28

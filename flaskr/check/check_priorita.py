@@ -6,6 +6,7 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 import yaml
 import logging
 import re
+import openpyxl 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -96,6 +97,9 @@ class Check_priorita():
         print("start checking if prestazione prime visite is correct")
         error_dict.update({'error_prime_visite': []})
         
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
+
         str_check = "PRIMA VISITA"
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -108,12 +112,24 @@ class Check_priorita():
         out1 = ", \n".join(error_dict['error_prime_visite'])
         self.output_message = self.output_message + "\nerror_prime_visite: \n" + "at index: \n" + out1
         
+        out_message = ""
+        for ind in error_dict['error_prime_visite']:
+            out_message = "Rilevato errore di priorità per prestazione PRIMA VISITA"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message 
+            else:
+                sheet["BY"+ind] = out_message
+
+        xfile.save(self.file_data)  
         return error_dict
 
     '''Nel caso di prestazione visita di controllo, verificare se è presente il campo Accesso programmabile ZP'''
     def ck_controlli(self, df_mapping, error_dict):
         print("start checking if prestazione controlli is correct")
         error_dict.update({'error_controlli': []})
+
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
 
         str_check = "CONTROLLO"
         for index, row in df_mapping.iterrows():
@@ -127,12 +143,24 @@ class Check_priorita():
         out1 = ", \n".join(error_dict['error_controlli'])
         self.output_message = self.output_message + "\nerror_controlli: \n" + "at index: \n" + out1
         
+        out_message = ""
+        for ind in error_dict['error_controlli']:
+            out_message = "Rilevato errore di priorità per prestazione DI CONTROLLO"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message 
+            else:
+                sheet["BY"+ind] = out_message
+
+        xfile.save(self.file_data) 
         return error_dict
 
     '''Nel caso di prestazioni per esami strumentale, controllare se le priorità sono definite'''
     def ck_esami_strumentali(self, df_mapping, error_dict):
         print("start checking if prestazione esami is correct")
         error_dict.update({'error_esami_strumentali': []})
+
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
@@ -145,4 +173,13 @@ class Check_priorita():
         out1 = ", \n".join(error_dict['error_esami_strumentali'])
         self.output_message = self.output_message + "\nerror_esami_strumentali: \n" + "at index: \n" + out1
         
+        out_message = ""
+        for ind in error_dict['error_esami_strumentali']:
+            out_message = "Rilevato errore di priorità per prestazione di tipo esami strumentali"
+            if sheet["BY"+ind].value is not None:
+                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message 
+            else:
+                sheet["BY"+ind] = out_message
+
+        xfile.save(self.file_data)
         return error_dict
