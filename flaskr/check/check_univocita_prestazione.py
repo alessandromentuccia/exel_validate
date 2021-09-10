@@ -105,9 +105,105 @@ class Check_univocita_prestazione():
         prestazioni_list = [] #Codice Prestazione SISS
         agenda_prestazione_list = []
         metodica_distretti_dict = {} #dict delle metodiche e distretti delle prestazioni messe in lista
+        distretti_dict = {}
+        
+        index_dict = {}
         for index, row in df_mapping.iterrows():
-            #if row["Abilititazione Esposizione SISS"] == "S":
-            if row[self.work_casi_1_n] != "OK" or row[self.work_casi_1_n] in "1:N":
+            a_p = str(row[self.work_codice_agenda_siss]) + "_" + str(row[self.work_codice_prestazione_siss])
+            m_d = row[self.work_codice_metodica] + "_" + row[self.work_codice_distretto]
+            index_dict = self.update_list_in_dict(index_dict, a_p, str(int(index)+2))
+            distretti_dict = self.update_list_in_dict(distretti_dict, str(int(index)+2), row[self.work_operatore_logico_distretto])
+            if a_p not in metodica_distretti_dict.keys() and row[self.work_abilitazione_esposizione_siss] == "S":
+                #primo elemento inserito nel dict
+                metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
+            elif a_p in metodica_distretti_dict.keys() and row[self.work_abilitazione_esposizione_siss] == "S":
+                #secondo e successivi elementi inseriti nel dict
+                if m_d not in metodica_distretti_dict[a_p]:
+                    #elemento non costituisce caso 1:N al momento
+                    metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
+                elif m_d in metodica_distretti_dict[a_p]:
+                    #elemento costituisce caso 1:N. 2 o più elementi con stesso m_d
+                    metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
+                    #error_dict = self.update_list_in_dict(error_dict, str(int(index)+2), a_p)
+                else:
+                    #teoricamente non dovrebbe mai entrare in questa condizione
+                    metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
+
+        print("valutazione risultati casi 1:N")
+        for key, value in metodica_distretti_dict.items(): #key:a_p, value:m_d
+            print(key + ":  " + ", ".join(value))
+            indexAP = index_dict[key] #indici dove si trovano tutte le occorrenze di una coppia A/P
+            lengthMD = len(value) #occorrenze coppie prestazioni/agenda
+
+            set_duplicates = {}
+            if lengthMD > 1: #occorrenza multipla
+                print("occorrenza multipla " + str(lengthMD))
+                flag_error1 = False
+                flag_error2 = False
+                flag_error3 = False
+                flag_error4 = False
+                error_1_list = [] 
+                cont = 0
+                #d = "" #value[0].split("_")[1]
+                for v in value: #per ogni m_d
+                    print("v: " + v)
+                    if v in set_duplicates.keys():
+                        #set_duplicates.update({v: set_duplicates[v]+1})
+                        set_duplicates[v] = set_duplicates[v] + 1
+                        print("1:" + str(set_duplicates[v]))
+                    else:
+                        set_duplicates[v] = 1
+                        print("2:" + str(set_duplicates[v]))
+                    
+                    #set_duplicates[v] = set_duplicates[v].items + 1 #dict con key gli m_d e value sono le occorrenze
+                    distrettosplit = v.split("_") #faccio split m_d
+                    print("distrettosplit: " + distrettosplit[1])
+                    if distrettosplit[1] != []: #controllo se 'd' c'è
+                        for vv in distrettosplit[1].split(","):
+                            print("d: " + vv)
+                            if vv == "":
+                                flag_error1 = True
+                                error_1_list.append(indexAP[cont])
+                        #elif v.split("_")[1] == d:
+                        #    flag_error3 = True
+                    cont = cont + 1
+                
+                for k, v in set_duplicates.items(): #verifico le occorrenze
+                    if v > 1: #se le occorrenze sono > 1 allora caso 1:N
+                        flag_error2 = True
+
+                if flag_error1 == True: #se un distretto è vuoto
+                    for ind in error_1_list:
+                        print("flag error 1: " + ind)
+                        print(error_dict.keys())
+                        error_dict["error_casi_1n"].append(ind) #ind ha già sommato + 2
+                        casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + ": trovato caso 1:N con caso di distretto vuoto")
+                if flag_error2 == True: #se una delle m_d è multipla allora è errore
+                    for ind in indexAP:
+                        print("flag error 2: " + ind)
+                        error_dict["error_casi_1n"].append(ind) #ind ha già sommato + 2
+                        casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + ": " + ", ".join(value))
+                
+                opd = "A"
+                for ind in indexAP: 
+                    distretto_op = distretti_dict[ind] #vedo se gli operatori logici sono giusti
+                    if opd != distretto_op[0] and df_mapping.at[int(ind)-2,self.work_codice_distretto] != "" and opd != "A":
+                        print("dis:" + df_mapping.at[int(ind)-2,self.work_codice_distretto])
+                        flag_error4 = True
+                        print("flag error 4: " + ind)
+                        error_dict["error_casi_1n"].append(ind) #ind ha già sommato + 2
+                        casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + ": OP non conforme all'interno della coppia agenda/prestazione")
+                    opd = distretto_op[0]
+                
+                '''if flag_error3 == True: #errore se un distretto è uguale a quello precedente
+                    for ind in index_dict[key]:
+                        error_dict["error_casi_1n"].append(ind) #ind ha già sommato + 2
+                        casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + ": trovato caso 1:N con caso di distretto vuoto")'''
+                
+
+
+            #if row[self.work_abilitazione_esposizione_siss] == "S":
+            '''if row[self.work_casi_1_n] != "OK" or row[self.work_casi_1_n] in "1:N":
                 a_p = str(row[self.work_codice_agenda_siss]) + "_" + str(row[self.work_codice_prestazione_siss])
                 m_d = row[self.work_codice_metodica] + "_" + row[self.work_codice_distretto]
                 if a_p not in metodica_distretti_dict.keys() and row[self.work_abilitazione_esposizione_siss] == "S": 
@@ -119,33 +215,41 @@ class Check_univocita_prestazione():
                     metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
                 elif a_p in metodica_distretti_dict.keys() and m_d in metodica_distretti_dict[a_p] and row[self.work_abilitazione_esposizione_siss] == "S":
                     metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
-                    for md in metodica_distretti_dict[a_p]:
+                    ''''''for md in metodica_distretti_dict[a_p]:
                         if md.split("_")[1] == "":
                             error_dict["error_casi_1n"].append(str(int(index)+1))
-                            casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p + ": " + "caso 1:n con distretto vuoto")
+                            casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p + ": " + "caso 1:n con distretto vuoto")''''''
                     error_dict["error_casi_1n"].append(str(int(index)+2))
                     casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p + ": " + ", ".join(metodica_distretti_dict[a_p]))
                     #print("trovato caso 1:n per la coppia agenda-prestazione, all'indice: " + str(int(index)+2))
-                elif m_d.split("_")[1] == "" and a_p in metodica_distretti_dict.keys() and row[self.work_abilitazione_esposizione_siss] == "S":
+                elif m_d.split("_")[1] == "" and a_p in metodica_distretti_dict.keys() and len(metodica_distretti_dict[a_p]) > 1 and row[self.work_abilitazione_esposizione_siss] == "S":
                     metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
                     error_dict["error_casi_1n"].append(str(int(index)+2))
                     casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p + ": " + "caso 1:n con distretto vuoto")
                 elif a_p in metodica_distretti_dict.keys() and m_d not in metodica_distretti_dict[a_p] and row[self.work_abilitazione_esposizione_siss] == "S":
+                    ''''''for md in metodica_distretti_dict[a_p]:
+                        if md.split("_")[1] == "":
+                            error_dict["error_casi_1n"].append(str(int(index)+2))
+                            casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, str(int(index)+2), a_p + ": " + "caso 1:n un possibile distretto vuoto in una prestazione")''''''
                     metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
                 else:
                     logging.info("trovato caso 1:n con abilitazione SISS a N corretta, all'indice: " + str(int(index)+2))
                     #print("trovato caso 1:n con abilitazione SISS a N corretta, all'indice: " + str(int(index)+2))
-                    #print("A_P2: " + a_p + ", Abilititazione Esposizione SISS: " + row["Abilititazione Esposizione SISS"])
+                    #print("A_P2: " + a_p + ", Abilititazione Esposizione SISS: " + row["Abilititazione Esposizione SISS"])'''
         
+        #modificare controllo andando a verificare a valle la lunghezza del dict metodica_distretti_dict.
+        #se per ogni coppia a_p ci sono più di un m_d uguale, allora è errore.
+        #se uno di questi m_d ha d vuoto, allora manca d e bisogna segnalare
+        print("start definizione output casi 1:n")
         out1 = ""
-        out_message = ""
+        out_messsage = ""
         for ind in error_dict['error_casi_1n']:
             out_message = "Casi 1:N: rilevato per la coppia prestazione/agenda: '{}'".format(", ".join(casi_1n_dict_error[ind]))
             out1 = out1 + "at index: " + ind + ", on agenda_prestazione: " + ", ".join(casi_1n_dict_error[ind]) + ", \n"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         self.output_message = self.output_message + "\nerror_casi_1n: \n" + "at index: \n" + out1
             

@@ -111,6 +111,7 @@ class Check_distretti():
                     cod_pre_siss = str(row[self.work_codice_prestazione_siss])
                     for distretto in Distretto_string:
                         if distretto != "":
+                            distretto = distretto.strip()
                             short_sheet = sheet_Distretti.loc[sheet_Distretti["Codice Distretto"] == distretto] #filtro catalogo sul codice distretto                     
                             
                             #print("disciplina " + str(disciplina["Cod Disciplina"]) + " " + str(disciplina["Codice Quesito"]))
@@ -137,10 +138,10 @@ class Check_distretti():
         for ind in error_dict['error_distretti_inprestazione']:
             out1 = out1 + "at index: " + ind + ", on distretti: " + ", ".join(distretto_dict_error[ind]) + ", \n"
             out_message = "Distretti: '{}' non previsti per la prestazione: '{}'".format(", ".join(distretto_dict_error[ind]), prestazioni_dict[ind])
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         self.output_message = self.output_message + "\nerror_distretti_inprestazione: \n" + out1
         
@@ -178,16 +179,16 @@ class Check_distretti():
         out_message = ""
         for ind in error_dict['error_distretti_caratteri_non_consentiti']:
             out_message = "Distretti presentano errori di sintassi: rilevati caratteri non consentiti"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_distretti_trovato_spazio']:
             out_message = "Distretti presentano errori di sintassi: rilevati degli spazi non consentiti nella cella"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         xfile.save(self.file_data) 
 
@@ -236,10 +237,10 @@ class Check_distretti():
         for ind in error_dict['error_distretti_descrizione']:
             out1 = out1 + "at index: " + ind + ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
             out_message = "Distretti: '{}' presentano errori nella descrizione".format(", ".join(distretti_dict_error[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         self.output_message = self.output_message + "\nerror_distretti_descrizione: \n" + out1
 
         xfile.save(self.file_data)
@@ -248,7 +249,7 @@ class Check_distretti():
     def ck_distretti_operatori_logici(self, df_mapping, error_dict):
         print("start checking if there are the same logic op. for each prestazione")
         error_dict.update({
-            'error_distretti_operatori_logici': [],
+            'error_distretti_operatori_logici_non_necessari': [],
             'error_distretti_operatori_logici_mancante': [] })
         distretti_dict_error = {}
         #catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
@@ -269,18 +270,18 @@ class Check_distretti():
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                if row[self.work_operatore_logico_distretto] is not "":
-                    cod_pre_siss = str(row[self.work_codice_prestazione_siss])
+                if row[self.work_operatore_logico_distretto] is not "" and row[self.work_codice_distretto] is "":
+                    error_dict['error_distretti_operatori_logici_non_necessari'].append(str(int(index)+2))
+                    '''cod_pre_siss = str(row[self.work_codice_prestazione_siss])
                     searchedProdotto = cod_pre_siss.strip()
                     if searchedProdotto not in prestazione_checked:
                         result = self.findCell(sheet_mapping, searchedProdotto, self.work_index_codice_prestazione_SISS)
                         print("Prestazione SISS: " + searchedProdotto + ", all'indice: " + str(int(index)+2) + " result: %s", result)
-                        
-                        '''if result != -1:
+                        ''''''if result != -1:
                             for res in result_Value:     
                                 print("resultOP: " + res + ", operatore logico df_mapping: " + row[self.work_operatore_logico_distretto])
                                 if row[self.work_operatore_logico_distretto] != res:
-                                    flag_error = True'''
+                                    flag_error = True''''''
                         if result != -1:
                             for res in result:
                                 r = res.split("#")[0]
@@ -292,7 +293,7 @@ class Check_distretti():
                                     distretti_dict_error = self.update_list_in_dict(distretti_dict_error, str(int(r)+1), searchedProdotto)
                                     error_dict['error_distretti_operatori_logici'].append(str(int(r)+1))
                                     print("error OP at index:" +  str(int(r)+1))
-                    prestazione_checked.append(searchedProdotto)
+                    prestazione_checked.append(searchedProdotto)'''
 
                 elif row[self.work_operatore_logico_distretto] is "" and row[self.work_codice_distretto] is not "": 
                     error_dict['error_distretti_operatori_logici_mancante'].append(str(int(index)+2))
@@ -300,21 +301,21 @@ class Check_distretti():
         
         out1 = ""
         out_message = ""
-        for ind in error_dict['error_distretti_operatori_logici']:
-            out1 = out1 + "at index: " + ind + ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
-            out_message = "Distretti con OP diversi per le prestazioni: '{}'".format(", ".join(distretti_dict_error[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+        for ind in error_dict['error_distretti_operatori_logici_non_necessari']:
+            out1 = out1 + "at index: " + ind #+ ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
+            out_message = "Operatore logico non necessario, non c'è codice distretto"
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         self.output_message = self.output_message + "\nerror_distretti_operatori_logici: \n" + "at index: \n" + out1
         
         for ind in error_dict['error_distretti_operatori_logici_mancante']:
             out_message = "Distretti con Operatore logico assente"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         out2 = ", \n".join(error_dict['error_distretti_operatori_logici_mancante'])
         self.output_message = self.output_message + "\nerror_distretti_operatori_logici_mancante: \n" + "at index: \n" + out2
         

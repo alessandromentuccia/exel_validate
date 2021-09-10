@@ -77,6 +77,9 @@ class Check_action():
     work_index_codice_prestazione_SISS = 0
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
+    work_index_operatore_logico_QD = 0
+        
+    work_alert_column = ""
 
 
     def __init__(self):
@@ -114,6 +117,9 @@ class Check_action():
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] -1
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"] -1
         self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"] -1 
+        self.work_index_operatore_logico_QD = data[1]["work_index"]["work_index_operatore_logico_QD"] - 1 
+        
+        self.work_alert_column = data[1]["work_index"]["work_alert_column"]
 
     def import_file(self):
         logging.warning("import excel")
@@ -122,6 +128,7 @@ class Check_action():
         print(template_file) 
         template_file = Path(template_file)
         self.file_name = template_file
+        self.file_data = template_file
         if template_file.is_file(): #C:\Users\aless\csi-progetti\FaqBot\faqbot-09112020.xlsx
             self.read_exel_file(template_file)
         else:
@@ -156,17 +163,17 @@ class Check_action():
         print('Start analisys:\n', df_mapping)
 
         print("Fase 1") #FASE 1: CONTROLLO I QUESITI DIAGNOSTICI
-        QD_error = self.check_qd(df_mapping, sheet_QD)
-        #QD_error = {}
+        #QD_error = self.check_qd(df_mapping, sheet_QD)
+        QD_error = {}
         print("Fase 2") #FASE 2: CONTROLLO LE METODICHE
-        metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
-        #metodiche_error = {}
+        #metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
+        metodiche_error = {}
         print("Fase 3") #FASE 3: CONTROLLO I DISTRETTI
-        distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
-        #distretti_error = {}
+        #distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
+        distretti_error = {}
         print("Fase 4") #FASE 4: CONTROLLO LE PRIORITA'
-        priorita_error = self.check_priorita(df_mapping)
-        #priorita_error = {}
+        #priorita_error = self.check_priorita(df_mapping)
+        priorita_error = {}
         print("Fase 5") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
         univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
         #univocita_prestazione_error = {}
@@ -301,7 +308,7 @@ class Check_action():
         result_value = []
 
         for row in range(sh.nrows):
-            for col in range(start_col, sh.ncols):
+            for col in range(start_col, start_col+1):
                 myCell = sh.cell(row, col)
                 myValue = sh.cell(row, self.work_index_codice_prestazione_SISS)
                 abilita = sh.cell(row, self.work_index_abilitazione_esposizione_SISS)

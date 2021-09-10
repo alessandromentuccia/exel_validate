@@ -125,10 +125,10 @@ class Check_QD():
         for ind in error_dict['error_QD_agenda']:
             out1 = out1 + "at index: " + ind + ", ".join(QD_dict_error[ind]) + ", \n"
             out_message = "QD: '{}' diversi per le prestazioni della stessa agenda".format(", ".join(QD_dict_error[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         self.output_message = self.output_message + "\nerror_QD_agenda: \n" + out1
 
         xfile.save(self.file_data) 
@@ -169,7 +169,7 @@ class Check_QD():
                 descrizione_disciplina_mapping_row = row[self.work_descrizione_disciplina_catalogo]
                 #prendo tutte le agende con lo stesso codice
                 result = self.findCell_agenda(sheet_mapping, searchedAgenda, self.work_index_codice_SISS_agenda) #prendo tutte le righe con questa agenda
-                #print("start iterate each excel row")
+                print("start iterate each excel row")
                 if result != -1:
                     result_disciplina_last = ""
                     agende_error_list = []
@@ -234,37 +234,37 @@ class Check_QD():
         for ind in error_dict['error_QD_disciplina_agenda']:
             out1 = out1 + "at index: " + ind + ", error: " + QD_disci_dict_error[ind] + ", \n"
             out_message = "{}".format(QD_disci_dict_error[ind])
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         
         out2 = ""
         for ind in error_dict['error_discipline_agende_diverse']:
             out2 = out2 + "at index: " + ind + ", error: " + ", ".join(agenda_disci_dict_error[ind]) + ", \n"
             out_message = "{}".format(", ".join(agenda_disci_dict_error[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         
         out3 = ""
         for ind in error_dict['error_disciplina_mancante']:
             out3 = out3 + "at index: " + ind + "disciplina mancante, \n"
             out_message = "Disciplina mancante"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         
         out4 = ""
         for ind in error_dict['error_QD_descrizione_disciplina_agenda']:
             out4 = out4 + "at index: " + ind + ", error: " + QD_descri_disci_dict_error[ind] + ", \n"
             out_message = "{}".format(QD_descri_disci_dict_error[ind])
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         
     
         self.output_message = self.output_message + "\nerror_QD_disciplina_agenda: \n" + out1
@@ -309,22 +309,22 @@ class Check_QD():
         out_message = ""
         for ind in error_dict['error_QD_caratteri_non_consentiti']:
             out_message = "QD presentano errori di sintassi: rilevati caratteri non consentiti"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_spazio_bordi']:
             out_message = "QD presentano errori di sintassi: rilevati degli spazi alle estremità del contenuto della cella"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_spazio_internamente']:
             out_message = "QD presentano errori di sintassi: rilevati degli spazi all'interno del contenuto della cella"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         xfile.save(self.file_data) 
         return error_dict
@@ -352,6 +352,8 @@ class Check_QD():
                 if len(QD_string) != len(row[self.work_descrizione_QD].split(",")):
                     print("il numero di descrizioni è diverso dal numero di QD all'indice " + str(index))
                     flag_error = True
+                    QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), row[self.work_codice_QD])
+                                
 
                 if QD_string is not None:
                     for QD in QD_string:
@@ -385,6 +387,8 @@ class Check_QD():
                                     QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), QD)
                             except: #togliere try/catch e gestire gli spazi nell'if sopra
                                 #print("print QD_catalogo2:" + QD_catalogo)
+                                flag_error = True
+                                QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), QD)
                                 print("controllare manualmente qual'è il problema all'indice: " + str(int(index)+2))
                                 #print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", Description_list: %s", description_list)
                                 #logging.error("controllare manualmente il QD: " + QD + " all'indice: " + str(int(index)+2))
@@ -397,38 +401,68 @@ class Check_QD():
         out_message = ""
         for ind in error_dict['error_QD_descrizione']:
             out_message = "QD: '{}' presentano errori nella descrizione".format(", ".join(QD_dict_error_3[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_descrizione_space_bordo']:
             out_message = "QD: '{}' presentano spazi alle estremità della cella ".format(", ".join(QD_dict_error_1[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_descrizione_space_interno']:
             out_message = "QD: '{}' presentano spazi non consentiti tra i QD specificati".format(", ".join(QD_dict_error_2[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         xfile.save(self.file_data) 
         return error_dict
 
     def ck_QD_operatori_logici(self, df_mapping, error_dict):
         print("start checking if there are the same logic op. for each agenda")
-        error_dict.update({'error_QD_operatori_logici': []})
-        
+        error_dict.update({
+                        'error_QD_operatori_logici': [],
+                        'error_QD_operatori_logici_mancante': []})
+        QD_dict_error = {}
+
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
 
-        agenda = df_mapping[self.work_codice_agenda_siss].iloc[2]
-        last_OP = df_mapping[self.work_operatore_logico_QD].iloc[2]
+        wb = xlrd.open_workbook(self.file_data)
+        sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
+        print("sheet caricato")
+
+        #agenda = df_mapping[self.work_codice_agenda_siss].iloc[2]
+        #last_OP = df_mapping[self.work_operatore_logico_QD].iloc[2]
+
+        agende_checked = []
+        
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S" and row[self.work_codice_QD] != "":
-                if row[self.work_codice_agenda_siss] == agenda:
+                if row[self.work_operatore_logico_QD] is not "":
+                    agenda_SISS = str(row[self.work_codice_agenda_siss])
+                    agenda_SISS = agenda_SISS.strip()
+                    if agenda_SISS not in agende_checked:
+                        result = self.findCell(sheet_mapping, agenda_SISS, self.work_index_codice_SISS_agenda)
+
+                        if result != -1:
+                            for res in result:
+                                r = res.split("#")[0]
+                                c = res.split("#")[1]
+                                resultOP = sheet_mapping.cell(int(r), self.work_index_operatore_logico_QD).value
+                                if row[self.work_operatore_logico_QD] != resultOP and (row[self.work_operatore_logico_QD] != "" or resultOP != ""):
+                                    QD_dict_error = self.update_list_in_dict(QD_dict_error, str(int(r)+1), agenda_SISS)
+                                    error_dict['error_QD_operatori_logici'].append(str(int(r)+1))
+                                    print("error QD OP at index:" +  str(int(r)+1))
+                    agende_checked.append(agenda_SISS)
+
+                elif row[self.work_operatore_logico_distretto] is "" and row[self.work_codice_distretto] is not "": 
+                    error_dict['error_QD_operatori_logici_mancante'].append(str(int(index)+2))
+
+                '''if row[self.work_codice_agenda_siss] == agenda:
                     if row[self.work_operatore_logico_QD] == "":
                         error_dict['error_QD_operatori_logici'].append(str(int(index)+2))
                     else:  
@@ -437,16 +471,21 @@ class Check_QD():
                             error_dict['error_QD_operatori_logici'].append(str(int(index)+2))
                 else: 
                     agenda = row[self.work_codice_agenda_siss]
-                    last_OP = row[self.work_operatore_logico_QD]
-
+                    last_OP = row[self.work_operatore_logico_QD]'''
 
         out_message = ""
         for ind in error_dict['error_QD_descrizione_space_interno']:
-            out_message = "QD: trovato errore sull'operatore logico. Controllare se è presente e che è conforme nell'agenda".format(", ".join(QD_dict_error_2[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            out_message = "QD: trovato errore sull'operatore logico. Controllare se è presente e che è conforme nell'agenda"
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
+        for ind in error_dict['error_QD_operatori_logici_mancante']:
+            out_message = "QD: Operatore logico assente"
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet[self.work_alert_column+ind] = out_message
 
         xfile.save(self.file_data)
         return error_dict

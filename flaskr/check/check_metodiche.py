@@ -136,10 +136,10 @@ class Check_metodiche():
         for ind in error_dict['error_metodica_inprestazione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
             out_message = "Metodiche: '{}' non previste per la prestazione: '{}'".format(", ".join(metodica_dict_error[ind]), prestazioni_dict[ind])
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         self.output_message = self.output_message + "\nerror_metodica_inprestazione: \n" + out1
 
@@ -190,22 +190,22 @@ class Check_metodiche():
         out_message = ""
         for ind in error_dict['error_metodica_caratteri_non_consentiti']:
             out_message = "Metodiche presentano errori di sintassi: rilevati caratteri non consentiti"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_metodica_spazio_bordi']:
             out_message = "Metodiche presentano errori di sintassi: rilevati degli spazi alle estremità del contenuto della cella"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_metodica_spazio_internamente']:
             out_message = "Metodiche presentano errori di sintassi: rilevati degli spazi all'interno del contenuto della cella"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         xfile.save(self.file_data) 
         return error_dict #da eliminare
@@ -257,17 +257,17 @@ class Check_metodiche():
         for ind in error_dict['error_metodica_descrizione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
             out_message = "Metodiche: '{}' presentano errori nella descrizione".format(", ".join(metodica_dict_error[ind]))
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         self.output_message = self.output_message + "\nerror_metodica_descrizione: \n" + out1
         for ind in error_dict['error_metodica_separatore']:
             out_message = "Le descrizioni metodiche presentano errori col separatore ','"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
         out2 = ", \n".join(error_dict['error_metodica_separatore'])
         self.output_message = self.output_message + "\nerror_metodica_separatore: \n" + out2
 

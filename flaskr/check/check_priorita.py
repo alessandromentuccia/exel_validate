@@ -115,10 +115,10 @@ class Check_priorita():
         out_message = ""
         for ind in error_dict['error_prime_visite']:
             out_message = "Rilevato errore di priorità per prestazione PRIMA VISITA"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message 
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message 
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         xfile.save(self.file_data)  
         return error_dict
@@ -146,10 +146,10 @@ class Check_priorita():
         out_message = ""
         for ind in error_dict['error_controlli']:
             out_message = "Rilevato errore di priorità per prestazione DI CONTROLLO"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message 
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message 
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         xfile.save(self.file_data) 
         return error_dict
@@ -176,10 +176,10 @@ class Check_priorita():
         out_message = ""
         for ind in error_dict['error_esami_strumentali']:
             out_message = "Rilevato errore di priorità per prestazione di tipo esami strumentali"
-            if sheet["BY"+ind].value is not None:
-                sheet["BY"+ind] = str(sheet["BY"+ind].value) + "; \n" + out_message 
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message 
             else:
-                sheet["BY"+ind] = out_message
+                sheet[self.work_alert_column+ind] = out_message
 
         xfile.save(self.file_data)
         return error_dict

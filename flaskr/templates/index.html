@@ -6,18 +6,21 @@
 
 <body>
     <title>Mapping checker</title>
-    <h2>Controlla la coerenza del tuo file di mapping</h2>
-    <h3>inserisci nel primo box il file di configurazione e nel secondo il file di mapping da validare</h3>
+    <div>
+        <h2 style="text-align:center;">Controlla la coerenza del tuo file di mapping</h2>
+        <img src="images/ARIA_logo.jpg" alt="Aria logo" height="50%">
+    </div>
+    <h3 style="text-align:center;">inserisci nel primo box il file di configurazione e nel secondo il file di mapping da validare</h3>
     <form method=post enctype=multipart/form-data> 
         <input type="file" name="file1">
         <input type="file" name="file2">
         <button formaction="/generate">Avvio validazione</button>
     </form>
-    <h2>Download YAML template configuration file example</h2>
+    <h2 style="text-align:center;">Download YAML template configuration file example</h2>
     <form method=post>
         <button formaction="/send-example">Download mini template example</button>
     </form>
-    <h2>LOG</h2>
+    <h2 style="text-align:center;">LOG</h2>
     <pre id="output"></pre>
     <script>
         var output = document.getElementById('output');

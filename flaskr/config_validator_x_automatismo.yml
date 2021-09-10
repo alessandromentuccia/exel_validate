@@ -1,5 +1,5 @@
 - work_column:
-    work_sheet: "da verificare"
+    work_sheet: "Estrazione"
     work_codice_prestazione_siss: "Codice Prestazione SISS"
     work_descrizione_prestazione_siss: "Desc Prestazione SISS"
     work_codice_agenda_siss: "Codice SISS Agenda"
@@ -31,3 +31,5 @@
     work_index_operatore_logico_distretto: 53
     work_index_codici_disciplina_catalogo: 36
     work_index_codici_descri_disciplina_catalogo: 37
+    work_index_operatore_logico_QD: 40
+    work_alert_column: "BX"
