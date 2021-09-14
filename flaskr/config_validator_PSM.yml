@@ -30,3 +30,5 @@
     work_index_codice_prestazione_SISS: 18
     work_index_operatore_logico_distretto: 42
     work_index_codici_disciplina_catalogo: 28
+    work_index_operatore_logico_QD: 32
+    work_alert_column: "BN"

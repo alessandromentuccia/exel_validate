@@ -20,6 +20,7 @@
     work_priorita_primo_accesso_P: "Priorità Primo Accesso P"
     work_priorita_primo_accesso_B: "Priorità Primo Accesso B"
     work_accesso_programmabile_ZP: "Accesso Programmabile P"
+    work_combinata: "Combinata"
     
 - work_index:
     work_index_sheet: 0
@@ -33,3 +34,6 @@
     work_index_codici_descri_disciplina_catalogo: 37
     work_index_operatore_logico_QD: 40
     work_alert_column: "BX"
+
+- work_separator:
+    work_delimiter: ","

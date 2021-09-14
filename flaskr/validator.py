@@ -72,6 +72,7 @@ class Check_action():
     work_priorita_primo_accesso_P = ""
     work_priorita_primo_accesso_B = ""
     work_accesso_programmabile_ZP = ""
+    work_combinata = ""
 
     work_index_codice_QD = 0
     work_index_op_logic_distretto = 0
@@ -111,6 +112,7 @@ class Check_action():
         self.work_priorita_primo_accesso_P = data[0]["work_column"]["work_priorita_primo_accesso_P"]
         self.work_priorita_primo_accesso_B = data[0]["work_column"]["work_priorita_primo_accesso_B"]
         self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
+        self.work_combinata = data[0]["work_column"]["work_combinata"]
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1
@@ -168,17 +170,17 @@ class Check_action():
         print('Start analisys:\n', df_mapping)
 
         print("Fase 1") #FASE 1: CONTROLLO I QUESITI DIAGNOSTICI
-        #QD_error = self.check_qd(df_mapping, sheet_QD)
-        QD_error = {}
+        QD_error = self.check_qd(df_mapping, sheet_QD)
+        #QD_error = {}
         print("Fase 2") #FASE 2: CONTROLLO LE METODICHE
-        #metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
-        metodiche_error = {}
+        metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
+        #metodiche_error = {}
         print("Fase 3") #FASE 3: CONTROLLO I DISTRETTI
-        #distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
-        distretti_error = {}
+        distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
+        #distretti_error = {}
         print("Fase 4") #FASE 4: CONTROLLO LE PRIORITA'
-        #priorita_error = self.check_priorita(df_mapping)
-        priorita_error = {}
+        priorita_error = self.check_priorita(df_mapping)
+        #priorita_error = {}
         print("Fase 5") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
         univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
         #univocita_prestazione_error = {}

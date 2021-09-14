@@ -69,6 +69,7 @@ class Check_action():
     work_priorita_primo_accesso_P = ""
     work_priorita_primo_accesso_B = ""
     work_accesso_programmabile_ZP = ""
+    work_combinata = ""
 
     work_index_codice_QD = 0
     work_index_op_logic_distretto = 0
@@ -84,7 +85,7 @@ class Check_action():
 
     def __init__(self):
         self.output_message = ""
-        with open("./flaskr/config_validator_x_automatismo.yml", "rt", encoding='utf8') as yamlfile:
+        with open("./flaskr/config_validator_cardinal_shuster.yml", "rt", encoding='utf8') as yamlfile:
             data = yaml.load(yamlfile, Loader=yaml.FullLoader)
         logger.debug(data)
         self.work_sheet = data[0]["work_column"]["work_sheet"] 
@@ -108,6 +109,7 @@ class Check_action():
         self.work_priorita_primo_accesso_P = data[0]["work_column"]["work_priorita_primo_accesso_P"]
         self.work_priorita_primo_accesso_B = data[0]["work_column"]["work_priorita_primo_accesso_B"]
         self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
+        self.work_combinata = data[0]["work_column"]["work_combinata"]
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] -1
