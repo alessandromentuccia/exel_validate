@@ -68,8 +68,8 @@ class Check_univocita_prestazione():
         index_dict = {}
         
         for index, row in df_mapping.iterrows():
-            a_p = str(row[self.work_codice_agenda_siss]) + "_" + str(row[self.work_codice_prestazione_siss])
-            m_d = row[self.work_codice_metodica] + "_" + row[self.work_codice_distretto]
+            a_p = str(row[self.work_codice_agenda_siss]) + "|" + str(row[self.work_codice_prestazione_siss])
+            m_d = row[self.work_codice_metodica] + "|" + row[self.work_codice_distretto]
             index_dict = self.update_list_in_dict(index_dict, a_p, str(int(index)+2))
             distretti_dict = self.update_list_in_dict(distretti_dict, str(int(index)+2), row[self.work_operatore_logico_distretto])
             if a_p not in metodica_distretti_dict.keys() and row[self.work_abilitazione_esposizione_siss] == "S":
@@ -88,6 +88,7 @@ class Check_univocita_prestazione():
                     #teoricamente non dovrebbe mai entrare in questa condizione
                     metodica_distretti_dict = self.update_list_in_dict(metodica_distretti_dict, a_p, m_d)
 
+        #md_dict_total = metodica_distretti_dict
         print("valutazione risultati casi 1:N")
         for key, value in metodica_distretti_dict.items(): #key:a_p, value:m_d
             print(key + ":  " + ", ".join(value))
@@ -117,15 +118,25 @@ class Check_univocita_prestazione():
                         dict_items_cont[v] = [cont]
                         #print("2:" + str(set_duplicates[v]))
                     
-                    splitMD_list = v.split("_") #splitto m_d in una lista di due elementi
+                    splitMD_list = v.split("|") #splitto m_d in una lista di due elementi
                     print("splitMD_list: " + splitMD_list[1])
+                    split_district = splitMD_list[1]
                     #verifico se nei casi 1:N, i distretto non sono vuoti
-                    if splitMD_list[1] != []: 
-                        for distretto in splitMD_list[1].split(","):
+                    if split_district != '': #and self.list_duplicates(splitMD_list[0].split(self.work_delimiter)) != []: 
+                        #contM = 0
+                        metodica_list = []
+                        distretti_list = []
+                        for distretto in split_district.split(self.work_delimiter):
                             print("d: " + distretto)
                             if distretto == "":
                                 flag_error1 = True
                                 error_1_list.append(indexAP[cont])
+                            '''metodica = splitMD_list[0].split(self.work_delimiter)[contM]
+                            metodica_list.append(metodica)
+                            distretti_list.append(distretto)
+                            contM = contM + 1
+                        if self.list_duplicates(metodica_list) != [] and distretti_list == []:
+                            flag_error1 = False'''
                     cont = cont + 1
                 
                 #verifico le occorrenze degli m_d
@@ -152,34 +163,47 @@ class Check_univocita_prestazione():
                             error_dict["error_casi_1n"].append(ind) #ind ha già sommato + 2
                          
                 #verifico se gli operatori logici sono conformi e univoci per ogni coppia A/P nei casi 1:N
-                opd = "A"
+                opd = "U"
                 for ind in indexAP: 
                     distretto_op = distretti_dict[ind] 
-                    if opd != distretto_op[0] and df_mapping.at[int(ind)-2,self.work_codice_distretto] != "" and opd != "A":
+                    if opd != distretto_op[0] and df_mapping.at[int(ind)-2,self.work_codice_distretto] != "":
                         print("dis:" + df_mapping.at[int(ind)-2,self.work_codice_distretto])
                         flag_error3 = True
                         print("flag error 4: " + ind)
-                        error_dict["error_casi_1n"].append(ind) #ind ha già sommato + 2
-                        casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + ": OP non conforme all'interno della coppia agenda/prestazione")
-                    opd = distretto_op[0]
+                        if ind not in error_dict["error_casi_1n"]:
+                            error_dict["error_casi_1n"].append(ind) #ind ha già sommato + 2
+                        casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + ": Operatore Logico Distretti non conforme all'interno della coppia agenda/prestazione")
+                    #opd = distretto_op[0] 
     
                 #taggo i casi 1:N risolti, cioè che non presentano errori
                 for i in indexAP: 
-                    if i not in error_dict["error_casi_1n"]:
-                        out_message = "caso 1:N risolto"
+                    out_message = ""
+                    if flag_error1 == False and flag_error2 == False and flag_error3 == False:
+                        out_message = "__> Caso 1:N:\n"
+                        out_message = out_message + "  _> risolto "
                         if sheet[self.work_alert_column+i].value is not None:
                             sheet[self.work_alert_column+i] = str(sheet[self.work_alert_column+i].value) + "; \n" + out_message #modificare colonna alert
                         else:
                             sheet[self.work_alert_column+i] = out_message
+                    elif i not in error_dict["error_casi_1n"]:
+                        out_message = "__> Caso 1:N:\n"
+                        out_message = out_message + "  _> distretti o metodiche coerenti"
+                        if sheet[self.work_alert_column+i].value is not None:
+                            sheet[self.work_alert_column+i] = str(sheet[self.work_alert_column+i].value) + "; \n" + out_message #modificare colonna alert
+                        else:
+                            sheet[self.work_alert_column+i] = out_message
+
+                    
 
         #creazione del messaggio di alert riportato nel file excel
         print("start definizione output casi 1:n")
         out1 = ""
         out_message = ""
         for ind in error_dict['error_casi_1n']:
-            out_message = "Casi 1:N: rilevato per la coppia prestazione/agenda: '{}'".format(", ".join(casi_1n_dict_error[ind]))
+            out_message = "__> Caso 1:N:\n"
+            out_message = out_message + "  _> rilevato per la coppia prestazione/agenda: '{}'".format(", ".join(casi_1n_dict_error[ind]))
             if "S" in df_mapping.at[int(ind)-2, self.work_combinata]: #verifico se c'è combinata
-                out_message = out_message + "; \nCasi 1:N: rilevata possibile risoluzione tramite combinata"
+                out_message = out_message + ";\n  _> rilevata possibile risoluzione tramite combinata"
             out1 = out1 + "at index: " + ind + ", on agenda_prestazione: " + ", ".join(casi_1n_dict_error[ind]) + ", \n"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
@@ -190,3 +214,5 @@ class Check_univocita_prestazione():
             
         xfile.save(self.file_data)  
         return error_dict
+
+    

@@ -56,11 +56,50 @@ def generate():
     except Exception as e:
         logger.error(e)
         return str(e), 400
+
+@app.route('/validate_agende_interne', methods=['GET', 'POST'])
+def validate_agende_interne():
+    try:
+        configuration_file = _read_yml_file1(request, 'yml')
+        excel_filename = _read_yml_file2(request, 'xlsx')
+    except ValueError as e:
+        logger.error(e)
+        return str(e), 400
+
+    try:
+        print(excel_filename)
+        file_path = app.config['DOWNLOAD_FOLDER']  + excel_filename
+        check_action = validator.Check_action(configuration_file, file_path)
+        check_action.initializer_check_agende_interne()
+                               
+        return send_file(file_path,as_attachment = True, attachment_filename=excel_filename), 200
+    except Exception as e:
+        logger.error(e)
+        return str(e), 400
     
 @app.route('/sendexample', methods=['GET', 'POST'])
 def send_example():
     try:
         return send_file(TEMPLATE_MINI_EXAMPLE,as_attachment = True, attachment_filename=TEMPLATE_MINI_EXAMPLE), 200
+    except FileNotFoundError as e:
+        logger.error(e)
+        return str(e), 400
+
+@app.route('/post-avvio-check', methods=['GET', 'POST'])
+def post_avvio_service():
+    try:
+        #flash('check avviato')
+        return render_template('post_avvio_page.html'), 200
+    except FileNotFoundError as e:
+        logger.error(e)
+        return str(e), 400
+
+
+@app.route('/start-post-avvio-check', methods=['GET', 'POST'])
+def post_avvio_start_check():
+    try:
+        #flash('check avviato')
+        return render_template('index.html'), 200
     except FileNotFoundError as e:
         logger.error(e)
         return str(e), 400

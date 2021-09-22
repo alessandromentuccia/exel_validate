@@ -103,7 +103,7 @@ class Check_metodiche():
         prestazioni_dict = {}
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                Metodica_string = row[self.work_codice_metodica].split(",")
+                Metodica_string = row[self.work_codice_metodica].split(self.work_delimiter)
 
                 siss = "" 
                 siss_flag = False
@@ -111,6 +111,7 @@ class Check_metodiche():
                     cod_pre_siss = str(row[self.work_codice_prestazione_siss])
                     for metodica in Metodica_string:
                         if metodica != "":
+                            metodica = metodica.strip()
                             short_sheet = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                      
                             
                             print("prestazione della metodica in mapping:" + cod_pre_siss + " + " + siss)
@@ -135,7 +136,7 @@ class Check_metodiche():
         out_message = ""
         for ind in error_dict['error_metodica_inprestazione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
-            out_message = "Metodiche: '{}' non previste per la prestazione: '{}'".format(", ".join(metodica_dict_error[ind]), prestazioni_dict[ind])
+            out_message = "__> Metodiche: '{}' non previste per la prestazione: '{}'".format(", ".join(metodica_dict_error[ind]), prestazioni_dict[ind])
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -166,8 +167,21 @@ class Check_metodiche():
                 #flag_error = False
                 if row[self.work_codice_metodica] is not None:
                     
-                    row_replace = row[self.work_codice_metodica].replace(" ", "")
+                    #row_replace = row[self.work_codice_metodica].replace(" ", "")
                     if " " in row[self.work_codice_metodica]:
+                        if row[self.work_codice_metodica] != row[self.work_codice_metodica].strip():
+                            print("string contain space in the border")
+                            error_dict['error_metodica_spazio_bordi'].append(str(int(index)+2))
+                        r = row[self.work_codice_metodica].strip()
+                        if " " in r:
+                            print("string contain space inside the string")
+                            error_dict['error_metodica_spazio_internamente'].append(str(int(index)+2))
+                        row_replace = row[self.work_codice_metodica].replace(" ", "")
+                        if(string_check.search(row_replace) != None):
+                            print("String contains other Characters.")
+                            error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
+
+                    '''if " " in row[self.work_codice_metodica]:
                         if " " in row_replace.strip():
                             print("string contain space inside the string")
                             error_dict['error_metodica_spazio_internamente'].append(str(int(index)+2))
@@ -176,7 +190,8 @@ class Check_metodiche():
                             error_dict['error_metodica_spazio_bordi'].append(str(int(index)+2))
                     elif(string_check.search(row_replace) != None):
                         print("String contains other Characters.")
-                        error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
+                        error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))'''
+
 
         #da eliminare start
         out1 = ", \n".join(error_dict['error_metodica_caratteri_non_consentiti'])
@@ -189,19 +204,19 @@ class Check_metodiche():
 
         out_message = ""
         for ind in error_dict['error_metodica_caratteri_non_consentiti']:
-            out_message = "Metodiche presentano errori di sintassi: rilevati caratteri non consentiti"
+            out_message = "__> Metodiche presentano errori di sintassi: rilevati caratteri non consentiti"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_metodica_spazio_bordi']:
-            out_message = "Metodiche presentano errori di sintassi: rilevati degli spazi alle estremità del contenuto della cella"
+            out_message = "__> Metodiche presentano errori di sintassi: rilevati degli spazi alle estremità del contenuto della cella"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_metodica_spazio_internamente']:
-            out_message = "Metodiche presentano errori di sintassi: rilevati degli spazi all'interno del contenuto della cella"
+            out_message = "__> Metodiche presentano errori di sintassi: rilevati degli spazi all'interno del contenuto della cella"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -224,14 +239,14 @@ class Check_metodiche():
         
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                Metodica_string = row[self.work_codice_metodica].split(",")
-                Description_list = row[self.work_descrizione_metodica].split(",")
+                Metodica_string = row[self.work_codice_metodica].split(self.work_delimiter)
+                Description_list = row[self.work_descrizione_metodica].split(self.work_delimiter)
                 flag_error = False
-                if len(Metodica_string) != len(Description_list):
+                '''if len(Metodica_string) != len(Description_list):
                     print("il numero di descrizioni è diverso dal numero di metodiche all'indice " + str(index))
                     flag_error = True
                     metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), "Manca un Codice Metodica o una Descrizione")
-
+                '''
                 if Metodica_string is not None:
                     for metodica in Metodica_string:
                         if metodica != "":
@@ -256,14 +271,14 @@ class Check_metodiche():
         out_message = ""
         for ind in error_dict['error_metodica_descrizione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
-            out_message = "Metodiche: '{}' presentano errori nella descrizione".format(", ".join(metodica_dict_error[ind]))
+            out_message = "__> Metodiche: '{}' presentano errori nella descrizione".format(", ".join(metodica_dict_error[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         self.output_message = self.output_message + "\nerror_metodica_descrizione: \n" + out1
         for ind in error_dict['error_metodica_separatore']:
-            out_message = "Le descrizioni metodiche presentano errori col separatore ','"
+            out_message = "__> Le descrizioni metodiche presentano errori col separatore ','"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:

@@ -103,7 +103,7 @@ class Check_distretti():
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                Distretto_string = row[self.work_codice_distretto].split(",")
+                Distretto_string = row[self.work_codice_distretto].split(self.work_delimiter)
 
                 siss = ""
                 siss_flag = False
@@ -137,7 +137,7 @@ class Check_distretti():
         out_message = ""
         for ind in error_dict['error_distretti_inprestazione']:
             out1 = out1 + "at index: " + ind + ", on distretti: " + ", ".join(distretto_dict_error[ind]) + ", \n"
-            out_message = "Distretti: '{}' non previsti per la prestazione: '{}'".format(", ".join(distretto_dict_error[ind]), prestazioni_dict[ind])
+            out_message = "__> Distretti: '{}' non previsti per la prestazione: '{}'".format(", ".join(distretto_dict_error[ind]), prestazioni_dict[ind])
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -178,13 +178,13 @@ class Check_distretti():
         
         out_message = ""
         for ind in error_dict['error_distretti_caratteri_non_consentiti']:
-            out_message = "Distretti presentano errori di sintassi: rilevati caratteri non consentiti"
+            out_message = "__> Distretti presentano errori di sintassi: rilevati caratteri non consentiti"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_distretti_trovato_spazio']:
-            out_message = "Distretti presentano errori di sintassi: rilevati degli spazi non consentiti nella cella"
+            out_message = "__> Distretti presentano errori di sintassi: rilevati degli spazi non consentiti nella cella"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -205,12 +205,12 @@ class Check_distretti():
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                Distretto_string = row[self.work_codice_distretto].split(",")
-                Description_list = row[self.work_descrizione_distretto].split(",")
+                Distretto_string = row[self.work_codice_distretto].split(self.work_delimiter)
+                Description_list = row[self.work_descrizione_distretto].split(self.work_delimiter)
                 flag_error = False
-                if len(Distretto_string) != len(Description_list):
+                '''if len(Distretto_string) != len(Description_list):
                     print("il numero di descrizioni è diverso dal numero di distretti all'indice " + str(index))
-                    flag_error = True
+                    flag_error = True'''
 
                 if Distretto_string is not None:
                     for distretto in Distretto_string:
@@ -236,7 +236,7 @@ class Check_distretti():
         out_message = ""
         for ind in error_dict['error_distretti_descrizione']:
             out1 = out1 + "at index: " + ind + ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
-            out_message = "Distretti: '{}' presentano errori nella descrizione".format(", ".join(distretti_dict_error[ind]))
+            out_message = "__> Distretti: '{}' presentano errori nella descrizione".format(", ".join(distretti_dict_error[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -303,7 +303,7 @@ class Check_distretti():
         out_message = ""
         for ind in error_dict['error_distretti_operatori_logici_non_necessari']:
             out1 = out1 + "at index: " + ind #+ ", on distretto: " + ", ".join(distretti_dict_error[ind]) + ", \n"
-            out_message = "Operatore logico non necessario, non c'è codice distretto"
+            out_message = "__> Operatore logico non necessario, non c'è codice distretto"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -311,7 +311,7 @@ class Check_distretti():
         self.output_message = self.output_message + "\nerror_distretti_operatori_logici: \n" + "at index: \n" + out1
         
         for ind in error_dict['error_distretti_operatori_logici_mancante']:
-            out_message = "Distretti con Operatore logico assente"
+            out_message = "__> Distretti con Operatore logico assente"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:

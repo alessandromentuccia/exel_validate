@@ -1,7 +1,5 @@
 
 error_casi_1n: 
 at index: 
-at index: 206, on agenda_prestazione: RECO_T0004363_2104_C_0188761.02: caso 1:N con distretto vuoto, RECO_T0004363_2104_C_0188761.02 con metodica_distretto: M00000_, M00000_, 
-at index: 207, on agenda_prestazione: RECO_T0004363_2104_C_0188761.02: caso 1:N con distretto vuoto, RECO_T0004363_2104_C_0188761.02 con metodica_distretto: M00000_, M00000_, 
 
-{"QD_error": {}, "metodiche_error": {}, "distretti_error": {}, "priorita_error": {}, "univocita_prestazione_error": {"error_casi_1n": ["206", "207"]}, "QD_validator_error": {}, "metodiche_validator_error": {}, "distretti_validator_error": {}}
+{"QD_error": {}, "metodiche_error": {}, "distretti_error": {}, "priorita_error": {}, "univocita_prestazione_error": {"error_casi_1n": []}, "QD_validator_error": {}, "metodiche_validator_error": {}, "distretti_validator_error": {}}

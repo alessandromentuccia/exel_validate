@@ -1,0 +1,39 @@
+- work_column:
+    work_sheet: "Foglio1"
+    work_codice_prestazione_siss: "Codice Prestazione SISS"
+    work_descrizione_prestazione_siss: "Desc Prestazione SISS"
+    work_codice_agenda_siss: "Codice SISS Agenda"
+    work_casi_1_n: "CASI 1_N"
+    work_abilitazione_esposizione_siss: "Abi Esposizione SISS"
+    work_codici_disciplina_catalogo: "Codici disciplina da catalogo"
+    work_descrizione_disciplina_catalogo: "Desc disciplina da catalogo"
+    work_codice_QD: "Codice Quesito Diagnostico"
+    work_descrizione_QD: "Desc Quesito Diagnostico"
+    work_operatore_logico_QD: "Operatore Logico"
+    work_codice_metodica: "Codice Metodica"
+    work_descrizione_metodica: "Desc Metodica"
+    work_codice_distretto: "Codice Distretto"
+    work_descrizione_distretto: "Desc Distretto"
+    work_operatore_logico_distretto: "Operatore Logico Distretto"
+    work_priorita_U: "Priorità U"
+    work_priorita_primo_accesso_D: "Priorità Primo Accesso D"
+    work_priorita_primo_accesso_P: "Priorità Primo Accesso P"
+    work_priorita_primo_accesso_B: "Priorità Primo Accesso B"
+    work_accesso_programmabile_ZP: "Accesso Programmabile P"
+    work_combinata: "Combinata"
+
+- work_index:
+    work_index_sheet: 0
+    work_index_codice_QD: 34
+    work_index_op_logic_distretto: 47
+    work_index_codice_SISS_agenda: 13
+    work_index_abilitazione_esposizione_SISS: 24
+    work_index_codice_prestazione_SISS: 22
+    work_index_operatore_logico_distretto: 47
+    work_index_codici_disciplina_catalogo: 32
+    work_index_codici_descri_disciplina_catalogo: 33
+    work_index_operatore_logico_QD: 36
+    work_alert_column: "BR"
+
+- work_separator:
+    work_delimiter: ";"

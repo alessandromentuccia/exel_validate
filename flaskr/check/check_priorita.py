@@ -114,7 +114,7 @@ class Check_priorita():
         
         out_message = ""
         for ind in error_dict['error_prime_visite']:
-            out_message = "Rilevato errore di priorità per prestazione PRIMA VISITA"
+            out_message = "__> Rilevato errore di priorità per prestazione PRIMA VISITA"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message 
             else:
@@ -145,7 +145,7 @@ class Check_priorita():
         
         out_message = ""
         for ind in error_dict['error_controlli']:
-            out_message = "Rilevato errore di priorità per prestazione DI CONTROLLO"
+            out_message = "__> Rilevato errore di priorità per prestazione DI CONTROLLO"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message 
             else:
@@ -175,7 +175,7 @@ class Check_priorita():
         
         out_message = ""
         for ind in error_dict['error_esami_strumentali']:
-            out_message = "Rilevato errore di priorità per prestazione di tipo esami strumentali"
+            out_message = "__> Rilevato errore di priorità per prestazione di tipo esami strumentali"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message 
             else:

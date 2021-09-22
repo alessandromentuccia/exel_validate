@@ -124,7 +124,7 @@ class Check_QD():
         out_message = ""
         for ind in error_dict['error_QD_agenda']:
             out1 = out1 + "at index: " + ind + ", ".join(QD_dict_error[ind]) + ", \n"
-            out_message = "QD: '{}' diversi per le prestazioni della stessa agenda".format(", ".join(QD_dict_error[ind]))
+            out_message = "__> QD: '{}' diversi per le prestazioni della stessa agenda".format(", ".join(QD_dict_error[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -179,7 +179,7 @@ class Check_QD():
                         r = res.split("#")[0] #row agenda
                         c = res.split("#")[1] #column agenda
                         #print("start iterate result sheet_mapping")
-                        result_QD = sheet_mapping.cell(int(r), self.work_index_codice_QD).value.split(",") #QD
+                        result_QD = sheet_mapping.cell(int(r), self.work_index_codice_QD).value.split(self.work_delimiter) #QD
                         if result_QD is not None:
                             for QD in result_QD:
                                 #print("start iterate QD")
@@ -198,13 +198,13 @@ class Check_QD():
                                         disci_flag_QD = True
                                         if str(int(r)+1) not in agende_error_list:
                                             agende_error_list.append(str(int(r)+1))
-                                            QD_disci_dict_error[str(int(r)+1)] = "per il QD: "+ QD + " non c'è la disciplina: " + disciplina_mapping_row
+                                            QD_disci_dict_error[str(int(r)+1)] = "QD: "+ QD + " non appartiene alla disciplina: " + disciplina_mapping_row
                                             print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
                                     if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
                                         descri_disci_flag_QD = True
                                         if str(int(r)+1) not in descrizione_discipline_error_list:
                                             descrizione_discipline_error_list.append(str(int(r)+1))
-                                            QD_descri_disci_dict_error[str(int(r)+1)] = "per il QD: "+ QD + " non c'è la descrizione disciplina: " + descrizione_disciplina_mapping_row
+                                            QD_descri_disci_dict_error[str(int(r)+1)] = "La descrizione disciplina: " + descrizione_disciplina_mapping_row + "non è presente sul catalogo SISS"
                         
                         result_disciplina = sheet_mapping.cell(int(r), self.work_index_codici_disciplina_catalogo).value #disciplina da catalogo
                         if result_disciplina != "":
@@ -233,7 +233,7 @@ class Check_QD():
         out_message = ""
         for ind in error_dict['error_QD_disciplina_agenda']:
             out1 = out1 + "at index: " + ind + ", error: " + QD_disci_dict_error[ind] + ", \n"
-            out_message = "{}".format(QD_disci_dict_error[ind])
+            out_message = "__> {}".format(QD_disci_dict_error[ind])
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -242,7 +242,7 @@ class Check_QD():
         out2 = ""
         for ind in error_dict['error_discipline_agende_diverse']:
             out2 = out2 + "at index: " + ind + ", error: " + ", ".join(agenda_disci_dict_error[ind]) + ", \n"
-            out_message = "{}".format(", ".join(agenda_disci_dict_error[ind]))
+            out_message = "__> {}".format(", ".join(agenda_disci_dict_error[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -251,7 +251,7 @@ class Check_QD():
         out3 = ""
         for ind in error_dict['error_disciplina_mancante']:
             out3 = out3 + "at index: " + ind + "disciplina mancante, \n"
-            out_message = "Disciplina mancante"
+            out_message = "__> Disciplina mancante per la seguente prestazione"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -260,7 +260,7 @@ class Check_QD():
         out4 = ""
         for ind in error_dict['error_QD_descrizione_disciplina_agenda']:
             out4 = out4 + "at index: " + ind + ", error: " + QD_descri_disci_dict_error[ind] + ", \n"
-            out_message = "{}".format(QD_descri_disci_dict_error[ind])
+            out_message = "__> {}".format(QD_descri_disci_dict_error[ind])
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -308,19 +308,19 @@ class Check_QD():
                        
         out_message = ""
         for ind in error_dict['error_QD_caratteri_non_consentiti']:
-            out_message = "QD presentano errori di sintassi: rilevati caratteri non consentiti"
+            out_message = "__> QD presentano errori di sintassi: rilevati caratteri non consentiti"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_spazio_bordi']:
-            out_message = "QD presentano errori di sintassi: rilevati degli spazi alle estremità del contenuto della cella"
+            out_message = "__> QD presentano errori di sintassi: rilevati degli spazi alle estremità del contenuto della cella"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_spazio_internamente']:
-            out_message = "QD presentano errori di sintassi: rilevati degli spazi all'interno del contenuto della cella"
+            out_message = "__> QD presentano errori di sintassi: rilevati degli spazi all'interno del contenuto della cella"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -346,14 +346,14 @@ class Check_QD():
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                QD_string = row[self.work_codice_QD].split(",")
-                description_list = row[self.work_descrizione_QD]#.split(",")
+                QD_string = row[self.work_codice_QD].split(self.work_delimiter)
+                description_list = row[self.work_descrizione_QD]#.split(self.work_delimiter)
                 flag_error = False
-                if len(QD_string) != len(row[self.work_descrizione_QD].split(",")):
+                '''if len(QD_string) != len(row[self.work_descrizione_QD].split(self.work_delimiter)):
                     print("il numero di descrizioni è diverso dal numero di QD all'indice " + str(index))
                     flag_error = True
                     QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), row[self.work_codice_QD])
-                                
+                '''  
 
                 if QD_string is not None:
                     for QD in QD_string:
@@ -369,17 +369,17 @@ class Check_QD():
                                 QD_dict_error_1 = self.update_list_in_dict(QD_dict_error_1, str(int(index)+2), QD)
                                 description_list = description_list.strip()
 
-                            if " ," in description_list or ", " in description_list:
+                            if (" "+self.work_delimiter) in description_list or (self.work_delimiter+" ") in description_list:
                                 #print("print QD_catalogo2:" + QD_catalogo)
                                 #print("controllare manualmente qual'è il problema")
                                 print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", description_list: %s", description_list)
                                 logging.error("ERROR SPACE INTERNO: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
                                 error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))
                                 QD_dict_error_2 = self.update_list_in_dict(QD_dict_error_2, str(int(index)+2), QD)
-                                description_list = description_list.replace(", ", ",")
-                                description_list = description_list.replace(" ,", ",")
+                                description_list = description_list.replace(self.work_delimiter+" ", self.work_delimiter) #elimino spazio dopo  del separatore
+                                description_list = description_list.replace(" "+self.work_delimiter, self.work_delimiter) #elimino spazio prima del separatore
                             try:
-                                if QD_catalogo["Quesiti Diagnostici"].values[0] not in description_list.split(","):
+                                if QD_catalogo["Quesiti Diagnostici"].values[0] not in description_list.split(self.work_delimiter):
                                     print("la descrizione QD non è presente all'indice " + str(int(index)+2))
                                     #print("QD: " + QD + ", Quesiti Diagnostici: " + QD_catalogo["Quesiti Diagnostici"].values[0] + ", Description_list: %s", description_list)
                                     logging.error("ERROR DESCRIZIONE: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
@@ -400,19 +400,19 @@ class Check_QD():
 
         out_message = ""
         for ind in error_dict['error_QD_descrizione']:
-            out_message = "QD: '{}' presentano errori nella descrizione".format(", ".join(QD_dict_error_3[ind]))
+            out_message = "__> Descrizione dei QD: '{}' non trovati nel catalogo SISS".format(", ".join(QD_dict_error_3[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_descrizione_space_bordo']:
-            out_message = "QD: '{}' presentano spazi alle estremità della cella ".format(", ".join(QD_dict_error_1[ind]))
+            out_message = "__> Descrizione dei QD: '{}' presentano spazi alle estremità della cella ".format(", ".join(QD_dict_error_1[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_descrizione_space_interno']:
-            out_message = "QD: '{}' presentano spazi non consentiti tra i QD specificati".format(", ".join(QD_dict_error_2[ind]))
+            out_message = "__> Descrizione dei QD: '{}' presentano spazi non consentiti tra i QD specificati".format(", ".join(QD_dict_error_2[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -474,14 +474,14 @@ class Check_QD():
                     last_OP = row[self.work_operatore_logico_QD]'''
 
         out_message = ""
-        for ind in error_dict['error_QD_descrizione_space_interno']:
-            out_message = "QD: trovato errore sull'operatore logico. Controllare se è presente e che è conforme nell'agenda"
+        for ind in error_dict['error_QD_operatori_logici']:
+            out_message = "__> QD: trovato errore sull'operatore logico. Controllare se è presente e che è conforme nell'agenda"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_operatori_logici_mancante']:
-            out_message = "QD: Operatore logico assente"
+            out_message = "__> QD: Operatore logico assente"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:

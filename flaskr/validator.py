@@ -27,6 +27,7 @@ from flaskr.check.check_metodiche import Check_metodiche
 from flaskr.check.check_distretti import Check_distretti
 from flaskr.check.check_priorita import Check_priorita
 from flaskr.check.check_univocita_prestazione import Check_univocita_prestazione
+from flaskr.check.check_agende_interne import Check_agende_interne
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -73,6 +74,7 @@ class Check_action():
     work_priorita_primo_accesso_B = ""
     work_accesso_programmabile_ZP = ""
     work_combinata = ""
+    work_codice_agenda_interno = ""
 
     work_index_codice_QD = 0
     work_index_op_logic_distretto = 0
@@ -84,6 +86,7 @@ class Check_action():
     work_index_operatore_logico_QD = 0
 
     work_alert_column = ""
+    work_delimiter = ""
 
 
     def __init__(self, data, excel_file):
@@ -113,6 +116,7 @@ class Check_action():
         self.work_priorita_primo_accesso_B = data[0]["work_column"]["work_priorita_primo_accesso_B"]
         self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
         self.work_combinata = data[0]["work_column"]["work_combinata"]
+        self.work_codice_agenda_interno = data[0]["work_column"]["work_codice_agenda_interno"]
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1
@@ -125,7 +129,10 @@ class Check_action():
         self.work_index_operatore_logico_QD = data[1]["work_index"]["work_index_operatore_logico_QD"] - 1 
         
         self.work_alert_column = data[1]["work_index"]["work_alert_column"]
-
+        try:
+            self.work_delimiter = data[2]["work_separator"]["work_delimiter"]
+        except:
+            self.work_delimiter = "," #valore di default
         self.file_data = excel_file
 
 
@@ -147,7 +154,7 @@ class Check_action():
         #print ("print JSON")
         #print(sh)
         
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
+        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007"
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
@@ -185,7 +192,7 @@ class Check_action():
         univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
         #univocita_prestazione_error = {}
         print("Fase Vale Validator")
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
+        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007"
         wb = xlrd.open_workbook(catalogo_dir)
         sheet_QD_OW = wb.sheet_by_index(1)
         sheet_Metodiche_OW = wb.sheet_by_index(2)
@@ -354,5 +361,24 @@ class Check_action():
     def column_validator():
         return ""
 
+    def list_duplicates(self, seq):
+        seen = set()
+        seen_add = seen.add
+        # adds all elements it doesn't know yet to seen and all other to seen_twice
+        seen_twice = set( x for x in seq if x in seen or seen_add(x) )
+        # turn the set into a list (as requested)
+        return list( seen_twice )
 
-    
+
+    def initializer_check_agende_interne(self):
+        df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str}).replace(np.nan, '', regex=True)
+        error = self.analizer_agende_interne(df_mapping)
+        error_dict = {
+            "error_Aagende_interne": error
+        }
+        self._validation(error_dict)
+
+    def analizer_agende_interne(self, df_mapping):
+        Agende_interne_error = Check_agende_interne.ck_agende_interne(self, df_mapping, {})
+        
+        return Agende_interne_error
