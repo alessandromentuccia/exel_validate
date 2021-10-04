@@ -21,7 +21,8 @@
     work_priorita_primo_accesso_B: "Priorità Primo Accesso B"
     work_accesso_programmabile_ZP: "Accesso Programmabile P"
     work_combinata: "Combinata"
-
+    work_codice_agenda_interno: "Codice Interno Agenda"
+    
 - work_index:
     work_index_sheet: 0
     work_index_codice_QD: 40

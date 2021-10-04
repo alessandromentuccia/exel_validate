@@ -192,7 +192,7 @@ class Check_action():
         univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
         #univocita_prestazione_error = {}
         print("Fase Vale Validator")
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007"
+        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
         wb = xlrd.open_workbook(catalogo_dir)
         sheet_QD_OW = wb.sheet_by_index(1)
         sheet_Metodiche_OW = wb.sheet_by_index(2)

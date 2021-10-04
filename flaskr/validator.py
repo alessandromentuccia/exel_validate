@@ -154,7 +154,7 @@ class Check_action():
         #print ("print JSON")
         #print(sh)
         
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007"
+        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
@@ -192,7 +192,7 @@ class Check_action():
         univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
         #univocita_prestazione_error = {}
         print("Fase Vale Validator")
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007"
+        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
         wb = xlrd.open_workbook(catalogo_dir)
         sheet_QD_OW = wb.sheet_by_index(1)
         sheet_Metodiche_OW = wb.sheet_by_index(2)
@@ -230,8 +230,8 @@ class Check_action():
         error_QD_sintassi = Check_QD.ck_QD_sintassi(self, df_mapping, error_dict)
         error_QD_agenda = Check_QD.ck_QD_agenda(self, df_mapping, error_QD_sintassi)
         error_QD_disciplina_agenda = Check_QD.ck_QD_disciplina_agenda(self, df_mapping, sheet_QD, error_QD_agenda)
-        error_QD_descrizione = Check_QD.ck_QD_descrizione(self, df_mapping, sheet_QD, error_QD_disciplina_agenda)
-        error_QD_operatori_logici = Check_QD.ck_QD_operatori_logici(self, df_mapping, error_QD_descrizione)
+        #error_QD_descrizione = Check_QD.ck_QD_descrizione(self, df_mapping, sheet_QD, error_QD_disciplina_agenda)
+        error_QD_operatori_logici = Check_QD.ck_QD_operatori_logici(self, df_mapping, error_QD_disciplina_agenda)
 
         error_dict = error_QD_operatori_logici
         '''error_list = {
@@ -251,9 +251,9 @@ class Check_action():
 
         error_metodica_sintassi = Check_metodiche.ck_metodica_sintassi(self, df_mapping, error_dict)
         error_metodica_inprestazione = Check_metodiche.ck_metodica_inprestazione(self, df_mapping, sheet_Metodiche, error_metodica_sintassi)
-        error_metodica_descrizione = Check_metodiche.ck_metodica_descrizione(self, df_mapping, sheet_Metodiche, error_metodica_inprestazione)
+        #error_metodica_descrizione = Check_metodiche.ck_metodica_descrizione(self, df_mapping, sheet_Metodiche, error_metodica_inprestazione)
 
-        error_dict = error_metodica_descrizione
+        error_dict = error_metodica_inprestazione
         '''error_dict = {
             "error_metodica_inprestazione": error_metodica_inprestazione,
             "error_metodica_separatore": error_metodica_separatore,
@@ -269,8 +269,8 @@ class Check_action():
 
         error_distretti_sintassi = Check_distretti.ck_distretti_sintassi(self, df_mapping, error_dict)
         error_distretti_inprestazione = Check_distretti.ck_distretti_inprestazione(self, df_mapping, sheet_Distretti, error_distretti_sintassi)
-        error_distretti_descrizione = Check_distretti.ck_distretti_descrizione(self, df_mapping, sheet_Distretti, error_distretti_inprestazione)
-        error_distretti_operatori_logici = Check_distretti.ck_distretti_operatori_logici(self, df_mapping, error_distretti_descrizione)
+        #error_distretti_descrizione = Check_distretti.ck_distretti_descrizione(self, df_mapping, sheet_Distretti, error_distretti_inprestazione)
+        error_distretti_operatori_logici = Check_distretti.ck_distretti_operatori_logici(self, df_mapping, error_distretti_inprestazione)
 
         error_dict = error_distretti_operatori_logici
 

@@ -10,6 +10,7 @@ from flask import send_from_directory
 from werkzeug.utils import secure_filename
 # local imports
 import flaskr.validator
+import flaskr.validator_post_avvio
 from openpyxl import load_workbook
 dir = os.path.dirname(__file__)
 DOWNLOAD_FOLDER = os.path.join(dir, 'uploads/')
@@ -41,7 +42,7 @@ def upload_file():
 def generate():
     try:
         configuration_file = _read_yml_file1(request, 'yml')
-        excel_filename = _read_yml_file2(request, 'xlsx')
+        excel_filename = _read_yml_file2(request, 'file2', 'xlsx')
 
     except ValueError as e:
         logger.error(e)
@@ -61,7 +62,7 @@ def generate():
 def validate_agende_interne():
     try:
         configuration_file = _read_yml_file1(request, 'yml')
-        excel_filename = _read_yml_file2(request, 'xlsx')
+        excel_filename = _read_yml_file2(request, 'file2', 'xlsx')
     except ValueError as e:
         logger.error(e)
         return str(e), 400
@@ -90,7 +91,7 @@ def post_avvio_service():
     try:
         #flash('check avviato')
         return render_template('post_avvio_page.html'), 200
-    except FileNotFoundError as e:
+    except Exception as e:
         logger.error(e)
         return str(e), 400
 
@@ -98,9 +99,24 @@ def post_avvio_service():
 @app.route('/start-post-avvio-check', methods=['GET', 'POST'])
 def post_avvio_start_check():
     try:
-        #flash('check avviato')
-        return render_template('index.html'), 200
+        configuration_file = _read_yml_file1(request, 'yml')
+        excel1_filename = _read_yml_file2(request, 'fileM', 'xlsx')
+        excel2_filename = _read_yml_file2(request, 'fileR', 'xlsx')
+        _list = request.form.getlist('check')
+        
+        checked_dict = _get_form_checked_value(_list, request)
+        #return render_template('index.html'), 200
     except FileNotFoundError as e:
+        logger.error(e)
+        return str(e), 400
+
+    try:
+        file_path_mapping = app.config['DOWNLOAD_FOLDER']  + excel1_filename
+        file_path_rivisto = app.config['DOWNLOAD_FOLDER']  + excel2_filename
+        check_actionPA = validator_post_avvio.Check_action(configuration_file, file_path_mapping)
+        check_actionPA.initializer(file_path_rivisto, checked_dict)
+        return "lista: " + ", ".join(_list), 200
+    except Exception as e:
         logger.error(e)
         return str(e), 400
 
@@ -115,7 +131,23 @@ def stream():
     return app.response_class(read_log(), mimetype='text/plain')
 
     
-
+def _get_form_checked_value(_list, request):
+    _list.append("Sheet")
+    return_dict = { 
+                    "Sheet": "",
+                    "Quesiti": "",
+                    "OperatoreQD": "", 
+                    "Distretti": "",
+                    "OperatoreDistretto": "",
+                    "Metodiche": "",
+                    "Inviante": "", 
+                    "Risorsa": "",
+                    "Canaliabilitati": ""
+                }
+    for element in _list:
+        return_dict[element] = request.form[str(element)+'text']
+        #print(element + ": " + request.form[str(element)+'text'])
+    return return_dict
 
 def _read_yml_file(request, extension):
     if 'file' not in request.files:
@@ -135,11 +167,11 @@ def _read_yml_file1(request, extension):
     #     raise ValueError(f'File \"{file.filename}\" is not allowed, it must have {extension} extension')
     return template_file_dict
 
-def _read_yml_file2(request, extension):
-    if 'file2' not in request.files:
+def _read_yml_file2(request, name, extension):
+    if request.files[name].filename == '':
         raise ValueError('No file in the request')
     #file = request.files['file2'].read()
-    file = request.files['file2']
+    file = request.files[name]
     filename = secure_filename(file.filename)
     file.save(DOWNLOAD_FOLDER + filename)
     return filename

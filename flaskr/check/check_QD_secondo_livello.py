@@ -103,7 +103,7 @@ class Check_QD():
         error_dict.update({'QD_II_livello': []})
         
 
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007"
+        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
 
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system

@@ -21,19 +21,20 @@
     work_priorita_primo_accesso_B: "Priorità Primo Accesso B"
     work_accesso_programmabile_ZP: "Accesso Programmabile P"
     work_combinata: "Combinata"
+    work_codice_agenda_interno: "Codice Interno Agenda"
 
 - work_index:
     work_index_sheet: 0
-    work_index_codice_QD: 34
-    work_index_op_logic_distretto: 47
+    work_index_codice_QD: 35
+    work_index_op_logic_distretto: 48
     work_index_codice_SISS_agenda: 13
     work_index_abilitazione_esposizione_SISS: 24
     work_index_codice_prestazione_SISS: 22
-    work_index_operatore_logico_distretto: 47
+    work_index_operatore_logico_distretto: 48
     work_index_codici_disciplina_catalogo: 32
     work_index_codici_descri_disciplina_catalogo: 33
-    work_index_operatore_logico_QD: 36
-    work_alert_column: "BT"
+    work_index_operatore_logico_QD: 37
+    work_alert_column: "BS"
 
 - work_separator:
     work_delimiter: ";"
