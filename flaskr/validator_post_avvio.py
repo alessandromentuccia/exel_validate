@@ -72,6 +72,14 @@ class Check_action():
     work_combinata = ""
     work_codice_agenda_interno = ""
     work_codice_prestazione_interno = ""
+    work_inviante = ""
+    work_risorsa = ""
+    work_accesso_farmacia = ""
+    work_accesso_CCR = ""
+    work_accesso_cittadino = ""
+    work_accesso_MMG = ""
+    work_accesso_amministrativo = ""
+    work_accesso_PAI = ""
 
     work_index_codice_QD = 0
     work_index_op_logic_distretto = 0
@@ -115,6 +123,14 @@ class Check_action():
         self.work_combinata = data[0]["work_column"]["work_combinata"]
         self.work_codice_agenda_interno = data[0]["work_column"]["work_codice_agenda_interno"]
         self.work_codice_prestazione_interno = data[0]["work_column"]["work_codice_prestazione_interno"]
+        self.work_inviante = data[0]["work_column"]["work_inviante"]
+        self.work_risorsa = data[0]["work_column"]["work_risorsa"]
+        self.work_accesso_farmacia = data[0]["work_column"]["work_accesso_farmacia"]
+        self.work_accesso_CCR = data[0]["work_column"]["work_accesso_CCR"]
+        self.work_accesso_cittadino = data[0]["work_column"]["work_accesso_cittadino"]
+        self.work_accesso_MMG = data[0]["work_column"]["work_accesso_MMG"]
+        self.work_accesso_amministrativo = data[0]["work_column"]["work_accesso_amministrativo"]
+        self.work_accesso_PAI = data[0]["work_column"]["work_accesso_PAI"]
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1

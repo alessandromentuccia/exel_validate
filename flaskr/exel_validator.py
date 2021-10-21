@@ -22,7 +22,7 @@ import yaml
 
 #from Vale_validator_check.Vale_validator import Validator_v
 from check.check_QD import Check_QD
-from check.check_QD_secondo_livello import Check_QD
+#from check.check_QD_secondo_livello import Check_QD
 from check.check_metodiche import Check_metodiche
 from check.check_distretti import Check_distretti
 from check.check_priorita import Check_priorita
@@ -90,7 +90,7 @@ class Check_action():
 
     def __init__(self):
         self.output_message = ""
-        with open("./flaskr/config_validator_Settelaghi_verifiche.yml", "rt", encoding='utf8') as yamlfile:
+        with open("./flaskr/config_validator_PSD.yml", "rt", encoding='utf8') as yamlfile:
             data = yaml.load(yamlfile, Loader=yaml.FullLoader)
         logger.debug(data)
         self.work_sheet = data[0]["work_column"]["work_sheet"] 
@@ -157,7 +157,7 @@ class Check_action():
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
-        sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI' )
+        sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI', converters={"Codice SISS": str, "Codice Distretto": str})
         
         print("sheet_QD caricato\n")
         #print(sheet_QD)
@@ -177,8 +177,8 @@ class Check_action():
         print('Start analisys:\n', df_mapping)
 
         print("Fase 1") #FASE 1: CONTROLLO I QUESITI DIAGNOSTICI
-        #QD_error = self.check_qd(df_mapping, sheet_QD)
-        QD_error = {}
+        QD_error = self.check_qd(df_mapping, sheet_QD)
+        #QD_error = {}
         print("Fase 2") #FASE 2: CONTROLLO LE METODICHE
         #metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
         metodiche_error = {}
@@ -189,8 +189,8 @@ class Check_action():
         #priorita_error = self.check_priorita(df_mapping)
         priorita_error = {}
         print("Fase 5") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
-        univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
-        #univocita_prestazione_error = {}
+        #univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
+        univocita_prestazione_error = {}
         print("Fase Vale Validator")
         catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
         wb = xlrd.open_workbook(catalogo_dir)

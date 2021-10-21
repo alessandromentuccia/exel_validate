@@ -1,5 +1,17 @@
 
-error_casi_1n: 
-at index: 
+error_QD_agenda: 
+at index: 3QD00066, 
 
-{"QD_error": {}, "metodiche_error": {}, "distretti_error": {}, "priorita_error": {}, "univocita_prestazione_error": {"error_casi_1n": []}, "QD_validator_error": {}, "metodiche_validator_error": {}, "distretti_validator_error": {}}
+error_QD_disciplina_agenda: 
+at index: 2, error: QD: QD00067 non appartiene alla disciplina: , 
+at index: 3, error: QD: QD00066 non appartiene alla disciplina: , 
+at index: 5, error: QD: QD00066 non appartiene alla disciplina: , 
+at index: 6, error: QD: QD00066 non appartiene alla disciplina: , 
+at index: 7, error: QD: QD00066 non appartiene alla disciplina: , 
+
+error_discipline_agende_diverse: 
+
+error_disciplina_mancante: 
+\error_QD_descrizione_disciplina_agenda: 
+
+{"QD_error": {"error_QD_caratteri_non_consentiti": [], "error_QD_spazio_bordi": [], "error_QD_spazio_internamente": [], "error_QD_agenda": ["3"], "error_QD_vuoto": ["4"], "error_QD_disciplina_agenda": ["2", "3", "5", "6", "7"], "error_QD_descrizione_disciplina_agenda": [], "error_disciplina_mancante": [], "error_discipline_agende_diverse": [], "error_QD_descrizione": ["2", "3", "5", "6", "7", "202", "203", "204", "205", "206", "207", "208", "209", "210", "211", "212", "213", "214", "215", "216", "217", "218", "219", "220", "221"], "error_QD_descrizione_space_bordo": [], "error_QD_descrizione_space_interno": [], "error_QD_operatori_logici": [], "error_QD_operatori_logici_mancante": []}, "metodiche_error": {}, "distretti_error": {}, "priorita_error": {}, "univocita_prestazione_error": {}, "QD_validator_error": {}, "metodiche_validator_error": {}, "distretti_validator_error": {}}

@@ -37,4 +37,4 @@
     work_alert_column: "BR"
 
 - work_separator:
-    work_delimiter: ","
+    work_delimiter: ", "

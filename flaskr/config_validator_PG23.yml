@@ -1,5 +1,5 @@
 - work_column:
-    work_sheet: "Sheet 1"
+    work_sheet: "Estrazione"
     work_codice_prestazione_siss: "Codice Prestazione SISS"
     work_descrizione_prestazione_siss: "Desc Prestazione SISS"
     work_codice_agenda_siss: "Codice SISS Agenda"
@@ -21,19 +21,21 @@
     work_priorita_primo_accesso_B: "Priorità Primo Accesso B"
     work_accesso_programmabile_ZP: "Accesso Programmabile P"
     work_combinata: "Combinata"
+    work_codice_agenda_interno: "Codice Interno Agenda"
+    work_codice_prestazione_interno: "Codice Prestazione Cup"
 
 - work_index:
     work_index_sheet: 0
     work_index_codice_QD: 32
     work_index_op_logic_distretto: 45
-    work_index_codice_SISS_agenda: 13
+    work_index_codice_SISS_agenda: 12
     work_index_abilitazione_esposizione_SISS: 22
     work_index_codice_prestazione_SISS: 20
     work_index_operatore_logico_distretto: 45
     work_index_codici_disciplina_catalogo: 10
     work_index_codici_descri_disciplina_catalogo: 31
     work_index_operatore_logico_QD: 34
-    work_alert_column: "BY"
+    work_alert_column: "BP"
 
 - work_separator:
     work_delimiter: ","

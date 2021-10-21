@@ -23,6 +23,14 @@
     work_combinata: "NEW_COMBINATA"
     work_codice_agenda_interno: "CODICE INTERNO AGENDA"
     work_codice_prestazione_interno: "CODICE INTERNO PRESTAZIONE"
+    work_inviante: "New Inviante"
+    work_risorsa: "New RISORSA"
+    work_accesso_farmacia: "NEW_FARMACISTI"
+    work_accesso_CCR: "NEW_CCR"
+    work_accesso_cittadino: "NEW_CITTADINO"
+    work_accesso_MMG: "NEW_MMG"
+    work_accesso_amministrativo: "NEW ALTRO_OPERATORE"
+    work_accesso_PAI: "NEW CREG PAI"
 
 - work_index:
     work_index_sheet: 0

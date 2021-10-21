@@ -135,6 +135,9 @@ def _get_form_checked_value(_list, request):
     _list.append("Sheet")
     return_dict = { 
                     "Sheet": "",
+                    "Agenda": "",
+                    "PrestazioneSISS": "",
+                    "PrestazioneInterna": "",
                     "Quesiti": "",
                     "OperatoreQD": "", 
                     "Distretti": "",
@@ -142,7 +145,12 @@ def _get_form_checked_value(_list, request):
                     "Metodiche": "",
                     "Inviante": "", 
                     "Risorsa": "",
-                    "Canaliabilitati": ""
+                    "Farmacia": "",
+                    "CCR": "",
+                    "Cittadino": "",
+                    "MMG": "",
+                    "Amministrativo": "",
+                    "PAI": ""
                 }
     for element in _list:
         return_dict[element] = request.form[str(element)+'text']

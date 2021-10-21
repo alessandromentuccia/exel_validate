@@ -75,6 +75,7 @@ class Check_action():
     work_accesso_programmabile_ZP = ""
     work_combinata = ""
     work_codice_agenda_interno = ""
+    work_codice_prestazione_interno = ""
 
     work_index_codice_QD = 0
     work_index_op_logic_distretto = 0
@@ -117,6 +118,7 @@ class Check_action():
         self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
         self.work_combinata = data[0]["work_column"]["work_combinata"]
         self.work_codice_agenda_interno = data[0]["work_column"]["work_codice_agenda_interno"]
+        self.work_codice_prestazione_interno = data[0]["work_column"]["work_codice_prestazione_interno"]
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1

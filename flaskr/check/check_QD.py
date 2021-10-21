@@ -100,8 +100,11 @@ class Check_QD():
     def ck_QD_agenda(self, df_mapping, error_dict):
         print("start checking if foreach agenda there are the same QD")
         
-        error_dict.update({'error_QD_agenda': []})
+        error_dict.update({'error_QD_agenda': [],
+                           'error_QD_vuoto' : []})
         QD_dict_error = {}
+        index_agenda_dict = {}
+        QD_agenda_dict = {}
 
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
@@ -109,7 +112,50 @@ class Check_QD():
         agenda = df_mapping[self.work_codice_agenda_siss].iloc[2]
         last_QD = df_mapping[self.work_codice_QD].iloc[2]
         for index, row in df_mapping.iterrows():
-            if row[self.work_abilitazione_esposizione_siss] == "S":
+            index_agenda_dict = self.update_list_in_dict(index_agenda_dict, row[self.work_codice_agenda_siss], str(int(index)+2))
+            QD_agenda_dict[str(int(index)+2)] = str(row[self.work_codice_QD])
+            
+        for key, indice in index_agenda_dict.items(): #key: AGENDA, value: INDICE
+            flag_QD_non_vuoto = False
+            flag_QD_diverso = False
+
+            QD_list_vuoti = []
+            agenda = key
+            cont = 0
+            QD_list_last = []
+            QD_list_last_last = []
+            if len(indice) > 1:
+                for ind in indice: 
+                    QD_string = QD_agenda_dict[ind] #stringa dei QD
+                    print("indice: " + ind + "QD_string: " + QD_string)
+                    QD_prestazione = QD_string.split(self.work_delimiter) #lista dei QD
+                    QD_lista_prestazioni = []
+                    for QD in QD_prestazione:
+                        QD_lista_prestazioni.append(QD.strip()) #lista dei QD ripulita dagli spazi
+                    QD_lista_prestazioni.sort() #lista dei QD ordinata
+                    if cont == 0:
+                        cont = cont + 1                    
+                        QD_list_last = QD_lista_prestazioni 
+                    print("QD_lista_prestazioni", QD_lista_prestazioni)
+                    if QD_lista_prestazioni == ['']:
+                        QD_list_vuoti.append(ind)
+                        #QD_list_last = QD_list_last_last
+                    else:
+                        flag_QD_non_vuoto = True
+                        #D_list_last.sort()
+                        if QD_lista_prestazioni != QD_list_last:
+                            error_dict['error_QD_agenda'].append(ind)
+                            print("trovato QD non coerente in agenda")
+                            QD_dict_error = self.update_list_in_dict(QD_dict_error, ind, QD_string)
+                        QD_list_last = QD_lista_prestazioni
+                        #QD_list_last_last = QD_list_last
+            
+            if flag_QD_non_vuoto == True and QD_list_vuoti != ['']:
+                for ind in QD_list_vuoti:
+                    error_dict['error_QD_vuoto'].append(ind)
+            
+
+            '''if row[self.work_abilitazione_esposizione_siss] == "S":
                 if row[self.work_codice_agenda_siss] == agenda:
                     if row[self.work_codice_QD] != last_QD:
                         print("error QD at index:" +  str(int(index)+2))
@@ -118,8 +164,8 @@ class Check_QD():
                         QD_dict_error = self.update_list_in_dict(QD_dict_error, str(int(index)+2), row[self.work_codice_QD])
                 else: 
                     agenda = row[self.work_codice_agenda_siss]
-                    last_QD = row[self.work_codice_QD] 
-        
+                    last_QD = row[self.work_codice_QD]''' 
+        print("start definizione output agenda QD")
         out1 = ""
         out_message = ""
         for ind in error_dict['error_QD_agenda']:
@@ -129,8 +175,16 @@ class Check_QD():
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
+        print("print output qd vuoto")        
+        for ind in error_dict['error_QD_vuoto']:
+            #out1 = out1 + "at index: " + ind + ", ".join(QD_dict_error[ind]) + ", \n"
+            out_message = "__> QD: prestazione con QD vuoti nell'agenda"
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet[self.work_alert_column+ind] = out_message
         self.output_message = self.output_message + "\nerror_QD_agenda: \n" + out1
-
+        print("finish print output qd vuoto")  
         xfile.save(self.file_data) 
         return error_dict
 

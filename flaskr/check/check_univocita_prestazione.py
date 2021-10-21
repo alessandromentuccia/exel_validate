@@ -95,17 +95,24 @@ class Check_univocita_prestazione():
             indexAP = index_dict[key] #indici dove si trovano tutte le occorrenze di una coppia A/P
             lengthMD = len(value) #occorrenze coppie prestazioni/agenda
 
+            flag_error1 = False
+            flag_error2 = False
+            flag_error3 = False
+
+            '''error_distretti_duplicati = get_distretti_duplicates_in_agenda(self, value)
+            if error_distretti_duplicati == -1:
+                flag_error1 = True #da modificare'''
+
             set_duplicates = {} #dict con key gli m_d e value sono le occorrenze
             if lengthMD > 1: #occorrenza multipla, rilevo possibile caso 1:N se lenght > 1
                 print("occorrenza multipla " + str(lengthMD))
-                flag_error1 = False
-                flag_error2 = False
-                flag_error3 = False
+                
                 error_1_list = [] 
                 error_2_list = [] 
                 cont = 0
                 dict_items_cont = {} #inserisco chiave:m_d e value: a che indice di indexMD è
-                
+                distretti_list = []
+
                 for v in value: #per ogni m_d in value
                     print("v: " + v)
                     #definisco un dict per conteggiare le occorrenze degli m_d
@@ -122,15 +129,19 @@ class Check_univocita_prestazione():
                     print("splitMD_list: " + splitMD_list[1])
                     split_district = splitMD_list[1]
                     #verifico se nei casi 1:N, i distretto non sono vuoti
-                    if split_district != '': #and self.list_duplicates(splitMD_list[0].split(self.work_delimiter)) != []: 
+                    #if split_district != '': #and self.list_duplicates(splitMD_list[0].split(self.work_delimiter)) != []: 
                         #contM = 0
-                        metodica_list = []
-                        distretti_list = []
+                    metodica_list = []
+                    if split_district != "":
                         for distretto in split_district.split(self.work_delimiter):
                             print("d: " + distretto)
                             if distretto == "":
                                 flag_error1 = True
                                 error_1_list.append(indexAP[cont])
+                            elif distretto in distretti_list:
+                                flag_error2 = True
+                                error_2_list.append(indexAP[cont])
+                                distretti_list.append(distretto)
                             '''metodica = splitMD_list[0].split(self.work_delimiter)[contM]
                             metodica_list.append(metodica)
                             distretti_list.append(distretto)
@@ -145,7 +156,8 @@ class Check_univocita_prestazione():
                     if occorrenze > 1: #se le occorrenze sono > 1 allora caso 1:N
                         flag_error2 = True
                         for md in dict_items_cont[MD]:
-                            error_2_list.append(indexAP[md])
+                            if indexAP[md] not in error_2_list: 
+                                error_2_list.append(indexAP[md])
                 
                 #se flag_error1 è True, allora trovato errore distretto vuoto
                 if flag_error1 == True: 
@@ -158,7 +170,14 @@ class Check_univocita_prestazione():
                 if flag_error2 == True: 
                     for ind in error_2_list:
                         print("flag error 2: " + ind)
-                        casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + " con metodica_distretto: " + ", ".join(value))
+                        fl_value_null = False
+                        for v in value:
+                            if v != "|": #se true allora ci sono metodiche o distretti
+                                fl_value_null = True
+                        if fl_value_null == True:
+                            casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + " con metodica_distretto: " + ", ".join(value))
+                        else:
+                            casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + " le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N")
                         if ind not in error_dict["error_casi_1n"]:
                             error_dict["error_casi_1n"].append(ind) #ind ha già sommato + 2
                          
@@ -201,7 +220,7 @@ class Check_univocita_prestazione():
         out_message = ""
         for ind in error_dict['error_casi_1n']:
             out_message = "__> Caso 1:N:\n"
-            out_message = out_message + "  _> rilevato per la coppia prestazione/agenda: '{}'".format(", ".join(casi_1n_dict_error[ind]))
+            out_message = out_message + "  _> Per la coppia prestazione/agenda: '{}'".format(", ".join(casi_1n_dict_error[ind]))
             if "S" in df_mapping.at[int(ind)-2, self.work_combinata]: #verifico se c'è combinata
                 out_message = out_message + ";\n  _> rilevata possibile risoluzione tramite combinata"
             out1 = out1 + "at index: " + ind + ", on agenda_prestazione: " + ", ".join(casi_1n_dict_error[ind]) + ", \n"
@@ -215,4 +234,27 @@ class Check_univocita_prestazione():
         xfile.save(self.file_data)  
         return error_dict
 
-    
+    #per ogni agenda, trova se in ogni prestazione, i distretti sono tutti diversi
+    '''def get_distretti_duplicates_in_agenda(self, m_d_value):
+        m_d_error_dict = {}
+        distretti_list = []
+
+        for value in m_d_value: #in m_d_value ci sono tutti le metodiche e distretti di tutte le prestazioni dell'agenda
+
+            splitMD_list = value.split("|") #splitto m_d in una lista di due elementi
+            print("splitMD_list: " + splitMD_list[1])
+            split_district = splitMD_list[1] #lista contenente sono i distretti di una prestazione
+
+            if split_district != "":
+                
+                for distretto in split_district.split(self.work_delimiter): #singolo distretto delle lista distretti di una prestazione
+                    print("d: " + distretto)
+                    if distretto in distretti_list:
+                        m_d_error_dict = self.update_list_in_dict(m_d_error_dict, ind, )
+                        error_list.append(indexAP[cont])
+                    
+            cont = cont + 1
+
+        if m_d_error_dict == {}:
+            return -1
+        return m_d_error_dict'''

@@ -115,23 +115,23 @@ class Check_distretti():
                             short_sheet = sheet_Distretti.loc[sheet_Distretti["Codice Distretto"] == distretto] #filtro catalogo sul codice distretto                     
                             
                             #print("disciplina " + str(disciplina["Cod Disciplina"]) + " " + str(disciplina["Codice Quesito"]))
-                            print("prestazione del distretto in mapping 11:" + cod_pre_siss + " + " + siss)
+                            print("prestazione del distretto in mapping 11:" + cod_pre_siss + " + " + distretto)
                             
                             if cod_pre_siss not in short_sheet["Codice SISS"].values:
                                 siss_flag = True
                                 prestazioni_dict[str(int(index)+2)] = cod_pre_siss
-                                print("error distretto on index:" + str(int(index)+2))
+                                print("error distretto on index 1:" + str(int(index)+2))
                                 distretto_dict_error = self.update_list_in_dict(distretto_dict_error, str(int(index)+2), distretto)
                             else:
                                 if cod_pre_siss != siss and siss != "":
-                                    print("error distretto on index:" + str(int(index)+2))
+                                    print("error distretto on index 2:" + str(int(index)+2))
                                     siss_flag = True
                                     prestazioni_dict[str(int(index)+2)] = cod_pre_siss
                                     distretto_dict_error = self.update_list_in_dict(distretto_dict_error, str(int(index)+2), distretto)
-
+                    siss = cod_pre_siss
                 if siss_flag == True: #se durante il mapping con la sua prestazione, questa non viene rilevata, allora è errore
                     error_dict['error_distretti_inprestazione'].append(str(int(index)+2))
-                siss = cod_pre_siss
+                
 
         out1 = ""
         out_message = ""
