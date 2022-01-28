@@ -48,7 +48,6 @@ class Check_univocita_prestazione():
     work_accesso_programmabile_ZP = ""
 
     work_index_codice_QD = 0
-    work_index_op_logic_distretto = 0
     work_index_codice_SISS_agenda = 0
     work_index_abilitazione_esposizione_SISS = 0
     work_index_codice_prestazione_SISS = 0
@@ -69,7 +68,7 @@ class Check_univocita_prestazione():
         
         for index, row in df_mapping.iterrows():
             a_p = str(row[self.work_codice_agenda_siss]) + "|" + str(row[self.work_codice_prestazione_siss])
-            m_d = row[self.work_codice_metodica] + "|" + row[self.work_codice_distretto]
+            m_d = str(row[self.work_codice_metodica]) + "|" + str(row[self.work_codice_distretto])
             index_dict = self.update_list_in_dict(index_dict, a_p, str(int(index)+2))
             distretti_dict = self.update_list_in_dict(distretti_dict, str(int(index)+2), row[self.work_operatore_logico_distretto])
             if a_p not in metodica_distretti_dict.keys() and row[self.work_abilitazione_esposizione_siss] == "S":
@@ -220,9 +219,9 @@ class Check_univocita_prestazione():
         out_message = ""
         for ind in error_dict['error_casi_1n']:
             out_message = "__> Caso 1:N:\n"
-            out_message = out_message + "  _> Per la coppia prestazione/agenda: '{}'".format(", ".join(casi_1n_dict_error[ind]))
-            if "S" in df_mapping.at[int(ind)-2, self.work_combinata]: #verifico se c'è combinata
-                out_message = out_message + ";\n  _> rilevata possibile risoluzione tramite combinata"
+            out_message = out_message + "  _> Per la coppia agenda/prestazione: '{}'".format(", ".join(casi_1n_dict_error[ind]))
+            #if "S" in df_mapping.at[int(ind)-2, self.work_combinata] or "1" in df_mapping.at[int(ind)-2, self.work_combinata] or "2" in df_mapping.at[int(ind)-2, self.work_combinata]: #verifico se c'è combinata
+            #    out_message = out_message + ";\n  _> rilevata possibile risoluzione tramite combinata"
             out1 = out1 + "at index: " + ind + ", on agenda_prestazione: " + ", ".join(casi_1n_dict_error[ind]) + ", \n"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert

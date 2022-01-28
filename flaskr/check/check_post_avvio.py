@@ -27,7 +27,7 @@ class Check_post_avvio():
 
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
-
+ 
         if self.configurazione_rivisto["Quesiti"] != "":
             error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "Quesiti", self.work_codice_QD)
             error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "Quesiti", self.work_codice_QD)
@@ -86,11 +86,14 @@ class Check_post_avvio():
         return error_dict
 
     def ck_MAP(self, df_mapping, df_rivisto, error_dict, element, work_codice):
+        print("start checking MAPPING")
         error_dict.update({
             'error_ck_'+element: [] })
-        
-        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
-        sheet = xfile.get_sheet_by_name(self.work_sheet)
+
+        alert_column = "DP"
+
+        xfile = openpyxl.load_workbook(self.file_rivisto) #recupero file excel da file system
+        sheet = xfile.get_sheet_by_name(self.configurazione_rivisto["Sheet"])
 
         file_rivisto = self.file_rivisto 
         configurazione_rivisto = self.configurazione_rivisto
@@ -104,48 +107,56 @@ class Check_post_avvio():
             #print("iterate row: " + rivisto_key)
             #print("iterate row: " + row[self.configurazione_rivisto["Quesiti"]])
             searchedValue = row[configurazione_rivisto[element]] #modificare
-            result_ = self.findCell_dataframe(df_mapping, searchedValue, rivisto_key, work_codice) #modificare
+            if element == "Inviante":
+                if searchedValue == "":
+                    searchedValue = "0"
+            result_ = self.findCell_dataframe_MAP(df_mapping, searchedValue, rivisto_key, work_codice) #modificare
             if result_ == -1:
                 error_dict["error_ck_"+element].append(str(int(index)+2))
                 print("trovato errore su "+element)
                 out_message = "__> {}".format("Corrispondenza "+element+" non trovata in mapping")
-                if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
-                    sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                if sheet[alert_column+str(int(index)+2)].value is not None:
+                    sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
                 else:
-                    sheet[self.work_alert_column+str(int(index)+2)] = out_message
+                    sheet[alert_column+str(int(index)+2)] = out_message
                 
-        xfile.save(self.file_data)     
+        xfile.save(self.file_rivisto)     
         return error_dict
     
     #invertire mapping con rivisto e tutti gli altri attributi
     def ck_RIV(self, df_mapping, df_rivisto, error_dict, element, work_codice):
+        print("start checking RIVISTO")
         error_dict.update({
             'error_ck_reverse_'+element: [] })
         
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet)
-
-        file_rivisto = self.file_rivisto 
+        
+        file_rivisto = self.file_rivisto  
         configurazione_rivisto = self.configurazione_rivisto
 
-        agenda = configurazione_rivisto["Agenda"] #intesta
-        prestazioneSISS = configurazione_rivisto["PrestazioneSISS"]
-        prestazioneInterna = configurazione_rivisto["PrestazioneInterna"]
+        #agenda = configurazione_rivisto["Agenda"] #intesta
+        #prestazioneSISS = configurazione_rivisto["PrestazioneSISS"]
+        #prestazioneInterna = configurazione_rivisto["PrestazioneInterna"]
+        agenda = self.work_codice_agenda_siss #intesta
+        prestazioneSISS = self.work_codice_prestazione_siss
+        prestazioneInterna = self.work_codice_prestazione_interno
 
-        for index, row in df_rivisto.iterrows():
-            rivisto_key = str(row[agenda]).strip()+"|"+str(row[prestazioneSISS]).strip()+"|"+str(row[prestazioneInterna]).strip()
-            #print("iterate row: " + rivisto_key)
-            #print("iterate row: " + row[self.configurazione_rivisto["Quesiti"]])
-            searchedValue = row[configurazione_rivisto[element]] #modificare
-            result_ = self.findCell_dataframe(df_mapping, searchedValue, rivisto_key, work_codice) #modificare
-            if result_ == -1:
-                error_dict["error_ck_reverse_"+element].append(str(int(index)+2))
-                print("trovato errore su "+element)
-                out_message = "__> {}".format("Corrispondenza "+element+" non trovata in rivisto")
-                if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
-                    sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
-                else:
-                    sheet[self.work_alert_column+str(int(index)+2)] = out_message
+        for index, row in df_mapping.iterrows():
+            if row[self.work_abilitazione_esposizione_siss] == "S":
+                mapping_key = str(row[agenda]).strip()+"|"+str(row[prestazioneSISS]).strip()+"|"+str(row[prestazioneInterna]).strip()
+                #print("iterate row: " + rivisto_key)
+                #print("iterate row: " + row[self.configurazione_rivisto["Quesiti"]])
+                searchedValue = row[work_codice] #modificare
+                result_ = self.findCell_dataframe_RIV(df_rivisto, searchedValue, mapping_key, configurazione_rivisto[element]) #modificare
+                if result_ == -1:
+                    error_dict["error_ck_reverse_"+element].append(str(int(index)+2))
+                    print("trovato errore su "+element)
+                    out_message = "__> {}".format("Corrispondenza "+element+" non trovata in rivisto")
+                    if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
+                        sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                    else:
+                        sheet[self.work_alert_column+str(int(index)+2)] = out_message
                 
         xfile.save(self.file_data)     
         return error_dict

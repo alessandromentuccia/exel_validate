@@ -48,7 +48,6 @@ class Check_agende_interne():
     work_accesso_programmabile_ZP = ""
 
     work_index_codice_QD = 0
-    work_index_op_logic_distretto = 0
     work_index_codice_SISS_agenda = 0
     work_index_abilitazione_esposizione_SISS = 0
     work_index_codice_prestazione_SISS = 0

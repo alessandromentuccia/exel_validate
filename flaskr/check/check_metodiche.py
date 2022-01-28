@@ -48,49 +48,13 @@ class Check_metodiche():
     work_accesso_programmabile_ZP = ""
 
     work_index_codice_QD = 0
-    work_index_op_logic_distretto = 0
     work_index_codice_SISS_agenda = 0
     work_index_abilitazione_esposizione_SISS = 0
     work_index_codice_prestazione_SISS = 0
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
 
-    '''def __init__(self):
-        self.output_message = ""
-        with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
-            data = yaml.load(yamlfile, Loader=yaml.FullLoader)
-        logger.debug(data)
-        self.work_sheet = data[0]["work_column"]["work_sheet"] 
-        self.work_codice_prestazione_siss = data[0]["work_column"]["work_codice_prestazione_siss"]
-        self.work_descrizione_prestazione_siss = data[0]["work_column"]["work_descrizione_prestazione_siss"]
-        self.work_codice_agenda_siss = data[0]["work_column"]["work_codice_agenda_siss"]
-        self.work_casi_1_n = data[0]["work_column"]["work_casi_1_n"]
-        self.work_abilitazione_esposizione_siss = data[0]["work_column"]["work_abilitazione_esposizione_siss"]
-        self.work_codici_disciplina_catalogo = data[0]["work_column"]["work_codici_disciplina_catalogo"]
-        self.work_descrizione_disciplina_catalogo = data[0]["work_column"]["work_descrizione_disciplina_catalogo"]
-        self.work_codice_QD = data[0]["work_column"]["work_codice_QD"]
-        self.work_descrizione_QD = data[0]["work_column"]["work_descrizione_QD"]
-        self.work_operatore_logico_QD = data[0]["work_column"]["work_operatore_logico_QD"]
-        self.work_codice_metodica = data[0]["work_column"]["work_codice_metodica"]
-        self.work_descrizione_metodica = data[0]["work_column"]["work_descrizione_metodica"]
-        self.work_codice_distretto = data[0]["work_column"]["work_codice_distretto"]
-        self.work_descrizione_distretto = data[0]["work_column"]["work_descrizione_distretto"]
-        self.work_operatore_logico_distretto = data[0]["work_column"]["work_operatore_logico_distretto"]
-        self.work_priorita_U = data[0]["work_column"]["work_priorita_U"]
-        self.work_priorita_primo_accesso_D = data[0]["work_column"]["work_priorita_primo_accesso_D"]
-        self.work_priorita_primo_accesso_P = data[0]["work_column"]["work_priorita_primo_accesso_P"]
-        self.work_priorita_primo_accesso_B = data[0]["work_column"]["work_priorita_primo_accesso_B"]
-        self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
-
-        self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
-        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"]
-        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"]
-        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"]
-        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
-        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
-        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]'''
-
+    
     def ck_metodica_inprestazione(self, df_mapping, sheet_Metodiche, error_dict):
         print("start checking if metodica are correct")
         error_dict.update({'error_metodica_inprestazione': []})
@@ -110,8 +74,8 @@ class Check_metodiche():
                 if Metodica_string is not None:
                     cod_pre_siss = str(row[self.work_codice_prestazione_siss])
                     for metodica in Metodica_string:
+                        metodica = metodica.strip()
                         if metodica != "":
-                            metodica = metodica.strip()
                             short_sheet = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                      
                             
                             print("prestazione della metodica in mapping:" + cod_pre_siss + " + " + siss)
@@ -249,6 +213,7 @@ class Check_metodiche():
                 '''
                 if Metodica_string is not None:
                     for metodica in Metodica_string:
+                        metodica = metodica.strip()
                         if metodica != "":
                             metodica_catalogo = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                    
                             

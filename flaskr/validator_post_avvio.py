@@ -82,7 +82,6 @@ class Check_action():
     work_accesso_PAI = ""
 
     work_index_codice_QD = 0
-    work_index_op_logic_distretto = 0
     work_index_codice_SISS_agenda = 0
     work_index_abilitazione_esposizione_SISS = 0
     work_index_codice_prestazione_SISS = 0
@@ -134,7 +133,6 @@ class Check_action():
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1
-        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"] - 1
         self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"] - 1
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"] - 1
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] - 1
@@ -210,7 +208,7 @@ class Check_action():
                 myValue = sh.cell(row, self.work_index_codice_SISS_agenda) #Codice SISS agenda 15
                 #abilita = sh.cell(row, self.work_index_abilitazione_esposizione_SISS-1) #abilitazione esposizione SISS 28
                 if myCell.value == searchedValue: # and abilita.value == "S":
-                    result_coord.append(str(row) + "#" + str(col))
+                    result_coord.append(str(row) + "|" + str(col))
                     result_value.append(myValue.value)
                     #return row, col#xl_rowcol_to_cell(row, col)
 
@@ -218,9 +216,8 @@ class Check_action():
             return -1
         return result_coord#, result_value
 
-    def findCell_dataframe(self, df, searchedValue, key_rivisto, column_name):
+    def findCell_dataframe_MAP(self, df, searchedValue, key_rivisto, column_name):
         result_coord = []
-        mapping_key_list = []
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
@@ -229,7 +226,25 @@ class Check_action():
             #print("trovata corrisponenza key: " + searchedValue)
             if mapping_key == key_rivisto and row[self.work_abilitazione_esposizione_siss] == "S":
                 #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
-                if row[column_name] == searchedValue:
+                if str(row[column_name]) == searchedValue:
+                    result_coord.append(str(index) + "#" + column_name)
+                    #print("trovato QD corretto")
+                
+        if result_coord == []:
+            return -1
+        return result_coord#, result_value
+
+    def findCell_dataframe_RIV(self, df, searchedValue, key_mapping, column_name):
+        result_coord = []
+
+        #print("start findcell dataframe")
+        for index, row in df.iterrows():
+            rivisto_key = str(row[self.configurazione_rivisto["Agenda"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]].strip())
+            #print("iterate mapping: " + mapping_key)
+            #print("trovata corrisponenza key: " + searchedValue)
+            if rivisto_key == key_mapping:
+                #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
+                if str(row[column_name]) == str(searchedValue):
                     result_coord.append(str(index) + "#" + column_name)
                     #print("trovato QD corretto")
                 

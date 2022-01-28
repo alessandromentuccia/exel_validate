@@ -115,7 +115,8 @@ def post_avvio_start_check():
         file_path_rivisto = app.config['DOWNLOAD_FOLDER']  + excel2_filename
         check_actionPA = validator_post_avvio.Check_action(configuration_file, file_path_mapping)
         check_actionPA.initializer(file_path_rivisto, checked_dict)
-        return "lista: " + ", ".join(_list), 200
+        #return "lista: " + ", ".join(_list), 200
+        return send_file(file_path_rivisto,as_attachment = True, attachment_filename=excel2_filename), 200
     except Exception as e:
         logger.error(e)
         return str(e), 400
@@ -133,6 +134,9 @@ def stream():
     
 def _get_form_checked_value(_list, request):
     _list.append("Sheet")
+    _list.append("Agenda")
+    _list.append("PrestazioneSISS")
+    _list.append("PrestazioneInterna")
     return_dict = { 
                     "Sheet": "",
                     "Agenda": "",

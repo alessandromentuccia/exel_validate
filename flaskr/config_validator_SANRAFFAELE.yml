@@ -1,0 +1,41 @@
+- work_column:
+    work_sheet: "Rivisto"
+    work_codice_prestazione_siss: "CD_PRESTAZIONE_SISS"
+    work_descrizione_prestazione_siss: "DS_ESTESA_PRESTAZIONE_SISS"
+    work_codice_agenda_siss: "CD_AGENDA"
+    work_casi_1_n: "CASI 1:N"
+    work_abilitazione_esposizione_siss: "FL_ESPOSIZIONE_SISS"
+    work_codici_disciplina_catalogo: "CODICE_DISCIPLINA_X_QD"
+    work_descrizione_disciplina_catalogo: "CD_DISCIPLINA_QD"
+    work_codice_QD: "ID_QUESITO_DIAGNOSTICO"
+    work_descrizione_QD: "DESCRIZIONE_QD"
+    work_operatore_logico_QD: "CD_OPE_QD"
+    work_codice_metodica: "ID_METODICA"
+    work_descrizione_metodica: "DESCRIZIONE METODICA"
+    work_codice_distretto: "ID_DISTRETTO_ANATOMICO"
+    work_descrizione_distretto: "DESCRIZIONE DISTRETTO"
+    work_operatore_logico_distretto: "CD_OPE_DS"
+    work_priorita_U: "FL_URGENTE"
+    work_priorita_primo_accesso_D: "FL_PRIORITA_OD"
+    work_priorita_primo_accesso_P: "FL_PRIORITA_OP"
+    work_priorita_primo_accesso_B: "FL_PRIORITA_ALTA"
+    work_accesso_programmabile_ZP: "FL_ACCESSO_PROGRAMMABILE"
+    work_combinata: "ID_COMBINATA"
+    work_codice_agenda_interno: "CODICE INTERNO AGENDA"
+    work_codice_prestazione_interno: "CODICE INTERNO PRESTAZIONE"
+
+- work_index:
+    work_index_sheet: 0
+    work_index_codice_QD: 64
+    work_index_op_logic_distretto: 71
+    work_index_codice_SISS_agenda: 15
+    work_index_abilitazione_esposizione_SISS: 29
+    work_index_codice_prestazione_SISS: 24
+    work_index_operatore_logico_distretto: 71
+    work_index_codici_disciplina_catalogo: 45
+    work_index_codici_descri_disciplina_catalogo: 11
+    work_index_operatore_logico_QD: 67
+    work_alert_column: "DP"
+
+- work_separator:
+    work_delimiter: ","

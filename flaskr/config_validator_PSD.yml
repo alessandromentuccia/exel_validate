@@ -23,19 +23,27 @@
     work_combinata: "Combinata"
     work_codice_agenda_interno: "Codice Interno Agenda"
     work_codice_prestazione_interno: "Codice Prestazione Cup"
+    work_inviante: "Inviante"
+    work_risorsa: "Risorsa"
+    work_accesso_farmacia: "Farmacisti"
+    work_accesso_CCR: "CCR"
+    work_accesso_cittadino: "Cittadino"
+    work_accesso_MMG: "MMG"
+    work_accesso_amministrativo: "Amministrativo Ente"
+    work_accesso_PAI: "PAI (Ex CreG)"
 
 - work_index:
     work_index_sheet: 1
-    work_index_codice_QD: 35
-    work_index_op_logic_distretto: 47
-    work_index_codice_SISS_agenda: 16
-    work_index_abilitazione_esposizione_SISS: 25
-    work_index_codice_prestazione_SISS: 21
-    work_index_operatore_logico_distretto: 47
-    work_index_codici_disciplina_catalogo: 33
-    work_index_codici_descri_disciplina_catalogo: 34
-    work_index_operatore_logico_QD: 37
-    work_alert_column: "BR"
+    work_index_codice_QD: 30
+    work_index_op_logic_distretto: 42
+    work_index_codice_SISS_agenda: 13
+    work_index_abilitazione_esposizione_SISS: 20
+    work_index_codice_prestazione_SISS: 18
+    work_index_operatore_logico_distretto: 42
+    work_index_codici_disciplina_catalogo: 28
+    work_index_codici_descri_disciplina_catalogo: 29
+    work_index_operatore_logico_QD: 32
+    work_alert_column: "BM"
 
 - work_separator:
     work_delimiter: ","

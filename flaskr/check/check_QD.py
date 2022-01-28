@@ -51,7 +51,6 @@ class Check_QD():
     work_accesso_programmabile_ZP = ""
 
     work_index_codice_QD = 0
-    work_index_op_logic_distretto = 0
     work_index_codice_SISS_agenda = 0
     work_index_abilitazione_esposizione_SISS = 0
     work_index_codice_prestazione_SISS = 0
@@ -59,49 +58,14 @@ class Check_QD():
     work_index_codici_disciplina_catalogo = 0
     work_index_codici_descri_disciplina_catalogo = 0
 
-    '''def __init__(self, data, excel_file):
-        #self.output_message = ""
-        #with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
-        #    data = yaml.load(yamlfile, Loader=yaml.FullLoader)
-        #logger.debug(data)
-        self.work_sheet = data[0]["work_column"]["work_sheet"] 
-        self.work_codice_prestazione_siss = data[0]["work_column"]["work_codice_prestazione_siss"]
-        self.work_descrizione_prestazione_siss = data[0]["work_column"]["work_descrizione_prestazione_siss"]
-        self.work_codice_agenda_siss = data[0]["work_column"]["work_codice_agenda_siss"]
-        self.work_casi_1_n = data[0]["work_column"]["work_casi_1_n"]
-        self.work_abilitazione_esposizione_siss = data[0]["work_column"]["work_abilitazione_esposizione_siss"]
-        self.work_codici_disciplina_catalogo = data[0]["work_column"]["work_codici_disciplina_catalogo"]
-        self.work_descrizione_disciplina_catalogo = data[0]["work_column"]["work_descrizione_disciplina_catalogo"]
-        self.work_codice_QD = data[0]["work_column"]["work_codice_QD"]
-        self.work_descrizione_QD = data[0]["work_column"]["work_descrizione_QD"]
-        self.work_operatore_logico_QD = data[0]["work_column"]["work_operatore_logico_QD"]
-        self.work_codice_metodica = data[0]["work_column"]["work_codice_metodica"]
-        self.work_descrizione_metodica = data[0]["work_column"]["work_descrizione_metodica"]
-        self.work_codice_distretto = data[0]["work_column"]["work_codice_distretto"]
-        self.work_descrizione_distretto = data[0]["work_column"]["work_descrizione_distretto"]
-        self.work_operatore_logico_distretto = data[0]["work_column"]["work_operatore_logico_distretto"]
-        self.work_priorita_U = data[0]["work_column"]["work_priorita_U"]
-        self.work_priorita_primo_accesso_D = data[0]["work_column"]["work_priorita_primo_accesso_D"]
-        self.work_priorita_primo_accesso_P = data[0]["work_column"]["work_priorita_primo_accesso_P"]
-        self.work_priorita_primo_accesso_B = data[0]["work_column"]["work_priorita_primo_accesso_B"]
-        self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
-
-        self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
-        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"]
-        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"]
-        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"]
-        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
-        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
-        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]
-        self.work_index_codici_descri_disciplina_catalogo = data[1]["work_index"]["work_index_codici_descri_disciplina_catalogo"]
-        '''
 
     def ck_QD_agenda(self, df_mapping, error_dict):
         print("start checking if foreach agenda there are the same QD")
         
-        error_dict.update({'error_QD_agenda': [],
-                           'error_QD_vuoto' : []})
+        error_dict.update({
+            'error_QD_agenda': [],
+            'error_QD_vuoto' : []})
+            
         QD_dict_error = {}
         index_agenda_dict = {}
         QD_agenda_dict = {}
@@ -109,11 +73,12 @@ class Check_QD():
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
         
-        agenda = df_mapping[self.work_codice_agenda_siss].iloc[2]
-        last_QD = df_mapping[self.work_codice_QD].iloc[2]
+        #agenda = df_mapping[self.work_codice_agenda_siss].iloc[2]
+        #last_QD = df_mapping[self.work_codice_QD].iloc[2]
         for index, row in df_mapping.iterrows():
-            index_agenda_dict = self.update_list_in_dict(index_agenda_dict, row[self.work_codice_agenda_siss], str(int(index)+2))
-            QD_agenda_dict[str(int(index)+2)] = str(row[self.work_codice_QD])
+            if row[self.work_abilitazione_esposizione_siss] == "S":
+                index_agenda_dict = self.update_list_in_dict(index_agenda_dict, row[self.work_codice_agenda_siss], str(int(index)+2))
+                QD_agenda_dict[str(int(index)+2)] = str(row[self.work_codice_QD])
             
         for key, indice in index_agenda_dict.items(): #key: AGENDA, value: INDICE
             flag_QD_non_vuoto = False
@@ -219,8 +184,8 @@ class Check_QD():
             disci_flag_agenda = False
             if row[self.work_codice_agenda_siss] not in agende_viewed and row[self.work_codice_QD] is not None:
                 searchedAgenda = row[self.work_codice_agenda_siss]
-                disciplina_mapping_row = row[self.work_codici_disciplina_catalogo]
-                descrizione_disciplina_mapping_row = row[self.work_descrizione_disciplina_catalogo]
+                #disciplina_mapping_row = row[self.work_codici_disciplina_catalogo]
+                #descrizione_disciplina_mapping_row = row[self.work_descrizione_disciplina_catalogo]
                 #prendo tutte le agende con lo stesso codice
                 result = self.findCell_agenda(sheet_mapping, searchedAgenda, self.work_index_codice_SISS_agenda) #prendo tutte le righe con questa agenda
                 print("start iterate each excel row")
@@ -230,15 +195,16 @@ class Check_QD():
                     descrizione_discipline_error_list = []
                     discipline_error_list = []
                     for res in result: #per ogni risultato controllo che ci sia la stessa disciplina
-                        r = res.split("#")[0] #row agenda
-                        c = res.split("#")[1] #column agenda
+                        r = res.split("|")[0] #row agenda
+                        c = res.split("|")[1] #column agenda
                         #print("start iterate result sheet_mapping")
                         result_QD = sheet_mapping.cell(int(r), self.work_index_codice_QD).value.split(self.work_delimiter) #QD
                         if result_QD is not None:
                             for QD in result_QD:
                                 #print("start iterate QD")
+                                QD = QD.strip()
                                 if QD != "":
-                                    short_sheet = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD.strip()]
+                                    short_sheet = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD]
                                     di_list = []
                                     for ss in short_sheet["Cod Disciplina"].values: #risolvo problema discipline con codici multipli
                                         #print("start iterate cod disciplina" + ss)
@@ -247,19 +213,24 @@ class Check_QD():
                                             di_list = di_list + ss.split("\n")
                                         else:
                                             di_list.append(ss)
-                                    
-                                    if disciplina_mapping_row not in di_list:
-                                        disci_flag_QD = True
-                                        if str(int(r)+1) not in agende_error_list:
-                                            agende_error_list.append(str(int(r)+1))
-                                            QD_disci_dict_error[str(int(r)+1)] = "QD: "+ QD + " non appartiene alla disciplina: " + disciplina_mapping_row
-                                            print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
-                                    if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
-                                        descri_disci_flag_QD = True
-                                        if str(int(r)+1) not in descrizione_discipline_error_list:
-                                            descrizione_discipline_error_list.append(str(int(r)+1))
-                                            QD_descri_disci_dict_error[str(int(r)+1)] = "La descrizione disciplina: " + descrizione_disciplina_mapping_row + "non è presente sul catalogo SISS"
-                        
+                                    disciplina_mapping_row = df_mapping[self.work_codici_disciplina_catalogo].iloc[int(r)-1]
+                                    if disciplina_mapping_row != "":
+                                        descrizione_disciplina_mapping_row = df_mapping[self.work_descrizione_disciplina_catalogo].iloc[int(r)-1]
+                                        if disciplina_mapping_row not in di_list:
+                                            disci_flag_QD = True
+                                            if str(int(r)+1) not in agende_error_list:
+                                                agende_error_list.append(str(int(r)+1))
+                                                QD_disci_dict_error[str(int(r)+1)] = "QD: "+ QD + " non appartiene alla disciplina: " + disciplina_mapping_row
+                                                print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
+                                        if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
+                                            descri_disci_flag_QD = True
+                                            if str(int(r)+1) not in descrizione_discipline_error_list:
+                                                descrizione_discipline_error_list.append(str(int(r)+1))
+                                                QD_descri_disci_dict_error[str(int(r)+1)] = "La descrizione disciplina: " + descrizione_disciplina_mapping_row + "non è presente sul catalogo SISS"
+                                    else:
+                                        if str(int(r)-1) not in error_dict['error_disciplina_mancante']:
+                                            error_dict['error_disciplina_mancante'].append(str(int(r)-1)) 
+
                         result_disciplina = sheet_mapping.cell(int(r), self.work_index_codici_disciplina_catalogo).value #disciplina da catalogo
                         if result_disciplina != "":
                             if result_disciplina_last != "": #se non è la prima iterazione
@@ -336,7 +307,7 @@ class Check_QD():
             'error_QD_spazio_bordi': [],
             'error_QD_spazio_internamente': [],
         })
-        string_check = re.compile('1234567890,Q') #lista caratteri ammessi
+        string_check = re.compile('1234567890,Q;') #lista caratteri ammessi
 
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
@@ -411,12 +382,11 @@ class Check_QD():
 
                 if QD_string is not None:
                     for QD in QD_string:
+                        QD = QD.strip()
                         if QD != "":
-                            QD = QD.strip()
                             QD_catalogo = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD]  
                             #print("QD: " + str(QD)) 
-                            #try:
-                            
+                                                        
                             if description_list != description_list.strip(): #there is a space in the beginning or in the end
                                 error_dict['error_QD_descrizione_space_bordo'].append(str(int(index)+2))
                                 logging.error("ERROR SPACE BORDI: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
@@ -495,7 +465,7 @@ class Check_QD():
         agende_checked = []
         
         for index, row in df_mapping.iterrows():
-            if row[self.work_abilitazione_esposizione_siss] == "S" and row[self.work_codice_QD] != "":
+            if row[self.work_abilitazione_esposizione_siss] == "S" and row[self.work_codice_QD].strip() != "":
                 if row[self.work_operatore_logico_QD] is not "":
                     agenda_SISS = str(row[self.work_codice_agenda_siss])
                     agenda_SISS = agenda_SISS.strip()

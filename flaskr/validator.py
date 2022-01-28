@@ -27,6 +27,7 @@ from flaskr.check.check_metodiche import Check_metodiche
 from flaskr.check.check_distretti import Check_distretti
 from flaskr.check.check_priorita import Check_priorita
 from flaskr.check.check_univocita_prestazione import Check_univocita_prestazione
+from flaskr.check.check_canali import Check_canali
 from flaskr.check.check_agende_interne import Check_agende_interne
 
 logger = logging.getLogger(__name__)
@@ -58,6 +59,7 @@ class Check_action():
     work_codice_agenda_siss = ""
     work_casi_1_n = ""
     work_abilitazione_esposizione_siss = ""
+    work_prenotabile_siss = ""
     work_codici_disciplina_catalogo = ""
     work_descrizione_disciplina_catalogo = ""
     work_codice_QD = ""
@@ -76,9 +78,17 @@ class Check_action():
     work_combinata = ""
     work_codice_agenda_interno = ""
     work_codice_prestazione_interno = ""
+    work_inviante = ""
+    work_accesso_farmacia = ""
+    work_accesso_CCR = ""
+    work_accesso_cittadino = ""
+    work_accesso_MMG = ""
+    work_accesso_amministrativo = ""
+    work_accesso_PAI = ""
+    work_gg_preparazione = ""
+    work_gg_refertazione = ""
 
     work_index_codice_QD = 0
-    work_index_op_logic_distretto = 0
     work_index_codice_SISS_agenda = 0
     work_index_abilitazione_esposizione_SISS = 0
     work_index_codice_prestazione_SISS = 0
@@ -101,6 +111,7 @@ class Check_action():
         self.work_codice_agenda_siss = data[0]["work_column"]["work_codice_agenda_siss"]
         self.work_casi_1_n = data[0]["work_column"]["work_casi_1_n"]
         self.work_abilitazione_esposizione_siss = data[0]["work_column"]["work_abilitazione_esposizione_siss"]
+        self.work_prenotabile_siss = data[0]["work_column"]["work_prenotabile_siss"]
         self.work_codici_disciplina_catalogo = data[0]["work_column"]["work_codici_disciplina_catalogo"]
         self.work_descrizione_disciplina_catalogo = data[0]["work_column"]["work_descrizione_disciplina_catalogo"]
         self.work_codice_QD = data[0]["work_column"]["work_codice_QD"]
@@ -119,10 +130,18 @@ class Check_action():
         self.work_combinata = data[0]["work_column"]["work_combinata"]
         self.work_codice_agenda_interno = data[0]["work_column"]["work_codice_agenda_interno"]
         self.work_codice_prestazione_interno = data[0]["work_column"]["work_codice_prestazione_interno"]
+        self.work_inviante = data[0]["work_column"]["work_inviante"]
+        self.work_accesso_farmacia = data[0]["work_column"]["work_accesso_farmacia"]
+        self.work_accesso_CCR = data[0]["work_column"]["work_accesso_CCR"]
+        self.work_accesso_cittadino = data[0]["work_column"]["work_accesso_cittadino"]
+        self.work_accesso_MMG = data[0]["work_column"]["work_accesso_MMG"]
+        self.work_accesso_amministrativo = data[0]["work_column"]["work_accesso_amministrativo"]
+        self.work_accesso_PAI = data[0]["work_column"]["work_accesso_PAI"]
+        self.work_gg_preparazione = data[0]["work_column"]["work_gg_preparazione"]
+        self.work_gg_refertazione = data[0]["work_column"]["work_gg_refertazione"]
 
         self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1
-        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"] - 1
         self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"] - 1
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"] - 1
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] - 1
@@ -152,7 +171,7 @@ class Check_action():
 
     def initializer(self):
         #pd.set_option("display.max_rows", None, "display.max_columns", None)
-        df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str}).replace(np.nan, '', regex=True)
+        df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str, self.work_codice_metodica: str, self.work_codice_distretto: str}).replace(np.nan, '', regex=True)
         #print ("print JSON")
         #print(sh)
         
@@ -160,7 +179,7 @@ class Check_action():
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
-        sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI' )
+        sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI', converters={"Codice SISS": str, "Codice Distretto": str})
         
         print("sheet_QD caricato\n")
         #print(sheet_QD)
@@ -193,6 +212,9 @@ class Check_action():
         print("Fase 5") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
         univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
         #univocita_prestazione_error = {}
+        print("Fase 6")
+        canali_error = self.check_canali(df_mapping)
+        #canali_error = {}
         print("Fase Vale Validator")
         catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
         wb = xlrd.open_workbook(catalogo_dir)
@@ -202,9 +224,9 @@ class Check_action():
         QD_validator_error = {}
         metodiche_validator_error = {}
         distretti_validator_error = {}
-        #QD_validator_error = Validator.ck_QD_description(self, df_mapping, sheet_QD_OW)
-        #metodiche_validator_error = Validator.ck_metodiche_description(self, df_mapping, sheet_Metodiche_OW)
-        #distretti_validator_error = Validator.ck_distretti_description(self, df_mapping, sheet_Distretti_OW)
+        #QD_validator_error = Validator_v.ck_QD_description(self, df_mapping, sheet_QD_OW)
+        #metodiche_validator_error = Validator_v.ck_metodiche_description(self, df_mapping, sheet_Metodiche_OW)
+        #distretti_validator_error = Validator_v.ck_distretti_description(self, df_mapping, sheet_Distretti_OW)
 
 
         error_dict = {
@@ -215,7 +237,8 @@ class Check_action():
             "univocita_prestazione_error": univocita_prestazione_error,
             "QD_validator_error": QD_validator_error,
             "metodiche_validator_error": metodiche_validator_error,
-            "distretti_validator_error": distretti_validator_error
+            "distretti_validator_error": distretti_validator_error,
+            "canali_error": canali_error
         }
 
         self._validation(error_dict)
@@ -287,11 +310,6 @@ class Check_action():
         error_esami_strumentali =Check_priorita.ck_esami_strumentali(self, df_mapping, error_controlli)
 
         error_dict = error_esami_strumentali
-        '''error_list = {
-            "error_prime_visite": error_prime_visite,
-            "error_controlli": error_controlli,
-            "error_esami_strumentali": error_esami_strumentali
-        }'''
 
         return error_dict
 
@@ -301,6 +319,17 @@ class Check_action():
 
         return error_dict
 
+    def check_canali(self, df_mapping):
+        print("start checking canali di accesso")
+
+        error_dict = {}
+        error_canali_vuoti = Check_canali.ck_canali_vuoti(self, df_mapping, error_dict)
+        error_canali_PAI = Check_canali.ck_canali_PAI(self, df_mapping, error_canali_vuoti)
+        error_canali_abilitati = Check_canali.ck_canali_abilitati(self, df_mapping, error_canali_PAI)
+
+        error_dict = error_canali_abilitati
+
+        return error_dict
 
     def _validation(self, error_dict):
         print("questi sono gli errori indivuduati e separati per categoria:\n %s", error_dict)
@@ -342,7 +371,7 @@ class Check_action():
                 myValue = sh.cell(row, self.work_index_codice_SISS_agenda) #Codice SISS agenda 15
                 #abilita = sh.cell(row, self.work_index_abilitazione_esposizione_SISS-1) #abilitazione esposizione SISS 28
                 if myCell.value == searchedValue: # and abilita.value == "S":
-                    result_coord.append(str(row) + "#" + str(col))
+                    result_coord.append(str(row) + "|" + str(col))
                     result_value.append(myValue.value)
                     #return row, col#xl_rowcol_to_cell(row, col)
 

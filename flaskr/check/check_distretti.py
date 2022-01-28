@@ -48,48 +48,11 @@ class Check_distretti():
     work_accesso_programmabile_ZP = ""
 
     work_index_codice_QD = 0
-    work_index_op_logic_distretto = 0
     work_index_codice_SISS_agenda = 0
     work_index_abilitazione_esposizione_SISS = 0
     work_index_codice_prestazione_SISS = 0
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
-
-    '''def __init__(self):
-        self.output_message = ""
-        with open("./flaskr/config_validator_PSM.yml", "rt", encoding='utf8') as yamlfile:
-            data = yaml.load(yamlfile, Loader=yaml.FullLoader)
-        logger.debug(data)
-        self.work_sheet = data[0]["work_column"]["work_sheet"] 
-        self.work_codice_prestazione_siss = data[0]["work_column"]["work_codice_prestazione_siss"]
-        self.work_descrizione_prestazione_siss = data[0]["work_column"]["work_descrizione_prestazione_siss"]
-        self.work_codice_agenda_siss = data[0]["work_column"]["work_codice_agenda_siss"]
-        self.work_casi_1_n = data[0]["work_column"]["work_casi_1_n"]
-        self.work_abilitazione_esposizione_siss = data[0]["work_column"]["work_abilitazione_esposizione_siss"]
-        self.work_codici_disciplina_catalogo = data[0]["work_column"]["work_codici_disciplina_catalogo"]
-        self.work_descrizione_disciplina_catalogo = data[0]["work_column"]["work_descrizione_disciplina_catalogo"]
-        self.work_codice_QD = data[0]["work_column"]["work_codice_QD"]
-        self.work_descrizione_QD = data[0]["work_column"]["work_descrizione_QD"]
-        self.work_operatore_logico_QD = data[0]["work_column"]["work_operatore_logico_QD"]
-        self.work_codice_metodica = data[0]["work_column"]["work_codice_metodica"]
-        self.work_descrizione_metodica = data[0]["work_column"]["work_descrizione_metodica"]
-        self.work_codice_distretto = data[0]["work_column"]["work_codice_distretto"]
-        self.work_descrizione_distretto = data[0]["work_column"]["work_descrizione_distretto"]
-        self.work_operatore_logico_distretto = data[0]["work_column"]["work_operatore_logico_distretto"]
-        self.work_priorita_U = data[0]["work_column"]["work_priorita_U"]
-        self.work_priorita_primo_accesso_D = data[0]["work_column"]["work_priorita_primo_accesso_D"]
-        self.work_priorita_primo_accesso_P = data[0]["work_column"]["work_priorita_primo_accesso_P"]
-        self.work_priorita_primo_accesso_B = data[0]["work_column"]["work_priorita_primo_accesso_B"]
-        self.work_accesso_programmabile_ZP = data[0]["work_column"]["work_accesso_programmabile_ZP"]
-
-        self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
-        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"]
-        self.work_index_op_logic_distretto = data[1]["work_index"]["work_index_op_logic_distretto"]
-        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"]
-        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"]
-        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"]
-        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"]
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"]'''
 
     
     def ck_distretti_inprestazione(self, df_mapping, sheet_Distretti, error_dict):
@@ -110,8 +73,8 @@ class Check_distretti():
                 if Distretto_string is not None:
                     cod_pre_siss = str(row[self.work_codice_prestazione_siss])
                     for distretto in Distretto_string:
+                        distretto = distretto.strip()
                         if distretto != "":
-                            distretto = distretto.strip()
                             short_sheet = sheet_Distretti.loc[sheet_Distretti["Codice Distretto"] == distretto] #filtro catalogo sul codice distretto                     
                             
                             #print("disciplina " + str(disciplina["Cod Disciplina"]) + " " + str(disciplina["Codice Quesito"]))
@@ -154,7 +117,7 @@ class Check_distretti():
             'error_distretti_caratteri_non_consentiti': [],
             'error_distretti_trovato_spazio': []
         })
-        string_check = re.compile('1234567890,M')
+        string_check = re.compile('1234567890,D;')
 
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
@@ -162,7 +125,7 @@ class Check_distretti():
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
                 #print("Distretto: " + row["Codice Distretto"])
-                if row[self.work_codice_distretto] is not None:
+                if row[self.work_codice_distretto].strip() is not None:
                     r = row[self.work_codice_distretto].strip()
                     if(string_check.search(row[self.work_codice_distretto]) != None):
                         print("String contains other Characters.")
@@ -214,6 +177,7 @@ class Check_distretti():
 
                 if Distretto_string is not None:
                     for distretto in Distretto_string:
+                        distretto = distretto.strip()
                         if distretto != "":
                             distretto_catalogo = sheet_Distretti.loc[sheet_Distretti["Codice Distretto"] == distretto]                    
                             
@@ -270,7 +234,7 @@ class Check_distretti():
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                if row[self.work_operatore_logico_distretto] is not "" and row[self.work_codice_distretto] is "":
+                if row[self.work_operatore_logico_distretto] is not "" and row[self.work_codice_distretto].strip() is "":
                     error_dict['error_distretti_operatori_logici_non_necessari'].append(str(int(index)+2))
                     '''cod_pre_siss = str(row[self.work_codice_prestazione_siss])
                     searchedProdotto = cod_pre_siss.strip()
@@ -295,7 +259,7 @@ class Check_distretti():
                                     print("error OP at index:" +  str(int(r)+1))
                     prestazione_checked.append(searchedProdotto)'''
 
-                elif row[self.work_operatore_logico_distretto] is "" and row[self.work_codice_distretto] is not "": 
+                elif row[self.work_operatore_logico_distretto] is "" and row[self.work_codice_distretto].strip() is not "": 
                     error_dict['error_distretti_operatori_logici_mancante'].append(str(int(index)+2))
                     
         
