@@ -147,10 +147,10 @@ class Check_canali():
             if row[self.work_abilitazione_esposizione_siss] == "S" and row[self.work_prenotabile_siss] == "S": #se prestazione esposta e prenotabile
                 if row[self.work_accesso_PAI] == "S":
                     if row[self.work_accesso_farmacia] == "N" and row[self.work_accesso_CCR] == "N" and row[self.work_accesso_cittadino] == "N" and row[self.work_accesso_MMG] == "N" and row[self.work_accesso_amministrativo] == "N" and row[self.work_accesso_PAI] == "N":
-                        error_dict["canali_abilitati"].append(str(int(index)+2))
+                        error_dict["error_canali_abilitati"].append(str(int(index)+2))
             
         out_message = ""
-        for ind in error_dict['canali_abilitati']:
+        for ind in error_dict['error_canali_abilitati']:
             out_message = "__> Rilevati canali di accesso tutti disabilitati per prestazione esposta e prenotabile"
             out_message = out_message + "\n _> abilitare almeno uno dei canali di prenotazione proposti."
             if sheet[self.work_alert_column+ind].value is not None:

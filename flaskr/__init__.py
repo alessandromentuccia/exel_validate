@@ -43,15 +43,17 @@ def generate():
     try:
         configuration_file = _read_yml_file1(request, 'yml')
         excel_filename = _read_yml_file2(request, 'file2', 'xlsx')
-
+        _list = request.form.getlist('check')
+        checked_dict = _get_generateform_checked_value(_list)
     except ValueError as e:
         logger.error(e)
         return str(e), 400
     try:
         print(excel_filename)
         file_path = app.config['DOWNLOAD_FOLDER']  + excel_filename
+        #check_actionPA.initializer(file_path_rivisto, checked_dict)
         check_action = validator.Check_action(configuration_file, file_path)
-        check_action.initializer()
+        check_action.initializer(checked_dict)
                                
         return send_file(file_path,as_attachment = True, attachment_filename=excel_filename), 200
     except Exception as e:
@@ -131,7 +133,21 @@ def stream():
 
     return app.response_class(read_log(), mimetype='text/plain')
 
+def _get_generateform_checked_value(_list):
     
+    return_dict = { 
+                    "Quesiti": "",
+                    "Metodiche": "",
+                    "Distretti": "",
+                    "Priorita": "",
+                    "Prestazione": "",
+                    "Canali": "",
+                    "Inviante": ""
+                }
+    for element in _list:
+        return_dict[element] = 1
+    return return_dict
+
 def _get_form_checked_value(_list, request):
     _list.append("Sheet")
     _list.append("Agenda")

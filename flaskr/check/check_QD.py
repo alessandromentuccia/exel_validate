@@ -120,16 +120,6 @@ class Check_QD():
                     error_dict['error_QD_vuoto'].append(ind)
             
 
-            '''if row[self.work_abilitazione_esposizione_siss] == "S":
-                if row[self.work_codice_agenda_siss] == agenda:
-                    if row[self.work_codice_QD] != last_QD:
-                        print("error QD at index:" +  str(int(index)+2))
-                        #error_list.append(str(int(index)+2))
-                        error_dict['error_QD_agenda'].append(str(int(index)+2))
-                        QD_dict_error = self.update_list_in_dict(QD_dict_error, str(int(index)+2), row[self.work_codice_QD])
-                else: 
-                    agenda = row[self.work_codice_agenda_siss]
-                    last_QD = row[self.work_codice_QD]''' 
         print("start definizione output agenda QD")
         out1 = ""
         out_message = ""
@@ -170,89 +160,75 @@ class Check_QD():
         QD_descri_disci_dict_error = {}
         agenda_disci_dict_error = {}
        
-        #file_contents=self.file_data.getvalue()
-        #for row in range(sheet_mapping.nrows):
-        #print(sheet_mapping.row_values(row))
-        wb = xlrd.open_workbook(self.file_data)
-        sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
-        #disciplina_QD_column = sheet_QD[['Cod Disciplina','Codice Quesito']]
-        #print("disciplina_QD_column: %s", disciplina_QD_column)
         agende_viewed = []
         for index, row in df_mapping.iterrows():
-            disci_flag_QD = False
-            descri_disci_flag_QD = False
-            disci_flag_agenda = False
-            if row[self.work_codice_agenda_siss] not in agende_viewed and row[self.work_codice_QD] is not None:
-                searchedAgenda = row[self.work_codice_agenda_siss]
-                #disciplina_mapping_row = row[self.work_codici_disciplina_catalogo]
-                #descrizione_disciplina_mapping_row = row[self.work_descrizione_disciplina_catalogo]
-                #prendo tutte le agende con lo stesso codice
-                result = self.findCell_agenda(sheet_mapping, searchedAgenda, self.work_index_codice_SISS_agenda) #prendo tutte le righe con questa agenda
-                print("start iterate each excel row")
-                if result != -1:
-                    result_disciplina_last = ""
-                    agende_error_list = []
-                    descrizione_discipline_error_list = []
-                    discipline_error_list = []
-                    for res in result: #per ogni risultato controllo che ci sia la stessa disciplina
-                        r = res.split("|")[0] #row agenda
-                        c = res.split("|")[1] #column agenda
-                        #print("start iterate result sheet_mapping")
-                        result_QD = sheet_mapping.cell(int(r), self.work_index_codice_QD).value.split(self.work_delimiter) #QD
-                        if result_QD is not None:
-                            for QD in result_QD:
-                                #print("start iterate QD")
-                                QD = QD.strip()
-                                if QD != "":
-                                    short_sheet = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD]
-                                    di_list = []
-                                    for ss in short_sheet["Cod Disciplina"].values: #risolvo problema discipline con codici multipli
-                                        #print("start iterate cod disciplina" + ss)
-                                        if "\n" in ss:
-                                            ss = str(ss)
-                                            di_list = di_list + ss.split("\n")
+            
+            if row[self.work_abilitazione_esposizione_siss] == "S":
+                if row[self.work_codice_agenda_siss] not in agende_viewed and row[self.work_codice_QD] is not None:
+                    searchedAgenda = row[self.work_codice_agenda_siss]
+                    
+                    result = self.findCell_agenda_II(df_mapping, searchedAgenda, self.work_codice_agenda_siss) 
+                    #print("start iterate each excel row for agenda: " + str(searchedAgenda) + " result is: ", result)
+                    if result != -1:
+                        last_disciplina_mapping_row = ""
+                        agende_error_list = []
+                        descrizione_discipline_error_list = []
+                        
+                        for res in result: #per ogni risultato controllo che ci sia la stessa disciplina
+                            indice = int(res)+2
+                            result_QD = df_mapping[self.work_codice_QD].iloc[int(res)]
+                            disciplina_mapping_row = df_mapping[self.work_codici_disciplina_catalogo].iloc[int(res)]#-1]
+                            descrizione_disciplina_mapping_row = df_mapping[self.work_descrizione_disciplina_catalogo].iloc[int(res)]#-1]
+                            #print("qui 1, index: " + str(res) + " QD: ", result_QD)
+                            if result_QD != "":
+                                QD_list = result_QD.split(self.work_delimiter)
+                                for QD in QD_list:
+                                    QD = QD.strip()
+                                    #print("start iterate QD:" + QD)
+                                    if QD != "":
+                                        short_sheet = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD] #ricavo uno sheet del catalogo filtrato per il QD
+                                        di_list = []
+                                        for ss in short_sheet["Cod Disciplina"].values: #risolvo problema discipline con codici multipli
+                                            #print("start iterate cod disciplina" + ss)
+                                            if "\n" in ss:
+                                                ss = str(ss)
+                                                di_list = di_list + ss.split("\n")
+                                            else:
+                                                di_list.append(ss)
+                                        
+                                        #print("qui 2")
+                                        if disciplina_mapping_row != "":
+                                            if disciplina_mapping_row not in di_list and di_list != []:
+                                                
+                                                if str(indice) not in agende_error_list:
+                                                    agende_error_list.append(str(indice))
+                                                    QD_disci_dict_error[str(indice)] = "QD: "+ QD + " non appartiene alla disciplina: " + disciplina_mapping_row
+                                                    #print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
+                                                    if str(indice) not in error_dict['error_QD_disciplina_agenda']:
+                                                        error_dict['error_QD_disciplina_agenda'].append(str(indice))
+                                            if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
+                                                
+                                                if str(indice) not in descrizione_discipline_error_list:
+                                                    descrizione_discipline_error_list.append(str(indice))
+                                                    QD_descri_disci_dict_error[str(indice)] = "La descrizione disciplina: " + descrizione_disciplina_mapping_row + "non è presente sul catalogo attributi GP++"
                                         else:
-                                            di_list.append(ss)
-                                    disciplina_mapping_row = df_mapping[self.work_codici_disciplina_catalogo].iloc[int(r)-1]
-                                    if disciplina_mapping_row != "":
-                                        descrizione_disciplina_mapping_row = df_mapping[self.work_descrizione_disciplina_catalogo].iloc[int(r)-1]
-                                        if disciplina_mapping_row not in di_list:
-                                            disci_flag_QD = True
-                                            if str(int(r)+1) not in agende_error_list:
-                                                agende_error_list.append(str(int(r)+1))
-                                                QD_disci_dict_error[str(int(r)+1)] = "QD: "+ QD + " non appartiene alla disciplina: " + disciplina_mapping_row
-                                                print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
-                                        if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
-                                            descri_disci_flag_QD = True
-                                            if str(int(r)+1) not in descrizione_discipline_error_list:
-                                                descrizione_discipline_error_list.append(str(int(r)+1))
-                                                QD_descri_disci_dict_error[str(int(r)+1)] = "La descrizione disciplina: " + descrizione_disciplina_mapping_row + "non è presente sul catalogo SISS"
-                                    else:
-                                        if str(int(r)-1) not in error_dict['error_disciplina_mancante']:
-                                            error_dict['error_disciplina_mancante'].append(str(int(r)-1)) 
+                                            if str(indice) not in error_dict['error_disciplina_mancante']:
+                                                error_dict['error_disciplina_mancante'].append(str(indice)) 
 
-                        result_disciplina = sheet_mapping.cell(int(r), self.work_index_codici_disciplina_catalogo).value #disciplina da catalogo
-                        if result_disciplina != "":
-                            if result_disciplina_last != "": #se non è la prima iterazione
-                                if result_disciplina != result_disciplina_last:
-                                    disci_flag_agenda = True
-                                    discipline_error_list.append(str(int(r)+1))
-                                    agenda_disci_dict_error = self.update_list_in_dict(agenda_disci_dict_error, str(int(r)+1), "agenda con discipline diverse: "+ result_disciplina + " e " + result_disciplina_last)
-                                    #print("result_disciplina: " + result_disciplina + ", result_disciplina_last: " + result_disciplina_last)
-                                else: 
-                                    result_disciplina_last = result_disciplina    
-                
-                    if disci_flag_QD == True: #se la disciplina non è rilevata nel catalogo allora è errore
-                        for age in agende_error_list:
-                            error_dict['error_QD_disciplina_agenda'].append(age)
                             
-                    if disci_flag_agenda == True: #se la disciplina è diversa in una stessa agenda, allora è errore
-                        for age in discipline_error_list:
-                            error_dict['error_discipline_agende_diverse'].append(age)
-                else:
-                    error_dict['error_disciplina_mancante'].append(str(int(index)+2))     #inserisco la riga senza disciplina negli errori
+                            #print("qui 3")
+                            if disciplina_mapping_row != "":
+                                if last_disciplina_mapping_row != "": #se non è la prima iterazione
+                                    if disciplina_mapping_row != last_disciplina_mapping_row:
+                                        
+                                        agenda_disci_dict_error = self.update_list_in_dict(agenda_disci_dict_error, str(indice), "agenda con discipline diverse: "+ disciplina_mapping_row + " e " + last_disciplina_mapping_row)
+                                        #print("disciplina_mapping_row: " + disciplina_mapping_row + ", last_disciplina_mapping_row: " + last_disciplina_mapping_row)
+                                        if str(indice) not in error_dict['error_QD_disciplina_agenda']:
+                                             error_dict['error_discipline_agende_diverse'].append(str(indice))
+                                    else: 
+                                        last_disciplina_mapping_row = disciplina_mapping_row    
 
-                agende_viewed.append(searchedAgenda)
+                    agende_viewed.append(searchedAgenda)
 
         out1 = ""
         out_message = ""
@@ -314,22 +290,19 @@ class Check_QD():
 
         for index, row in df_mapping.iterrows():
             #print("QD: " + row["Codice Quesito Diagnostico"])
-            if row[self.work_abilitazione_esposizione_siss] != None: 
-                if row[self.work_abilitazione_esposizione_siss] == "S": 
-                    #flag_error = False
-                    if row[self.work_codice_QD] is not None:
-                        row_replace = row[self.work_codice_QD].replace(" ", "")
-                        if " " in row[self.work_codice_QD]:
-                            if " " in row_replace.strip():
-                                #print("string contain space inside the string")
-                                error_dict['error_QD_spazio_internamente'].append(str(int(index)+2))
-                            else:
-                                #print("string contain space in the border")
-                                error_dict['error_QD_spazio_bordi'].append(str(int(index)+2))
-                        elif(string_check.search(row_replace) != None):
-                            #print("String contains other Characters.")
-                            error_dict['error_QD_caratteri_non_consentiti'].append(str(int(index)+2))
-                            #flag_error = True
+            if row[self.work_abilitazione_esposizione_siss] == "S": 
+                if row[self.work_codice_QD] is not None:
+                    row_replace = row[self.work_codice_QD].replace(" ", "")
+                    if " " in row[self.work_codice_QD]:
+                        if " " in row_replace.strip():
+                            #print("string contain space inside the string")
+                            error_dict['error_QD_spazio_internamente'].append(str(int(index)+2))
+                        else:
+                            #print("string contain space in the border")
+                            error_dict['error_QD_spazio_bordi'].append(str(int(index)+2))
+                    elif(string_check.search(row_replace) != None):
+                        #print("String contains other Characters.")
+                        error_dict['error_QD_caratteri_non_consentiti'].append(str(int(index)+2))
                        
         out_message = ""
         for ind in error_dict['error_QD_caratteri_non_consentiti']:
@@ -359,72 +332,80 @@ class Check_QD():
         error_dict.update({
             'error_QD_descrizione': [],
             'error_QD_descrizione_space_bordo': [],
-            'error_QD_descrizione_space_interno': []
+            'error_QD_descrizione_space_interno': [],
+            'error_QD_codice': []
         })
 
         QD_dict_error_1 = {}
         QD_dict_error_2 = {}
         QD_dict_error_3 = {}
+        QD_dict_error_4 = {}
         
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
 
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                QD_string = row[self.work_codice_QD].split(self.work_delimiter)
+                QD_list = row[self.work_codice_QD].split(self.work_delimiter)
                 description_list = row[self.work_descrizione_QD]#.split(self.work_delimiter)
                 flag_error = False
-                '''if len(QD_string) != len(row[self.work_descrizione_QD].split(self.work_delimiter)):
+                '''if len(QD_list) != len(row[self.work_descrizione_QD].split(self.work_delimiter)):
                     print("il numero di descrizioni è diverso dal numero di QD all'indice " + str(index))
                     flag_error = True
                     QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), row[self.work_codice_QD])
                 '''  
 
-                if QD_string is not None:
-                    for QD in QD_string:
+                if QD_list is not None:
+                    for QD in QD_list:
                         QD = QD.strip()
                         if QD != "":
                             QD_catalogo = sheet_QD.loc[sheet_QD["Codice Quesito"] == QD]  
                             #print("QD: " + str(QD)) 
-                                                        
-                            if description_list != description_list.strip(): #there is a space in the beginning or in the end
-                                error_dict['error_QD_descrizione_space_bordo'].append(str(int(index)+2))
-                                logging.error("ERROR SPACE BORDI: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
-                                QD_dict_error_1 = self.update_list_in_dict(QD_dict_error_1, str(int(index)+2), QD)
-                                description_list = description_list.strip()
+                            if QD_catalogo.empty:  
+                                print("codice " + QD + " non presente da catologo attributi GP")
+                                if str(int(index)+2) not in error_dict['error_QD_codice']:
+                                    error_dict['error_QD_codice'].append(str(int(index)+2))
+                                QD_dict_error_4 = self.update_list_in_dict(QD_dict_error_4, str(int(index)+2), QD)                        
+                                
+                            else:
+                                if description_list != description_list.strip(): #there is a space in the beginning or in the end
+                                    error_dict['error_QD_descrizione_space_bordo'].append(str(int(index)+2))
+                                    logging.error("ERROR SPACE BORDI: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
+                                    QD_dict_error_1 = self.update_list_in_dict(QD_dict_error_1, str(int(index)+2), QD)
+                                    description_list = description_list.strip()
 
-                            if (" "+self.work_delimiter) in description_list or (self.work_delimiter+" ") in description_list:
-                                #print("print QD_catalogo2:" + QD_catalogo)
-                                #print("controllare manualmente qual'è il problema")
-                                print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", description_list: %s", description_list)
-                                logging.error("ERROR SPACE INTERNO: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
-                                error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))
-                                QD_dict_error_2 = self.update_list_in_dict(QD_dict_error_2, str(int(index)+2), QD)
-                                description_list = description_list.replace(self.work_delimiter+" ", self.work_delimiter) #elimino spazio dopo  del separatore
-                                description_list = description_list.replace(" "+self.work_delimiter, self.work_delimiter) #elimino spazio prima del separatore
-                            try:
-                                if QD_catalogo["Quesiti Diagnostici"].values[0] not in description_list.split(self.work_delimiter):
-                                    print("la descrizione QD non è presente all'indice " + str(int(index)+2))
-                                    #print("QD: " + QD + ", Quesiti Diagnostici: " + QD_catalogo["Quesiti Diagnostici"].values[0] + ", Description_list: %s", description_list)
-                                    logging.error("ERROR DESCRIZIONE: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
+                                if (" "+self.work_delimiter) in description_list or (self.work_delimiter+" ") in description_list:
+                                    #print("print QD_catalogo2:" + QD_catalogo)
+                                    #print("controllare manualmente qual'è il problema")
+                                    print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", description_list: %s", description_list)
+                                    logging.error("ERROR SPACE INTERNO: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
+                                    error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))
+                                    QD_dict_error_2 = self.update_list_in_dict(QD_dict_error_2, str(int(index)+2), QD)
+                                    description_list = description_list.replace(self.work_delimiter+" ", self.work_delimiter) #elimino spazio dopo  del separatore
+                                    description_list = description_list.replace(" "+self.work_delimiter, self.work_delimiter) #elimino spazio prima del separatore
+                                
+                                try:
+                                    if QD_catalogo["Quesiti Diagnostici"].values[0] not in description_list.split(self.work_delimiter):
+                                        print("la descrizione QD non è presente all'indice " + str(int(index)+2))
+                                        #print("QD: " + QD + ", Quesiti Diagnostici: " + QD_catalogo["Quesiti Diagnostici"].values[0] + ", Description_list: %s", description_list)
+                                        logging.error("ERROR DESCRIZIONE: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
+                                        flag_error = True
+                                        QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), QD)
+                                except: #togliere try/catch e gestire gli spazi nell'if sopra
+                                    #print("print QD_catalogo2:" + QD_catalogo)
                                     flag_error = True
                                     QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), QD)
-                            except: #togliere try/catch e gestire gli spazi nell'if sopra
-                                #print("print QD_catalogo2:" + QD_catalogo)
-                                flag_error = True
-                                QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), QD)
-                                print("controllare manualmente qual'è il problema all'indice: " + str(int(index)+2))
-                                #print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", Description_list: %s", description_list)
-                                #logging.error("controllare manualmente il QD: " + QD + " all'indice: " + str(int(index)+2))
-                                #error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))  
-                                      
+                                    print("controllare manualmente qual'è il problema all'indice: " + str(int(index)+2))
+                                    #print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", Description_list: %s", description_list)
+                                    #logging.error("controllare manualmente il QD: " + QD + " all'indice: " + str(int(index)+2))
+                                    #error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))  
                             
                 if flag_error == True:
                    error_dict['error_QD_descrizione'].append(str(int(index)+2))  
 
         out_message = ""
         for ind in error_dict['error_QD_descrizione']:
-            out_message = "__> Descrizione dei QD: '{}' non trovati nel catalogo SISS".format(", ".join(QD_dict_error_3[ind]))
+            out_message = "__> Descrizione dei QD: '{}' non presenti su catalogo degli attributi GP++".format(", ".join(QD_dict_error_3[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -437,6 +418,12 @@ class Check_QD():
                 sheet[self.work_alert_column+ind] = out_message
         for ind in error_dict['error_QD_descrizione_space_interno']:
             out_message = "__> Descrizione dei QD: '{}' presentano spazi non consentiti tra i QD specificati".format(", ".join(QD_dict_error_2[ind]))
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet[self.work_alert_column+ind] = out_message
+        for ind in error_dict['error_QD_codice']:
+            out_message = "__> QD: '{}' non presenti su catalogo degli attributi GP++".format(", ".join(QD_dict_error_4[ind]))
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
@@ -455,47 +442,30 @@ class Check_QD():
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
 
-        wb = xlrd.open_workbook(self.file_data)
-        sheet_mapping = wb.sheet_by_index(self.work_index_sheet)
-        print("sheet caricato")
-
-        #agenda = df_mapping[self.work_codice_agenda_siss].iloc[2]
-        #last_OP = df_mapping[self.work_operatore_logico_QD].iloc[2]
-
         agende_checked = []
         
         for index, row in df_mapping.iterrows():
-            if row[self.work_abilitazione_esposizione_siss] == "S" and row[self.work_codice_QD].strip() != "":
-                if row[self.work_operatore_logico_QD] is not "":
-                    agenda_SISS = str(row[self.work_codice_agenda_siss])
-                    agenda_SISS = agenda_SISS.strip()
+            if row[self.work_abilitazione_esposizione_siss] == "S":
+                if row[self.work_operatore_logico_QD] != "" and row[self.work_codice_QD].strip() != "":
+                    agenda_SISS = row[self.work_codice_agenda_siss]
+                    agenda_SISS_str = str(agenda_SISS).strip()
                     if agenda_SISS not in agende_checked:
-                        result = self.findCell(sheet_mapping, agenda_SISS, self.work_index_codice_SISS_agenda)
-
+                        result = self.findCell_agenda_II(df_mapping, agenda_SISS, self.work_codice_agenda_siss) 
+                        #print("result dell'agenda '" + agenda_SISS_str + "' :", result)
                         if result != -1:
                             for res in result:
-                                r = res.split("#")[0]
-                                c = res.split("#")[1]
-                                resultOP = sheet_mapping.cell(int(r), self.work_index_operatore_logico_QD).value
-                                if row[self.work_operatore_logico_QD] != resultOP and (row[self.work_operatore_logico_QD] != "" or resultOP != ""):
-                                    QD_dict_error = self.update_list_in_dict(QD_dict_error, str(int(r)+1), agenda_SISS)
-                                    error_dict['error_QD_operatori_logici'].append(str(int(r)+1))
-                                    print("error QD OP at index:" +  str(int(r)+1))
+                                indice = int(res)+2
+                                resultOP = df_mapping[self.work_operatore_logico_QD].iloc[int(res)]
+                                #print("resultOP:" + resultOP + "all'indice:" + str(indice))
+                                if row[self.work_operatore_logico_QD] != resultOP or resultOP != "":
+                                    QD_dict_error = self.update_list_in_dict(QD_dict_error, str(indice), agenda_SISS_str)
+                                    error_dict['error_QD_operatori_logici'].append(str(indice))
+                                    #print("error QD OP at index:" +  str(indice))
                     agende_checked.append(agenda_SISS)
 
-                elif row[self.work_operatore_logico_distretto] is "" and row[self.work_codice_distretto] is not "": 
+                elif row[self.work_operatore_logico_QD] == "" and row[self.work_codice_QD].strip() != "": 
                     error_dict['error_QD_operatori_logici_mancante'].append(str(int(index)+2))
-
-                '''if row[self.work_codice_agenda_siss] == agenda:
-                    if row[self.work_operatore_logico_QD] == "":
-                        error_dict['error_QD_operatori_logici'].append(str(int(index)+2))
-                    else:  
-                        if row[self.work_operatore_logico_QD] != last_OP:
-                            print("error OP at index:" +  str(int(index)+2))
-                            error_dict['error_QD_operatori_logici'].append(str(int(index)+2))
-                else: 
-                    agenda = row[self.work_codice_agenda_siss]
-                    last_OP = row[self.work_operatore_logico_QD]'''
+                    
 
         out_message = ""
         for ind in error_dict['error_QD_operatori_logici']:
@@ -510,6 +480,6 @@ class Check_QD():
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
-
+        print("finish checking if there are the same logic op. for each agenda")
         xfile.save(self.file_data)
         return error_dict

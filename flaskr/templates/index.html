@@ -16,7 +16,7 @@
     <h3 style="text-align:center;">Controlla il tuo file di mapping inserendo gli opportuni file e premendo sul bottone della validazione voluta</h3>
     <form method=post enctype=multipart/form-data> 
         <fieldset>
-            <legend>inserisci nel primo box il file di configurazione e nel secondo il file di mapping da validare</legend>
+            <legend><b>inserisci nel primo box il file di configurazione e nel secondo il file di mapping da validare</b></legend>
             <div>
                 <input type="file" name="file1" id="file1">
                 <label for="file1">Carica file di configurazione</label>
@@ -25,22 +25,41 @@
                 <input type="file" name="file2" id="file2">
                 <label for="file2">Carica file di mapping da validare</label>
             </div>
+            <hr>
+            <legend><b>seleziona i controlli che vuoi eseguire</b></legend>
+            <div class="checkConfiguration">  
+                <input type="checkbox" id="Quesiti" name="check" value="Quesiti" checked>
+                <label for="Quesiti">Quesiti</label>
+                <input type="checkbox" id="Metodiche" name="check" value="Metodiche" checked>
+                <label for="Metodiche">Metodiche</label>
+                <input type="checkbox" id="Distretti" name="check" value="Distretti" checked>
+                <label for="Distretti">Distretti</label>
+                <input type="checkbox" id="Priorita" name="check" value="Priorita" checked>
+                <label for="Priorita">Priorit&agrave;</label>
+                <input type="checkbox" id="Prestazione" name="check" value="Prestazione" checked>
+                <label for="Prestazione">Prestazione</label>
+                <input type="checkbox" id="Canali" name="check" value="Canali" checked>
+                <label for="Canali">Canali</label>
+                <input type="checkbox" id="Inviante" name="check" value="Inviante"checked> 
+                <label for="Inviante">Inviante</label>
+              </div>
+              <hr>
             <div>
                 <button formaction="/generate">Avvio validazione</button>
                 <button formaction="/validate_agende_interne">Avvio validazione agende interne</button>
             </div>
         </fieldset>
     </form>
-    <h2 style="text-align:center;">Download template di esempio di un file di configurazione</h2>
+    <h3 style="text-align:center;">Download template di esempio di un file di configurazione</h3>
     <form method=post style="text-align:center;">
         <button formaction="/send-example">Download template example</button>
     </form>
-    <h2 style="text-align:center;">Servizio per i controlli post avvio</h2>
+    <h3 style="text-align:center;">Servizio per i controlli post avvio</h3>
     <form method=post style="text-align:center;">
         <button formaction="/post-avvio-check">Apri servizio</button>
     </form>
 
-    <h2 style="text-align:center;">LOG</h2>
+    <h3 style="text-align:center;">LOG</h3>
     <pre id="output"></pre>
     <script>
         var output = document.getElementById('output');

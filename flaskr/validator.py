@@ -1,4 +1,5 @@
 import argparse
+from distutils.log import error
 import itertools
 import json
 import logging
@@ -26,9 +27,10 @@ from flaskr.check.check_QD import Check_QD
 from flaskr.check.check_metodiche import Check_metodiche
 from flaskr.check.check_distretti import Check_distretti
 from flaskr.check.check_priorita import Check_priorita
-from flaskr.check.check_univocita_prestazione import Check_univocita_prestazione
+from flaskr.check.check_prestazione import Check_prestazione
 from flaskr.check.check_canali import Check_canali
 from flaskr.check.check_agende_interne import Check_agende_interne
+from flaskr.check.check_inviante import Check_inviante
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -48,6 +50,7 @@ class Check_action():
 
     file_name = ""
     file_data = {}
+    controls_setted = {}
     catalogo = OrderedDict()
     flag_check_list = []
     error_list = {}
@@ -87,6 +90,7 @@ class Check_action():
     work_accesso_PAI = ""
     work_gg_preparazione = ""
     work_gg_refertazione = ""
+    work_nota_operatore = ""
 
     work_index_codice_QD = 0
     work_index_codice_SISS_agenda = 0
@@ -139,15 +143,16 @@ class Check_action():
         self.work_accesso_PAI = data[0]["work_column"]["work_accesso_PAI"]
         self.work_gg_preparazione = data[0]["work_column"]["work_gg_preparazione"]
         self.work_gg_refertazione = data[0]["work_column"]["work_gg_refertazione"]
+        self.work_nota_operatore = data[0]["work_column"]["work_nota_operatore"]
 
-        self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
+        '''self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1
         self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"] - 1
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"] - 1
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] - 1
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"] - 1
         self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"] - 1
-        self.work_index_operatore_logico_QD = data[1]["work_index"]["work_index_operatore_logico_QD"] - 1 
+        self.work_index_operatore_logico_QD = data[1]["work_index"]["work_index_operatore_logico_QD"] - 1 '''
         
         self.work_alert_column = data[1]["work_index"]["work_alert_column"]
         try:
@@ -169,12 +174,14 @@ class Check_action():
         else:
             print("Il file non esiste, prova a ricaricare il file con la directory corretta.\n")
 
-    def initializer(self):
+    def initializer(self, checked_dict):
         #pd.set_option("display.max_rows", None, "display.max_columns", None)
         df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str, self.work_codice_metodica: str, self.work_codice_distretto: str}).replace(np.nan, '', regex=True)
         #print ("print JSON")
         #print(sh)
-        
+        print(checked_dict)
+        self.controls_setted = checked_dict
+
         catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
@@ -196,25 +203,34 @@ class Check_action():
         self.check_column_name(df_mapping)
 
         print('Start analisys:\n', df_mapping)
-
-        print("Fase 1") #FASE 1: CONTROLLO I QUESITI DIAGNOSTICI
-        QD_error = self.check_qd(df_mapping, sheet_QD)
-        #QD_error = {}
-        print("Fase 2") #FASE 2: CONTROLLO LE METODICHE
-        metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
-        #metodiche_error = {}
-        print("Fase 3") #FASE 3: CONTROLLO I DISTRETTI
-        distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
-        #distretti_error = {}
-        print("Fase 4") #FASE 4: CONTROLLO LE PRIORITA'
-        priorita_error = self.check_priorita(df_mapping)
-        #priorita_error = {}
-        print("Fase 5") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
-        univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
-        #univocita_prestazione_error = {}
-        print("Fase 6")
-        canali_error = self.check_canali(df_mapping)
-        #canali_error = {}
+        QD_error = {}
+        if self.controls_setted["Quesiti"] == 1:
+            print("Fase 1: Controllo Quesiti selezionato") #FASE 1: CONTROLLO I QUESITI DIAGNOSTICI
+            QD_error = self.check_qd(df_mapping, sheet_QD)
+        metodiche_error = {}
+        if self.controls_setted["Metodiche"] == 1:
+            print("Fase 2: Controllo Metodiche selezionato") #FASE 2: CONTROLLO LE METODICHE
+            metodiche_error = self.check_metodiche(df_mapping, sheet_Metodiche)
+        distretti_error = {}
+        if self.controls_setted["Distretti"] == 1:    
+            print("Fase 3: Controllo Distretti selezionato") #FASE 3: CONTROLLO I DISTRETTI
+            distretti_error = self.check_distretti(df_mapping, sheet_Distretti)
+        priorita_error = {}
+        if self.controls_setted["Priorita"] == 1:
+            print("Fase 4: Controllo Priorita selezionato") #FASE 4: CONTROLLO LE PRIORITA'
+            priorita_error = self.check_priorita(df_mapping)
+        prestazione_error = {}
+        if self.controls_setted["Prestazione"] == 1:
+            print("Fase 5: Controllo Prestazione selezionato") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
+            prestazione_error = self.check_prestazione(df_mapping)
+        canali_error = {}
+        if self.controls_setted["Canali"] == 1:
+            print("Fase 6: Controllo Canali selezionato")
+            canali_error = self.check_canali(df_mapping)
+        inviante_error = {}
+        if self.controls_setted["Inviante"] == 1:
+            print("Fase 7: Controllo Inviante selezionato")
+            inviante_error = self.check_inviante(df_mapping)
         print("Fase Vale Validator")
         catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
         wb = xlrd.open_workbook(catalogo_dir)
@@ -234,11 +250,12 @@ class Check_action():
             "metodiche_error": metodiche_error,
             "distretti_error": distretti_error,
             "priorita_error": priorita_error,    
-            "univocita_prestazione_error": univocita_prestazione_error,
+            "prestazione_error": prestazione_error,
             "QD_validator_error": QD_validator_error,
             "metodiche_validator_error": metodiche_validator_error,
             "distretti_validator_error": distretti_validator_error,
-            "canali_error": canali_error
+            "canali_error": canali_error,
+            "inviante_error": inviante_error
         }
 
         self._validation(error_dict)
@@ -255,16 +272,10 @@ class Check_action():
         error_QD_sintassi = Check_QD.ck_QD_sintassi(self, df_mapping, error_dict)
         error_QD_agenda = Check_QD.ck_QD_agenda(self, df_mapping, error_QD_sintassi)
         error_QD_disciplina_agenda = Check_QD.ck_QD_disciplina_agenda(self, df_mapping, sheet_QD, error_QD_agenda)
-        #error_QD_descrizione = Check_QD.ck_QD_descrizione(self, df_mapping, sheet_QD, error_QD_disciplina_agenda)
-        error_QD_operatori_logici = Check_QD.ck_QD_operatori_logici(self, df_mapping, error_QD_disciplina_agenda)
+        error_QD_descrizione = Check_QD.ck_QD_descrizione(self, df_mapping, sheet_QD, error_QD_disciplina_agenda)
+        error_QD_operatori_logici = Check_QD.ck_QD_operatori_logici(self, df_mapping, error_QD_descrizione)
 
         error_dict = error_QD_operatori_logici
-        '''error_list = {
-            "error_QD_agenda": error_QD_agenda,
-            "error_QD_disciplina_agenda": error_QD_disciplina_agenda,
-            "error_QD_sintassi": error_QD_sintassi,
-            "error_QD_descrizione": error_QD_descrizione
-        }'''
 
         return error_dict
 
@@ -279,11 +290,6 @@ class Check_action():
         #error_metodica_descrizione = Check_metodiche.ck_metodica_descrizione(self, df_mapping, sheet_Metodiche, error_metodica_inprestazione)
 
         error_dict = error_metodica_inprestazione
-        '''error_dict = {
-            "error_metodica_inprestazione": error_metodica_inprestazione,
-            "error_metodica_separatore": error_metodica_separatore,
-            "error_metodica_descrizione": error_metodica_descrizione
-        }'''
 
         #print("error_dict: %s", error_dict)
         return error_dict
@@ -313,9 +319,15 @@ class Check_action():
 
         return error_dict
 
-    def check_univocita_prestazione(self, df_mapping):
+    def check_prestazione(self, df_mapping):
         print("start checking univocità delle prestazioni")
-        error_dict = Check_univocita_prestazione.ck_casi_1n(self, df_mapping, {})
+        error_dict = {}
+
+        error_casi_1N = Check_prestazione.ck_casi_1n(self, df_mapping, error_dict)
+        error_prestazione = Check_prestazione.ck_prestazione(self, df_mapping, error_casi_1N)
+        error_prestazione_non_prenotabile = Check_prestazione.ck_prestazione_nonprenotabile(self, df_mapping, error_prestazione)
+
+        error_dict = error_prestazione_non_prenotabile
 
         return error_dict
 
@@ -328,6 +340,17 @@ class Check_action():
         error_canali_abilitati = Check_canali.ck_canali_abilitati(self, df_mapping, error_canali_PAI)
 
         error_dict = error_canali_abilitati
+
+        return error_dict
+
+    def check_inviante(self, df_mapping):
+        print("start checking inviante")
+
+        error_dict = {}
+
+        error_inviante = Check_inviante.ck_inviante(self, df_mapping, error_dict)
+
+        error_dict = error_inviante
 
         return error_dict
 
@@ -378,6 +401,19 @@ class Check_action():
         if result_coord == []:
             return -1
         return result_coord#, result_value
+                                    
+    def findCell_agenda_II(self, df, searchedValue, name_column):#sheet_mapping, searchedAgenda, self.work_index_codice_SISS_agenda
+        result_coord = []
+
+        for rowIndex, row in df.iterrows(): #iterate over rows
+            myCell = row[name_column]
+            abilita = row[self.work_abilitazione_esposizione_siss]
+            if myCell == searchedValue and abilita == "S":
+                result_coord.append(str(rowIndex))
+
+        if result_coord == []:
+            return -1
+        return result_coord
 
     '''Metodo che aggiunge elemento in una lista esistente o crea la lista nel caso
     non fosse presente'''

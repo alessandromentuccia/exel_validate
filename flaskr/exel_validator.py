@@ -26,10 +26,10 @@ from check.check_QD import Check_QD
 from check.check_metodiche import Check_metodiche
 from check.check_distretti import Check_distretti
 from check.check_priorita import Check_priorita
-from check.check_univocita_prestazione import Check_univocita_prestazione
+from check.check_prestazione import Check_prestazione
 from flaskr.check.check_canali import Check_canali
 from check.check_agende_interne import Check_agende_interne
-
+from flaskr.check.check_inviante import Check_inviante
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -85,6 +85,7 @@ class Check_action():
     work_accesso_PAI = ""
     work_gg_preparazione = ""
     work_gg_refertazione = ""
+    work_nota_operatore = ""
 
     work_index_codice_QD = 0
     work_index_codice_SISS_agenda = 0
@@ -136,15 +137,16 @@ class Check_action():
         self.work_accesso_PAI = data[0]["work_column"]["work_accesso_PAI"]
         self.work_gg_preparazione = data[0]["work_column"]["work_gg_preparazione"]
         self.work_gg_refertazione = data[0]["work_column"]["work_gg_refertazione"]
+        self.work_nota_operatore = data[0]["work_column"]["work_nota_operatore"]
 
-        self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
+        '''self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
         self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] -1
         self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"] -1
         self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"] -1
         self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] -1
         self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"] -1
         self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"] -1 
-        self.work_index_operatore_logico_QD = data[1]["work_index"]["work_index_operatore_logico_QD"] - 1 
+        self.work_index_operatore_logico_QD = data[1]["work_index"]["work_index_operatore_logico_QD"] - 1 '''
         
         self.work_alert_column = data[1]["work_index"]["work_alert_column"]
         try:
@@ -208,11 +210,14 @@ class Check_action():
         #priorita_error = self.check_priorita(df_mapping)
         priorita_error = {}
         print("Fase 5") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
-        univocita_prestazione_error = self.check_univocita_prestazione(df_mapping)
+        univocita_prestazione_error = self.check_prestazione(df_mapping)
         #univocita_prestazione_error = {}
         print("Fase 6")
         canali_error = self.check_canali(df_mapping)
         #canali_error = {}
+        print("Fase 7")
+        inviante_error = self.check_inviante(df_mapping)
+        #inviante_error = {}
         print("Fase Vale Validator")
         catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
         wb = xlrd.open_workbook(catalogo_dir)
@@ -236,7 +241,8 @@ class Check_action():
             "QD_validator_error": QD_validator_error,
             "metodiche_validator_error": metodiche_validator_error,
             "distretti_validator_error": distretti_validator_error,
-            "canali_error": canali_error
+            "canali_error": canali_error,
+            "inviante_error": inviante_error
         }
 
         self._validation(error_dict)
@@ -321,9 +327,15 @@ class Check_action():
 
         return error_dict
 
-    def check_univocita_prestazione(self, df_mapping):
+    def check_prestazione(self, df_mapping):
         print("start checking univocità delle prestazioni")
-        error_dict = Check_univocita_prestazione.ck_casi_1n(self, df_mapping, {})
+        error_dict = {}
+
+        error_casi_1N = Check_prestazione.ck_casi_1n(self, df_mapping, error_dict)
+        error_prestazione = Check_prestazione.ck_prestazione(self, df_mapping, error_casi_1N)
+        error_prestazione_non_prenotabile = Check_prestazione.ck_prestazione_nonprenotabile(self, df_mapping, error_prestazione)
+
+        error_dict = error_prestazione_non_prenotabile
 
         return error_dict
 
@@ -332,9 +344,21 @@ class Check_action():
 
         error_dict = {}
         error_canali_vuoti = Check_canali.ck_canali_vuoti(self, df_mapping, error_dict)
-        error_Canali_PAI = Check_canali.ck_canali_PAI(self, df_mapping, error_canali_vuoti)
+        error_canali_PAI = Check_canali.ck_canali_PAI(self, df_mapping, error_canali_vuoti)
+        error_canali_abilitati = Check_canali.ck_canali_abilitati(self, df_mapping, error_canali_PAI)
 
-        error_dict = error_Canali_PAI
+        error_dict = error_canali_abilitati
+
+        return error_dict
+
+    def check_inviante(self, df_mapping):
+        print("start checking inviante")
+
+        error_dict = {}
+
+        error_inviante = Check_inviante.ck_inviante(self, df_mapping, error_dict)
+
+        error_dict = error_inviante
 
         return error_dict
 
