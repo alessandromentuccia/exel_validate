@@ -1,13 +1,9 @@
 import pandas as pd
 import numpy as np
-import requests
-import xlrd
 from xlsxwriter.utility import xl_rowcol_to_cell
-import yaml
 import logging
 import re
 import openpyxl 
-import sys
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -370,29 +366,29 @@ class Check_QD():
                             else:
                                 if description_list != description_list.strip(): #there is a space in the beginning or in the end
                                     error_dict['error_QD_descrizione_space_bordo'].append(str(int(index)+2))
-                                    logging.error("ERROR SPACE BORDI: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
                                     QD_dict_error_1 = self.update_list_in_dict(QD_dict_error_1, str(int(index)+2), QD)
                                     description_list = description_list.strip()
+                                    logging.error("ERROR SPACE BORDI: controllare QD: " + QD + ", description_list: '" + description_list + "' all'indice: " + str(int(index)+2))
 
                                 if (" "+self.work_delimiter) in description_list or (self.work_delimiter+" ") in description_list:
                                     #print("print QD_catalogo2:" + QD_catalogo)
                                     #print("controllare manualmente qual'è il problema")
-                                    print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", description_list: %s", description_list)
-                                    logging.error("ERROR SPACE INTERNO: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
+                                    #print("QD: " + QD + ", Quesiti Diagnostici size:" + str(QD_catalogo.size) + ", description_list: %s", description_list)
                                     error_dict['error_QD_descrizione_space_interno'].append(str(int(index)+2))
                                     QD_dict_error_2 = self.update_list_in_dict(QD_dict_error_2, str(int(index)+2), QD)
                                     description_list = description_list.replace(self.work_delimiter+" ", self.work_delimiter) #elimino spazio dopo  del separatore
                                     description_list = description_list.replace(" "+self.work_delimiter, self.work_delimiter) #elimino spazio prima del separatore
+                                    logging.error("ERROR SPACE INTERNO: controllare QD: " + QD + ", description_list: '" + description_list + "' all'indice: " + str(int(index)+2))
                                 
                                 try:
-                                    if QD_catalogo["Quesiti Diagnostici"].values[0] not in description_list.split(self.work_delimiter):
-                                        print("la descrizione QD non è presente all'indice " + str(int(index)+2))
+                                    desQD = QD_catalogo["Quesiti Diagnostici"].values[0].strip()
+                                    if desQD not in description_list.split(self.work_delimiter):
+                                        #print("la descrizione QD non è presente all'indice " + str(int(index)+2))
                                         #print("QD: " + QD + ", Quesiti Diagnostici: " + QD_catalogo["Quesiti Diagnostici"].values[0] + ", Description_list: %s", description_list)
-                                        logging.error("ERROR DESCRIZIONE: controllare QD: " + QD + " all'indice: " + str(int(index)+2))
+                                        logging.error("ERROR DESCRIZIONE: controllare descrizione QD: " + desQD + ", description_list: '" + description_list + "' all'indice: " + str(int(index)+2))
                                         flag_error = True
                                         QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), QD)
                                 except: #togliere try/catch e gestire gli spazi nell'if sopra
-                                    #print("print QD_catalogo2:" + QD_catalogo)
                                     flag_error = True
                                     QD_dict_error_3 = self.update_list_in_dict(QD_dict_error_3, str(int(index)+2), QD)
                                     print("controllare manualmente qual'è il problema all'indice: " + str(int(index)+2))
@@ -456,11 +452,12 @@ class Check_QD():
                             for res in result:
                                 indice = int(res)+2
                                 resultOP = df_mapping[self.work_operatore_logico_QD].iloc[int(res)]
-                                #print("resultOP:" + resultOP + "all'indice:" + str(indice))
-                                if row[self.work_operatore_logico_QD] != resultOP or resultOP != "":
+                                #print("resultOP: " + resultOP + " all'indice:" + str(indice))
+                                if str(row[self.work_operatore_logico_QD]) != str(resultOP) and str(resultOP) != "":
                                     QD_dict_error = self.update_list_in_dict(QD_dict_error, str(indice), agenda_SISS_str)
                                     error_dict['error_QD_operatori_logici'].append(str(indice))
-                                    #print("error QD OP at index:" +  str(indice))
+                                    print("error QD OP at index:" +  str(indice))
+                                    print("resultOP: " + str(resultOP) + " con: " + str(row[self.work_operatore_logico_QD]))
                     agende_checked.append(agenda_SISS)
 
                 elif row[self.work_operatore_logico_QD] == "" and row[self.work_codice_QD].strip() != "": 

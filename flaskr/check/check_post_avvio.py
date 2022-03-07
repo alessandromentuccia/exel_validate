@@ -28,7 +28,7 @@ class Check_post_avvio():
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
  
-        if self.configurazione_rivisto["Quesiti"] != "":
+        if self.configurazione_rivisto["Quesiti"] != "": #check list
             error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "Quesiti", self.work_codice_QD)
             error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "Quesiti", self.work_codice_QD)
             #error_dict = Check_post_avvio.ck_QD(self, df_mapping, df_rivisto, error_dict)
@@ -36,7 +36,7 @@ class Check_post_avvio():
             error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "OperatoreQD", self.work_operatore_logico_QD)
             error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "OperatoreQD", self.work_operatore_logico_QD)
             #error_dict = Check_post_avvio.ck_Operatore_QD(self, df_mapping, df_rivisto, error_dict)
-        if self.configurazione_rivisto["Distretti"] != "":
+        if self.configurazione_rivisto["Distretti"] != "": #check list
             error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "Distretti", self.work_codice_distretto)
             error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "Distretti", self.work_codice_distretto)
             #error_dict = Check_post_avvio.ck_Distretti(self, df_mapping, df_rivisto, error_dict)
@@ -44,7 +44,7 @@ class Check_post_avvio():
             error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "OperatoreDistretto", self.work_operatore_logico_distretto)
             error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "OperatoreDistretto", self.work_operatore_logico_distretto)
             #error_dict = Check_post_avvio.ck_Operatore_Distretti(self, df_mapping, df_rivisto, error_dict)
-        if self.configurazione_rivisto["Metodiche"] != "":
+        if self.configurazione_rivisto["Metodiche"] != "": #check list
             error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "Metodiche", self.work_codice_metodica)
             error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "Metodiche", self.work_codice_metodica)
             #error_dict = Check_post_avvio.ck_Metodiche(self, df_mapping, df_rivisto, error_dict)    
@@ -85,6 +85,7 @@ class Check_post_avvio():
         print("start definizione output controlli post avvio")
         return error_dict
 
+    '''metodo che controlla se gli attributi del rivisto sono configurati allo stesso modo anche nel mapping'''
     def ck_MAP(self, df_mapping, df_rivisto, error_dict, element, work_codice):
         print("start checking MAPPING")
         error_dict.update({
@@ -123,7 +124,7 @@ class Check_post_avvio():
         xfile.save(self.file_rivisto)     
         return error_dict
     
-    #invertire mapping con rivisto e tutti gli altri attributi
+    '''Metodo che controlla se gli attributi del mapping sono anche sul rivisto'''
     def ck_RIV(self, df_mapping, df_rivisto, error_dict, element, work_codice):
         print("start checking RIVISTO")
         error_dict.update({
@@ -135,9 +136,6 @@ class Check_post_avvio():
         file_rivisto = self.file_rivisto  
         configurazione_rivisto = self.configurazione_rivisto
 
-        #agenda = configurazione_rivisto["Agenda"] #intesta
-        #prestazioneSISS = configurazione_rivisto["PrestazioneSISS"]
-        #prestazioneInterna = configurazione_rivisto["PrestazioneInterna"]
         agenda = self.work_codice_agenda_siss #intesta
         prestazioneSISS = self.work_codice_prestazione_siss
         prestazioneInterna = self.work_codice_prestazione_interno

@@ -74,8 +74,10 @@ class Check_inviante():
             if row[self.work_abilitazione_esposizione_siss] == "S": #se prestazione esposta
                 if row[self.work_inviante] == "": #controllo se inviante è stato configurato
                     error_dict['error_invianti_vuoti'].append(str(int(index)+2)) 
+                    print("error_invianti_vuoti")
                 elif row[self.work_inviante] == "0" and str_check in row[self.work_codice_prestazione_siss]: #controllo se inviante non è 0 quando prestazione di controllo
                     error_dict['error_inviante_controllo'].append(str(int(index)+2))
+                    print("error_inviante_controllo")
                 
         out_message = ""
         for ind in error_dict['error_invianti_vuoti']:

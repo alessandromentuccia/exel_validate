@@ -1,11 +1,7 @@
 import pandas as pd
 import numpy as np
-import requests
-import xlrd
 from xlsxwriter.utility import xl_rowcol_to_cell
-import yaml
 import logging
-import re
 import openpyxl 
 
 logger = logging.getLogger(__name__)

@@ -2,6 +2,7 @@ import argparse
 import itertools
 import json
 import logging
+from operator import le
 import random
 import re
 import time
@@ -54,6 +55,7 @@ class Check_action():
     work_codice_agenda_siss = ""
     work_casi_1_n = ""
     work_abilitazione_esposizione_siss = ""
+    work_prenotabile_siss = ""
     work_codici_disciplina_catalogo = ""
     work_descrizione_disciplina_catalogo = ""
     work_codice_QD = ""
@@ -73,13 +75,16 @@ class Check_action():
     work_codice_agenda_interno = ""
     work_codice_prestazione_interno = ""
     work_inviante = ""
-    work_risorsa = ""
     work_accesso_farmacia = ""
     work_accesso_CCR = ""
     work_accesso_cittadino = ""
     work_accesso_MMG = ""
     work_accesso_amministrativo = ""
     work_accesso_PAI = ""
+    work_gg_preparazione = ""
+    work_gg_refertazione = ""
+    work_nota_operatore = ""
+    work_risorsa = ""
 
     work_index_codice_QD = 0
     work_index_codice_SISS_agenda = 0
@@ -104,6 +109,7 @@ class Check_action():
         self.work_codice_agenda_siss = data[0]["work_column"]["work_codice_agenda_siss"]
         self.work_casi_1_n = data[0]["work_column"]["work_casi_1_n"]
         self.work_abilitazione_esposizione_siss = data[0]["work_column"]["work_abilitazione_esposizione_siss"]
+        self.work_prenotabile_siss = data[0]["work_column"]["work_prenotabile_siss"]
         self.work_codici_disciplina_catalogo = data[0]["work_column"]["work_codici_disciplina_catalogo"]
         self.work_descrizione_disciplina_catalogo = data[0]["work_column"]["work_descrizione_disciplina_catalogo"]
         self.work_codice_QD = data[0]["work_column"]["work_codice_QD"]
@@ -123,23 +129,17 @@ class Check_action():
         self.work_codice_agenda_interno = data[0]["work_column"]["work_codice_agenda_interno"]
         self.work_codice_prestazione_interno = data[0]["work_column"]["work_codice_prestazione_interno"]
         self.work_inviante = data[0]["work_column"]["work_inviante"]
-        self.work_risorsa = data[0]["work_column"]["work_risorsa"]
         self.work_accesso_farmacia = data[0]["work_column"]["work_accesso_farmacia"]
         self.work_accesso_CCR = data[0]["work_column"]["work_accesso_CCR"]
         self.work_accesso_cittadino = data[0]["work_column"]["work_accesso_cittadino"]
         self.work_accesso_MMG = data[0]["work_column"]["work_accesso_MMG"]
         self.work_accesso_amministrativo = data[0]["work_column"]["work_accesso_amministrativo"]
         self.work_accesso_PAI = data[0]["work_column"]["work_accesso_PAI"]
+        self.work_gg_preparazione = data[0]["work_column"]["work_gg_preparazione"]
+        self.work_gg_refertazione = data[0]["work_column"]["work_gg_refertazione"]
+        self.work_nota_operatore = data[0]["work_column"]["work_nota_operatore"]
+        self.work_risorsa = data[0]["work_column"]["work_risorsa"]
 
-        self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
-        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1
-        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"] - 1
-        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"] - 1
-        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] - 1
-        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"] - 1
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"] - 1
-        self.work_index_operatore_logico_QD = data[1]["work_index"]["work_index_operatore_logico_QD"] - 1 
-        
         self.work_alert_column = data[1]["work_index"]["work_alert_column"]
         try:
             self.work_delimiter = data[2]["work_separator"]["work_delimiter"]
@@ -222,13 +222,41 @@ class Check_action():
         #print("start findcell dataframe")
         for index, row in df.iterrows():
             mapping_key = str(row[self.work_codice_agenda_siss].strip())+"|"+str(row[self.work_codice_prestazione_siss].strip())+"|"+str(row[self.work_codice_prestazione_interno].strip())
-            #print("iterate mapping: " + mapping_key)
+            print("iterate mapping: " + mapping_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if mapping_key == key_rivisto and row[self.work_abilitazione_esposizione_siss] == "S":
-                #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
-                if str(row[column_name]) == searchedValue:
+                print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
+                m_row_value = str(row[column_name]).split(self.work_delimiter)
+                r_row_value = str(searchedValue).split(self.work_delimiter)
+                print("m_row_value", m_row_value)
+                print("r_row_value", r_row_value)
+                #m_row_value = m_row_value.sort(key = str)
+                #r_row_value = r_row_value.sort(key = str)
+                
+                result1 =  all(elem in r_row_value  for elem in m_row_value)
+                result2 =  all(elem in m_row_value  for elem in r_row_value)
+                if result1 and result2 and len(m_row_value)==len(r_row_value):
                     result_coord.append(str(index) + "#" + column_name)
-                    #print("trovato QD corretto")
+                    print("trovato QD corretto")
+                print("m_row_value", m_row_value)
+                print("r_row_value", r_row_value)
+                '''flag = False
+                for element1 in m_row_value:
+                    for element2 in r_row_value:
+                        if element1.strip() == element2.strip():
+                            flag = True
+                            
+                            #print("trovato QD corretto")
+
+                if flag == True:
+                    result_coord.append(str(index) + "#" + column_name)
+                    print("m_row_value", m_row_value)
+                    print("r_row_value", r_row_value)
+                #if str(row[column_name]) == searchedValue:
+                if m_row_value == r_row_value:
+                    result_coord.append(str(index) + "#" + column_name)
+                    print("trovato QD corretto")'''
+                    
                 
         if result_coord == []:
             return -1
@@ -240,13 +268,41 @@ class Check_action():
         #print("start findcell dataframe")
         for index, row in df.iterrows():
             rivisto_key = str(row[self.configurazione_rivisto["Agenda"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]].strip())
-            #print("iterate mapping: " + mapping_key)
+            print("iterate mapping: " + rivisto_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if rivisto_key == key_mapping:
-                #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
-                if str(row[column_name]) == str(searchedValue):
+                print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
+                r_row_value = str(row[column_name]).split(self.work_delimiter) #list
+                m_row_value = str(searchedValue).split(self.work_delimiter) #list
+                print("m_row_value", m_row_value)
+                print("r_row_value", r_row_value)
+                result1 =  all(elem in m_row_value  for elem in r_row_value)
+                result2 =  all(elem in r_row_value  for elem in m_row_value)
+                if result1 and result2 and len(m_row_value)==len(r_row_value):
                     result_coord.append(str(index) + "#" + column_name)
-                    #print("trovato QD corretto")
+                    print("trovato QD corretto")
+                #m_row_value = m_row_value.sort(key = str)
+                #r_row_value = r_row_value.sort(key = str)
+                print("m_row_value", m_row_value)
+                print("r_row_value", r_row_value)
+                '''flag = False
+                for element1 in r_row_value:
+                    for element2 in m_row_value:
+                        if element1.strip() == element2.strip():
+                            flag = True
+                            
+                            #print("trovato QD corretto")
+
+                if flag == True:
+                    result_coord.append(str(index) + "#" + column_name)
+                    print("m_row_value", m_row_value)
+                    print("r_row_value", r_row_value)
+
+                #if str(row[column_name]) == str(searchedValue):
+                if r_row_value == m_row_value:
+                    result_coord.append(str(index) + "#" + column_name)
+                    print("trovato QD corretto")'''
+                    
                 
         if result_coord == []:
             return -1
