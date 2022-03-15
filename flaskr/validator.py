@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import xlrd
 from xlsxwriter.utility import xl_rowcol_to_cell
+import matplotlib.pyplot as plt
 
 from flaskr.Vale_validator_check.Vale_validator import Validator_v
 from flaskr.check.check_QD import Check_QD
