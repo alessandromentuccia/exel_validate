@@ -216,6 +216,53 @@ class Check_action():
             return -1
         return result_coord#, result_value
 
+    def findCell_dataframe_MAP_string(self, df, searchedValue, key_rivisto, column_name):
+        result_coord = []
+
+        #print("start findcell dataframe")
+        for index, row in df.iterrows():
+            mapping_key = str(row[self.work_codice_agenda_siss].strip())+"|"+str(row[self.work_codice_prestazione_siss].strip())+"|"+str(row[self.work_codice_prestazione_interno].strip())
+            print("iterate mapping: " + mapping_key)
+            #print("trovata corrisponenza key: " + searchedValue)
+            if mapping_key == key_rivisto and row[self.work_abilitazione_esposizione_siss] == "S":
+                #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
+                m_row_value = str(row[column_name])
+                r_row_value = str(searchedValue)
+                #print("m_row_value", m_row_value)
+                #print("r_row_value", r_row_value)
+                
+                if m_row_value == r_row_value: #check the two row
+                    result_coord.append(str(index) + "#" + column_name)
+                    print("trovata corripondenza valori")
+                
+        if result_coord == []: #alert if doesn't exist a result
+            return -1
+        return result_coord
+
+    def findCell_dataframe_RIV_string(self, df, searchedValue, key_mapping, column_name):
+        result_coord = []
+
+        #print("start findcell dataframe")
+        for index, row in df.iterrows():
+            rivisto_key = str(row[self.configurazione_rivisto["Agenda"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]].strip())
+            print("iterate mapping: " + rivisto_key)
+            #print("trovata corrisponenza key: " + searchedValue)
+            if rivisto_key == key_mapping:
+                #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
+                r_row_value = str(row[column_name])
+                m_row_value = str(searchedValue)
+                #print("m_row_value", m_row_value)
+                #print("r_row_value", r_row_value)
+                
+                if m_row_value == r_row_value: #check the two row
+                    result_coord.append(str(index) + "#" + column_name)
+                    print("trovata corripondenza valori")
+                
+        if result_coord == []: #alert if doesn't exist a result
+            return -1
+        return result_coord
+
+
     def findCell_dataframe_MAP(self, df, searchedValue, key_rivisto, column_name):
         result_coord = []
 
@@ -225,40 +272,23 @@ class Check_action():
             print("iterate mapping: " + mapping_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if mapping_key == key_rivisto and row[self.work_abilitazione_esposizione_siss] == "S":
-                print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
+                #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
                 m_row_value = str(row[column_name]).split(self.work_delimiter)
                 r_row_value = str(searchedValue).split(self.work_delimiter)
-                print("m_row_value", m_row_value)
-                print("r_row_value", r_row_value)
+                #print("m_row_value", m_row_value)
+                #print("r_row_value", r_row_value)
                 #m_row_value = m_row_value.sort(key = str)
                 #r_row_value = r_row_value.sort(key = str)
                 
-                result1 =  all(elem in r_row_value  for elem in m_row_value)
-                result2 =  all(elem in m_row_value  for elem in r_row_value)
-                if result1 and result2 and len(m_row_value)==len(r_row_value):
+                result1 =  all(elem in r_row_value  for elem in m_row_value) #check list1 in list2
+                result2 =  all(elem in m_row_value  for elem in r_row_value) #check list2 in list1
+                if result1 and result2 and len(m_row_value)==len(r_row_value): #check result and lenght
                     result_coord.append(str(index) + "#" + column_name)
-                    print("trovato QD corretto")
-                print("m_row_value", m_row_value)
-                print("r_row_value", r_row_value)
-                '''flag = False
-                for element1 in m_row_value:
-                    for element2 in r_row_value:
-                        if element1.strip() == element2.strip():
-                            flag = True
-                            
-                            #print("trovato QD corretto")
-
-                if flag == True:
-                    result_coord.append(str(index) + "#" + column_name)
-                    print("m_row_value", m_row_value)
-                    print("r_row_value", r_row_value)
-                #if str(row[column_name]) == searchedValue:
-                if m_row_value == r_row_value:
-                    result_coord.append(str(index) + "#" + column_name)
-                    print("trovato QD corretto")'''
-                    
+                    print("trovata corripondenza valori")
+                    #print("m_row_value", m_row_value)
+                    #print("r_row_value", r_row_value)
                 
-        if result_coord == []:
+        if result_coord == []: #alert if doesn't exist a result
             return -1
         return result_coord#, result_value
 
@@ -271,40 +301,22 @@ class Check_action():
             print("iterate mapping: " + rivisto_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if rivisto_key == key_mapping:
-                print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
+                #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
                 r_row_value = str(row[column_name]).split(self.work_delimiter) #list
                 m_row_value = str(searchedValue).split(self.work_delimiter) #list
-                print("m_row_value", m_row_value)
-                print("r_row_value", r_row_value)
-                result1 =  all(elem in m_row_value  for elem in r_row_value)
-                result2 =  all(elem in r_row_value  for elem in m_row_value)
-                if result1 and result2 and len(m_row_value)==len(r_row_value):
+                #print("m_row_value", m_row_value)
+                #print("r_row_value", r_row_value)
+                result1 =  all(elem in m_row_value  for elem in r_row_value) #check list1 in list2
+                result2 =  all(elem in r_row_value  for elem in m_row_value) #check list2 in list1
+                if result1 and result2 and len(m_row_value)==len(r_row_value): #check result and lenght
                     result_coord.append(str(index) + "#" + column_name)
-                    print("trovato QD corretto")
-                #m_row_value = m_row_value.sort(key = str)
-                #r_row_value = r_row_value.sort(key = str)
-                print("m_row_value", m_row_value)
-                print("r_row_value", r_row_value)
-                '''flag = False
-                for element1 in r_row_value:
-                    for element2 in m_row_value:
-                        if element1.strip() == element2.strip():
-                            flag = True
-                            
-                            #print("trovato QD corretto")
-
-                if flag == True:
-                    result_coord.append(str(index) + "#" + column_name)
-                    print("m_row_value", m_row_value)
-                    print("r_row_value", r_row_value)
-
-                #if str(row[column_name]) == str(searchedValue):
-                if r_row_value == m_row_value:
-                    result_coord.append(str(index) + "#" + column_name)
-                    print("trovato QD corretto")'''
-                    
+                    print("trovata corripondenza valori")
+                    #m_row_value = m_row_value.sort(key = str)
+                    #r_row_value = r_row_value.sort(key = str)
+                    #rint("m_row_value", m_row_value)
+                    #print("r_row_value", r_row_value)
                 
-        if result_coord == []:
+        if result_coord == []: #alert if doesn't exist a result
             return -1
         return result_coord#, result_value
 
