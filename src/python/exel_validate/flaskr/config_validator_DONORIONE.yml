@@ -1,0 +1,41 @@
+- work_column:
+    work_sheet: "TRACCIATO MAPPING"
+    work_codice_prestazione_siss: "Codice Prestazione SISS"
+    work_descrizione_prestazione_siss: "Descrizione Prestazione SISS"
+    work_codice_agenda_siss: "Codice SISS Agenda"
+    work_casi_1_n: "1:N"
+    work_abilitazione_esposizione_siss: "NEW_ABILITAZIONE ESPOSIZIONE SISS"
+    work_codici_disciplina_catalogo: "CODICE_DISCIPLINA_X_QD"
+    work_descrizione_disciplina_catalogo: "DESCRIZIONE_DISCIPLINA_X_QD"
+    work_codice_QD: "QUESITO_DIAGNOSTICO"
+    work_descrizione_QD: "DESCRIZIONE_QD"
+    work_operatore_logico_QD: "OPER_LOGIC_QUESITO"
+    work_codice_metodica: "METODICA"
+    work_descrizione_metodica: "DESCRIZIONE METODICA"
+    work_codice_distretto: "DISTRETTO"
+    work_descrizione_distretto: "DESCRIZIONE DISTRETTO"
+    work_operatore_logico_distretto: "OPERATORE LOGICO DISTRETTO"
+    work_priorita_U: "New Priorità U"
+    work_priorita_primo_accesso_D: "New Priorità Primo Accesso D"
+    work_priorita_primo_accesso_P: "New Priorità Primo Accesso P"
+    work_priorita_primo_accesso_B: "New Priorità Primo Accesso B"
+    work_accesso_programmabile_ZP: "New Accesso Programmabile P"
+    work_combinata: "NEW_CODICE COMBINATA"
+    work_codice_agenda_interno: "Codice Interno Agenda"
+    work_codice_prestazione_interno: "Codice Prestazione Cup"
+
+- work_index:
+    work_index_sheet: 1
+    work_index_codice_QD: 49
+    work_index_op_logic_distretto: 61
+    work_index_codice_SISS_agenda: 16
+    work_index_abilitazione_esposizione_SISS: 31
+    work_index_codice_prestazione_SISS: 21
+    work_index_operatore_logico_distretto: 61
+    work_index_codici_disciplina_catalogo: 47
+    work_index_codici_descri_disciplina_catalogo: 48
+    work_index_operatore_logico_QD: 51
+    work_alert_column: "DK"
+
+- work_separator:
+    work_delimiter: ","

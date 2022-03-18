@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Mapping checker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style_post_avvio.css') }}" />
+    <!--<script src="{{ url_for('static', filename='jquery-3.6.0.min.js') }}"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script> 
+      $(function () {
+          $('.checkConfiguration input[type=checkbox]').on('click', function () {
+              $(this).closest('.checkConfiguration').find('input[type=text]').prop('disabled', !$(this).is(':checked'));
+          });
+      });
+    </script>
+    <script language="Javascript">
+      function IsEmpty() {
+        if (document.forms["Form"]["Sheettext"].value == "") {
+          alert(" Inserisci il nome dello sheet del rivisto");
+        }
+        return False;
+      }
+    </script>
+</head>
+
+<body>
+    <div style="display: inline;">
+      <h2 style="text-align:center;">Controlla coerenza post avvio</h2>
+      <img src="{{ url_for('static', filename='images/ARIA_logo.jpg') }}" alt="Aria logo" class="img">
+    </div>
+    <form method=post name="Form" onsubmit="return IsEmpty();" action="/start-post-avvio-check" enctype=multipart/form-data>
+        <fieldset>
+        <legend>Seleziona i controlli che vuoi effettuare</legend>
+          <div class="checkConfiguration"> 
+            <input  id="Sheet" name="Sheettext" type="text"/>
+            <label for="Sheet">Inserisci nome Sheet del rivisto</label>
+          </div>
+          <div class="checkConfiguration"> 
+            <input  id="Agenda" name="Agendatext" type="text"/>
+            <label for="Agenda">Inserisci nome colonna Codice Agenda SISS</label>
+          </div>
+          <div class="checkConfiguration"> 
+            <input  id="PrestazioneSISS" name="PrestazioneSISStext" type="text"/>
+            <label for="PrestazioneSISS">Inserisci nome colonna Codice Prestazione SISS</label>
+          </div>
+          <div class="checkConfiguration"> 
+            <input  id="PrestazioneInterna" name="PrestazioneInternatext" type="text"/>
+            <label for="PrestazioneInterna">Inserisci nome colonna Codice Prestazione Interna</label>
+          </div> 
+          <div class="checkConfiguration">  
+            <input type="checkbox" id="Quesiti" name="check" value="Quesiti">
+            <label for="Quesiti">Quesiti</label>
+            <input name="Quesititext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="OperatoreQD" name="check" value="OperatoreQD">
+            <label for="OperatoreQD">Operatore QD</label>
+            <input name="OperatoreQDtext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="Distretti" name="check" value="Distretti">
+            <label for="Distretti">Distretti</label>
+            <input name="Distrettitext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="OperatoreDistretto" name="check" value="OperatoreDistretto">
+            <label for="OperatoreDistretto">Operatore Distretto</label>
+            <input name="OperatoreDistrettotext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="Metodiche" name="check" value="Metodiche">
+            <label for="Metodiche">Metodiche</label>
+            <input name="Metodichetext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="Inviante" name="check" value="Inviante"> 
+            <label for="Inviante">Inviante</label>
+            <input name="Inviantetext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="Risorsa" name="check" value="Risorsa">
+            <label for="Risorsa">Risorsa</label>
+            <input name="Risorsatext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="Farmacia" name="check" value="Farmacia"> 
+            <label for="Farmacia">Canale accesso Farmacia</label>
+            <input name="Farmaciatext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="CCR" name="check" value="CCR"> 
+            <label for="CCR">Canale accesso CCR</label>
+            <input name="CCRtext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="Cittadino" name="check" value="Cittadino"> 
+            <label for="Cittadino">Canale accesso Cittadino</label>
+            <input name="Cittadinotext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="MMG" name="check" value="MMG"> 
+            <label for="MMG">Canale accesso MMG</label>
+            <input name="MMGtext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="Amministrativo" name="check" value="Amministrativo"> 
+            <label for="Amministrativo">Canale accesso Amministrativo</label>
+            <input name="Amministrativotext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div class="checkConfiguration">
+            <input type="checkbox" id="PAI" name="check" value="PAI"> 
+            <label for="PAI">Canale accesso PAI</label>
+            <input name="PAItext" type="text" class="Disabledtextbox" disabled="disabled" />
+          </div>
+          <div>
+            <input type="file" name="file1" id="file1">
+            <label for="file1">Carica file di configurazione</label>
+            <input type="file" name="fileM" id="fileM">
+            <label for="fileM">Carica il file di mapping</label>
+            <input type="file" name="fileR" id="fileR">
+            <label for="fileR">Carica il rivisto da verificare</label>
+          </div>
+          <div>
+            <button type="submit" >Avvio validazione</button>
+          </div>
+        </fieldset>
+      </form>
+
+</body>
+
+</html>
