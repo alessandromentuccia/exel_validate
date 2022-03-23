@@ -1,3 +1,4 @@
+import os
 from distutils.log import error
 import logging
 from collections import OrderedDict
@@ -32,7 +33,7 @@ logger.addHandler(f_handler)
 logger.addHandler(c_handler)
 
 RESULT_VALIDATION = "..\check_excel_result.txt"
-
+ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
 class Check_action():
 
@@ -170,7 +171,8 @@ class Check_action():
         print(checked_dict)
         self.controls_setted = checked_dict
 
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
@@ -220,7 +222,8 @@ class Check_action():
             print("Fase 7: Controllo Inviante selezionato")
             inviante_error = self.check_inviante(df_mapping)
         print("Fase Vale Validator")
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
         wb = xlrd.open_workbook(catalogo_dir)
         sheet_QD_OW = wb.sheet_by_index(1)
         sheet_Metodiche_OW = wb.sheet_by_index(2)

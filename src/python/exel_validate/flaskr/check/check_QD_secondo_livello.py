@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import requests
@@ -20,6 +21,8 @@ f_handler.setFormatter(formatter)
 c_handler.setFormatter(formatter)
 logger.addHandler(f_handler)
 logger.addHandler(c_handler)
+
+ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
 class Check_QD():
 
@@ -102,7 +105,8 @@ class Check_QD():
         error_dict.update({'QD_II_livello': []})
         
 
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
 
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system

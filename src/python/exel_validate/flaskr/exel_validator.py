@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 from collections import OrderedDict
@@ -35,6 +36,8 @@ f_handler.setFormatter(formatter)
 c_handler.setFormatter(formatter)
 logger.addHandler(f_handler)
 logger.addHandler(c_handler)
+
+ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
 
 class Check_action():
@@ -168,7 +171,8 @@ class Check_action():
         #print ("print JSON")
         #print(sh)
         
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche_attributi_catalogo GP++_201910.xls"
+        #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
@@ -213,7 +217,8 @@ class Check_action():
         inviante_error = self.check_inviante(df_mapping)
         #inviante_error = {}
         print("Fase Vale Validator")
-        catalogo_dir = "c:\\Users\\aless\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
+        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
         wb = xlrd.open_workbook(catalogo_dir)
         sheet_QD_OW = wb.sheet_by_index(1)
         sheet_Metodiche_OW = wb.sheet_by_index(2)

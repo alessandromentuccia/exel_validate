@@ -1,0 +1,62 @@
+
+error_QD_agenda: 
+
+error_QD_disciplina_agenda: 
+
+error_discipline_agende_diverse: 
+
+error_disciplina_mancante: 
+\error_QD_descrizione_disciplina_agenda: 
+
+Errori presenti nelle metodiche e riportate attraverso gli indici:
+
+error_metodica_caratteri_non_consentiti: 
+at index: 
+
+error_metodica_spazio_bordi: 
+at index: 
+
+error_metodica_spazio_internamente: 
+at index: 
+
+error_metodica_inprestazione: 
+
+error_distretti_caratteri_non_consentiti: 
+at index: 
+
+error_distretti_trovato_spazio: 
+at index: 
+
+error_distretti_inprestazione: 
+
+error_distretti_operatori_logici: 
+at index: 
+
+error_distretti_operatori_logici_mancante: 
+at index: 
+
+error_prime_visite: 
+at index: 
+
+error_controlli: 
+at index: 
+
+error_esami_strumentali: 
+at index: 
+
+error_casi_1n: 
+at index: 
+at index: 6, on agenda_prestazione: 010-1|088901.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 7, on agenda_prestazione: 010-1|088901.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 9, on agenda_prestazione: 010-1|08897.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 10, on agenda_prestazione: 010-1|08897.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 15, on agenda_prestazione: 011-1|088901.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 16, on agenda_prestazione: 011-1|088901.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 18, on agenda_prestazione: 011-1|08897.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 19, on agenda_prestazione: 011-1|08897.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 76, on agenda_prestazione: 015-1|6987371 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 77, on agenda_prestazione: 015-1|6987371 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 78, on agenda_prestazione: 015-1|6987372.01 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 79, on agenda_prestazione: 015-1|6987372.01 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 80, on agenda_prestazione: 015-1|6987372.02 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 81, on agenda_prestazione: 015-1|6987372.02 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 

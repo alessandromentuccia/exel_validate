@@ -10,6 +10,7 @@ from collections import OrderedDict
 from functools import reduce
 from pathlib import Path
 from typing import Dict, List
+from matplotlib.pyplot import flag
 
 
 #import openpyxl 
@@ -218,6 +219,7 @@ class Check_action():
 
     def findCell_dataframe_MAP_string(self, df, searchedValue, key_rivisto, column_name):
         result_coord = []
+        flag_find = False
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
@@ -230,17 +232,21 @@ class Check_action():
                 r_row_value = str(searchedValue)
                 #print("m_row_value", m_row_value)
                 #print("r_row_value", r_row_value)
+                flag_find = True
                 
                 if m_row_value == r_row_value: #check the two row
                     result_coord.append(str(index) + "#" + column_name)
                     print("trovata corripondenza valori")
-                
-        if result_coord == []: #alert if doesn't exist a result
+        
+        if flag_find == False:
+            return -2
+        elif result_coord == []: #alert if doesn't exist a result
             return -1
         return result_coord
 
     def findCell_dataframe_RIV_string(self, df, searchedValue, key_mapping, column_name):
         result_coord = []
+        flag_find = False
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
@@ -253,18 +259,22 @@ class Check_action():
                 m_row_value = str(searchedValue)
                 #print("m_row_value", m_row_value)
                 #print("r_row_value", r_row_value)
+                flag_find = True
                 
                 if m_row_value == r_row_value: #check the two row
                     result_coord.append(str(index) + "#" + column_name)
                     print("trovata corripondenza valori")
                 
-        if result_coord == []: #alert if doesn't exist a result
+        if flag_find == False:
+            return -2
+        elif result_coord == []: #alert if doesn't exist a result
             return -1
         return result_coord
 
 
     def findCell_dataframe_MAP(self, df, searchedValue, key_rivisto, column_name):
         result_coord = []
+        flag_find = False
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
@@ -279,6 +289,7 @@ class Check_action():
                 #print("r_row_value", r_row_value)
                 #m_row_value = m_row_value.sort(key = str)
                 #r_row_value = r_row_value.sort(key = str)
+                flag_find = True
                 
                 result1 =  all(elem in r_row_value  for elem in m_row_value) #check list1 in list2
                 result2 =  all(elem in m_row_value  for elem in r_row_value) #check list2 in list1
@@ -288,12 +299,15 @@ class Check_action():
                     #print("m_row_value", m_row_value)
                     #print("r_row_value", r_row_value)
                 
-        if result_coord == []: #alert if doesn't exist a result
+        if flag_find == False:
+            return -2
+        elif result_coord == []: #alert if doesn't exist a result
             return -1
-        return result_coord#, result_value
+        return result_coord
 
     def findCell_dataframe_RIV(self, df, searchedValue, key_mapping, column_name):
         result_coord = []
+        flag_find = False
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
@@ -306,6 +320,8 @@ class Check_action():
                 m_row_value = str(searchedValue).split(self.work_delimiter) #list
                 #print("m_row_value", m_row_value)
                 #print("r_row_value", r_row_value)
+                flag_find = True
+                
                 result1 =  all(elem in m_row_value  for elem in r_row_value) #check list1 in list2
                 result2 =  all(elem in r_row_value  for elem in m_row_value) #check list2 in list1
                 if result1 and result2 and len(m_row_value)==len(r_row_value): #check result and lenght
@@ -316,9 +332,11 @@ class Check_action():
                     #rint("m_row_value", m_row_value)
                     #print("r_row_value", r_row_value)
                 
-        if result_coord == []: #alert if doesn't exist a result
+        if flag_find == False:
+            return -2
+        elif result_coord == []: #alert if doesn't exist a result
             return -1
-        return result_coord#, result_value
+        return result_coord
 
     '''Metodo che aggiunge elemento in una lista esistente o crea la lista nel caso
     non fosse presente'''

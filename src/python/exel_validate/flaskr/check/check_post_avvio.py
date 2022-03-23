@@ -91,7 +91,7 @@ class Check_post_avvio():
         error_dict.update({
             'error_ck_'+element: [] })
 
-        alert_column = "DP"
+        alert_column = "CE"
 
         xfile = openpyxl.load_workbook(self.file_rivisto) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.configurazione_rivisto["Sheet"])
@@ -117,10 +117,25 @@ class Check_post_avvio():
             elif flag_type == "string":
                 result_ = self.findCell_dataframe_MAP_string(df_mapping, searchedValue, rivisto_key, work_codice) 
             
-            if result_ == -1:
+            if result_ == -2:
+                error_dict["error_ck_"+element].append(str(int(index)+2))
+                print("coppia non trovata nel mapping: " +element)
+                out_message = "__> {}".format("Coppia prestazione/agenda non trovata in mapping")
+                if sheet[alert_column+str(int(index)+2)].value is not None:
+                    sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                else:
+                    sheet[alert_column+str(int(index)+2)] = out_message
+            elif result_ == -1:
                 error_dict["error_ck_"+element].append(str(int(index)+2))
                 print("trovato errore su "+element)
                 out_message = "__> {}".format("Corrispondenza "+element+" non trovata in mapping")
+                if sheet[alert_column+str(int(index)+2)].value is not None:
+                    sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                else:
+                    sheet[alert_column+str(int(index)+2)] = out_message
+            else:
+                print("trovata corrispondenza "+element)
+                out_message = "__> {}".format(element + " corrisponde in mapping")
                 if sheet[alert_column+str(int(index)+2)].value is not None:
                     sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
                 else:
@@ -156,10 +171,26 @@ class Check_post_avvio():
                 elif flag_type == "string":
                     result_ = self.findCell_dataframe_RIV_string(df_rivisto, searchedValue, mapping_key, configurazione_rivisto[element])
                 
-                if result_ == -1:
+                if result_ == -2:
+                    error_dict["error_ck_"+element].append(str(int(index)+2))
+                    print("Coppia prestazione/agenda non trovata in rivisto: " +element)
+                    out_message = "__> {}".format("Coppia prestazione/agenda non trovata in rivisto")
+                    if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
+                        sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                    else:
+                        sheet[self.work_alert_column+str(int(index)+2)] = out_message
+                elif result_ == -1:
                     error_dict["error_ck_reverse_"+element].append(str(int(index)+2))
                     print("trovato errore su "+element)
                     out_message = "__> {}".format("Corrispondenza "+element+" non trovata in rivisto")
+                    if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
+                        sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                    else:
+                        sheet[self.work_alert_column+str(int(index)+2)] = out_message
+                else: 
+                    
+                    print("trovata corrispondenza "+element)
+                    out_message = "__> {}".format(element + " corrisponde in rivisto")
                     if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
                         sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
                     else:
