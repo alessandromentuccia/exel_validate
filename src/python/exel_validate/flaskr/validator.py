@@ -8,8 +8,10 @@ from typing import Dict, List
 import pandas as pd
 import numpy as np
 import xlrd
+import openpyxl
 from xlsxwriter.utility import xl_rowcol_to_cell
 import matplotlib.pyplot as plt
+from dotenv import load_dotenv
 
 from flaskr.Vale_validator_check.Vale_validator import Validator_v
 from flaskr.check.check_QD import Check_QD
@@ -33,6 +35,8 @@ logger.addHandler(f_handler)
 logger.addHandler(c_handler)
 
 RESULT_VALIDATION = "..\check_excel_result.txt"
+load_dotenv()
+CAT_NAME = os.getenv("CAT_SISS")
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
 class Check_action():
@@ -133,15 +137,6 @@ class Check_action():
         self.work_gg_preparazione = data[0]["work_column"]["work_gg_preparazione"]
         self.work_gg_refertazione = data[0]["work_column"]["work_gg_refertazione"]
         self.work_nota_operatore = data[0]["work_column"]["work_nota_operatore"]
-
-        '''self.work_index_sheet = data[1]["work_index"]["work_index_sheet"]
-        self.work_index_codice_QD = data[1]["work_index"]["work_index_codice_QD"] - 1
-        self.work_index_codice_SISS_agenda = data[1]["work_index"]["work_index_codice_SISS_agenda"] - 1
-        self.work_index_abilitazione_esposizione_SISS = data[1]["work_index"]["work_index_abilitazione_esposizione_SISS"] - 1
-        self.work_index_codice_prestazione_SISS = data[1]["work_index"]["work_index_codice_prestazione_SISS"] - 1
-        self.work_index_operatore_logico_distretto = data[1]["work_index"]["work_index_operatore_logico_distretto"] - 1
-        self.work_index_codici_disciplina_catalogo = data[1]["work_index"]["work_index_codici_disciplina_catalogo"] - 1
-        self.work_index_operatore_logico_QD = data[1]["work_index"]["work_index_operatore_logico_QD"] - 1 '''
         
         self.work_alert_column = data[1]["work_index"]["work_alert_column"]
         try:
@@ -151,18 +146,6 @@ class Check_action():
         self.file_data = excel_file
 
 
-    def import_file(self):
-        logging.warning("import excel")
-
-        template_file = input("Enter your mapping file.xlsx: ") ##insert mapping file
-        print(template_file) 
-        template_file = Path(template_file)
-        self.file_name = template_file
-        if template_file.is_file(): #C:\Users\aless\csi-progetti\FaqBot\faqbot-09112020.xlsx
-            self.initializer(template_file)
-        else:
-            print("Il file non esiste, prova a ricaricare il file con la directory corretta.\n")
-
     def initializer(self, checked_dict):
         #pd.set_option("display.max_rows", None, "display.max_columns", None)
         df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str, self.work_codice_metodica: str, self.work_codice_distretto: str}).replace(np.nan, '', regex=True)
@@ -171,9 +154,9 @@ class Check_action():
         print(checked_dict)
         self.controls_setted = checked_dict
 
-        #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
-        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
-
+        #catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_110322.xlsx')
+        catalogo_dir = os.path.join(ROOT_DIR, CAT_NAME) #catalogo SISS
+        
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
         sheet_Distretti = pd.read_excel(catalogo_dir, sheet_name='DISTRETTI', converters={"Codice SISS": str, "Codice Distretto": str})
@@ -222,8 +205,9 @@ class Check_action():
             print("Fase 7: Controllo Inviante selezionato")
             inviante_error = self.check_inviante(df_mapping)
         print("Fase Vale Validator")
-        #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
-        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
+        
+        '''#catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_110322.xls')
+        catalogo_dir = os.path.join(ROOT_DIR, CAT_NAME)
         wb = xlrd.open_workbook(catalogo_dir)
         sheet_QD_OW = wb.sheet_by_index(1)
         sheet_Metodiche_OW = wb.sheet_by_index(2)
@@ -233,7 +217,7 @@ class Check_action():
         distretti_validator_error = {}
         #QD_validator_error = Validator_v.ck_QD_description(self, df_mapping, sheet_QD_OW)
         #metodiche_validator_error = Validator_v.ck_metodiche_description(self, df_mapping, sheet_Metodiche_OW)
-        #distretti_validator_error = Validator_v.ck_distretti_description(self, df_mapping, sheet_Distretti_OW)
+        #distretti_validator_error = Validator_v.ck_distretti_description(self, df_mapping, sheet_Distretti_OW)'''
 
 
         error_dict = {
@@ -242,9 +226,9 @@ class Check_action():
             "distretti_error": distretti_error,
             "priorita_error": priorita_error,    
             "prestazione_error": prestazione_error,
-            "QD_validator_error": QD_validator_error,
+            '''"QD_validator_error": QD_validator_error,
             "metodiche_validator_error": metodiche_validator_error,
-            "distretti_validator_error": distretti_validator_error,
+            "distretti_validator_error": distretti_validator_error,'''
             "canali_error": canali_error,
             "inviante_error": inviante_error
         }
@@ -258,7 +242,6 @@ class Check_action():
         print("start checking QD") #Codice Quesito Diagnostico
         #controllo se per ogni Agenda sono inseriti gli stessi QD
         error_dict = {}
-        
 
         error_QD_sintassi = Check_QD.ck_QD_sintassi(self, df_mapping, error_dict)
         error_QD_agenda = Check_QD.ck_QD_agenda(self, df_mapping, error_QD_sintassi)
@@ -355,6 +338,21 @@ class Check_action():
         file = open(RESULT_VALIDATION, "w") 
         file.write(self.output_message)
         file.close() 
+        try:
+            xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+            sheet_mapping = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel mapping
+            try:
+                sheet_report = xfile.get_sheet_by_name('Report Validazione') #recupero sheet excel report validazione 
+            except:
+                #creo Report Validazione se non esiste
+                sheet_report = xfile.create_sheet('Report Validazione')
+            sheet_report["A1"] = "Report Validazione"
+            
+            xfile.save(self.file_data) 
+        except:
+            print("non esiste file o sheet")
+
+        
         
 
     def findCell(self, sh, searchedValue, start_col):

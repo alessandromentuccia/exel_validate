@@ -57,40 +57,54 @@ class Check_metodiche():
     
     def ck_metodica_inprestazione(self, df_mapping, sheet_Metodiche, error_dict):
         print("start checking if metodica are correct")
-        error_dict.update({'error_metodica_inprestazione': []})
+        error_dict.update({'error_metodica_inprestazione': [],
+                           'error_metodica_generale_assente': [],
+                           'error_metodica_generale_presente': []})
         #self.output_message = self.output_message + "\nerror_metodica_inprestazione: "
         
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
         
+        cod_metodica_generale = "M00000"
+
         metodica_dict_error = {}
         prestazioni_dict = {}
         for index, row in df_mapping.iterrows():
             if row[self.work_abilitazione_esposizione_siss] == "S":
-                Metodica_string = row[self.work_codice_metodica].split(self.work_delimiter)
+                Metodica_string = row[self.work_codice_metodica]
+                Metodica_list = Metodica_string.split(self.work_delimiter)
+
 
                 siss = "" 
                 siss_flag = False
-                if Metodica_string is not None:
+                if Metodica_list is not None:
+
                     cod_pre_siss = str(row[self.work_codice_prestazione_siss])
-                    for metodica in Metodica_string:
-                        metodica = metodica.strip()
-                        if metodica != "":
-                            short_sheet = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                      
+                    if cod_metodica_generale == Metodica_string.strip():
+                        error_dict['error_metodica_generale_presente'].append(str(int(index)+2))
+                    else:
+                        if cod_metodica_generale not in Metodica_string and Metodica_string.strip() != "":
+                            error_dict['error_metodica_generale_assente'].append(str(int(index)+2))
+                            #print("codice metodica: '" + str(Metodica_string).strip() + "'")
                             
-                            print("prestazione della metodica in mapping:" + cod_pre_siss + " + " + siss)
-                            
-                            if cod_pre_siss not in short_sheet["Codice SISS"].values:
-                                siss_flag = True
-                                metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
-                                prestazioni_dict[str(int(index)+2)] = cod_pre_siss
-                                print("error metodica on index:" + str(int(index)+2))
-                            else:
-                                if cod_pre_siss != siss and siss != "":
-                                    print("error metodica on index:" + str(int(index)+2))
+                        for metodica in Metodica_list:
+                            metodica = metodica.strip()
+                            if metodica != "":
+                                short_sheet = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                      
+                                
+                                print("prestazione della metodica in mapping:" + cod_pre_siss + " + " + siss)
+                                
+                                if cod_pre_siss not in short_sheet["Codice SISS"].values:
                                     siss_flag = True
                                     metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
                                     prestazioni_dict[str(int(index)+2)] = cod_pre_siss
+                                    print("error metodica on index:" + str(int(index)+2))
+                                else:
+                                    if cod_pre_siss != siss and siss != "":
+                                        print("error metodica on index:" + str(int(index)+2))
+                                        siss_flag = True
+                                        metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), metodica)
+                                        prestazioni_dict[str(int(index)+2)] = cod_pre_siss
                 if siss_flag == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
                     error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
                 siss = str(row[self.work_codice_prestazione_siss])
@@ -105,6 +119,21 @@ class Check_metodiche():
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
                 sheet[self.work_alert_column+ind] = out_message
+        for ind in error_dict['error_metodica_generale_assente']:
+            out1 = out1 + "at index: " + ind + ", metodica generale assente \n"
+            out_message = "__> Alert: si consiglia di verificare la METODICA GENERALE non configurata per la prestazione"
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet[self.work_alert_column+ind] = out_message
+        for ind in error_dict['error_metodica_generale_presente']:
+            out1 = out1 + "at index: " + ind + ", metodica generale presente \n"
+            out_message = "__> Alert: METODICA GENERALE configurata da sola - Si consiglia di lasciare vuoto il campo poichè è sottintesa"
+            if sheet[self.work_alert_column+ind].value is not None:
+                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            else:
+                sheet[self.work_alert_column+ind] = out_message
+        
 
         self.output_message = self.output_message + "\nerror_metodica_inprestazione: \n" + out1
 
@@ -206,11 +235,7 @@ class Check_metodiche():
                 Metodica_string = row[self.work_codice_metodica].split(self.work_delimiter)
                 Description_list = row[self.work_descrizione_metodica].split(self.work_delimiter)
                 flag_error = False
-                '''if len(Metodica_string) != len(Description_list):
-                    print("il numero di descrizioni è diverso dal numero di metodiche all'indice " + str(index))
-                    flag_error = True
-                    metodica_dict_error = self.update_list_in_dict(metodica_dict_error, str(int(index)+2), "Manca un Codice Metodica o una Descrizione")
-                '''
+                
                 if Metodica_string is not None:
                     for metodica in Metodica_string:
                         metodica = metodica.strip()

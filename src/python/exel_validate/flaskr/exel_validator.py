@@ -14,6 +14,7 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 import yaml
 #import xlsxwriter
 #from openpyxl.utils import get_column_letter
+from dotenv import load_dotenv
 
 from Vale_validator_check.Vale_validator import Validator_v
 from check.check_QD import Check_QD
@@ -37,8 +38,9 @@ c_handler.setFormatter(formatter)
 logger.addHandler(f_handler)
 logger.addHandler(c_handler)
 
+load_dotenv()
+CAT_NAME = os.getenv("CAT_SISS")
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
-
 
 class Check_action():
 
@@ -172,7 +174,8 @@ class Check_action():
         #print(sh)
         
         #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
-        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
+        #catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_110322.xlsx')
+        catalogo_dir = os.path.join(ROOT_DIR, CAT_NAME)
 
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
         sheet_Metodiche = pd.read_excel(catalogo_dir, sheet_name='METODICHE', converters={"Codice SISS": str, "Codice Metodica": str})
@@ -218,7 +221,8 @@ class Check_action():
         #inviante_error = {}
         print("Fase Vale Validator")
         #catalogo_dir = "c:\\Users\\aless\\exel_validate\\src\\python\\exel_validate\\CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls"
-        catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_202007.xls')
+        #catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_110322.xls')
+        catalogo_dir = os.path.join(ROOT_DIR, CAT_NAME)
         wb = xlrd.open_workbook(catalogo_dir)
         sheet_QD_OW = wb.sheet_by_index(1)
         sheet_Metodiche_OW = wb.sheet_by_index(2)

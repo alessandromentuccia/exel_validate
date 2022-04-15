@@ -9,9 +9,9 @@ from flask import Flask, flash, request, redirect, url_for, jsonify, send_file, 
 from flask import send_from_directory
 from werkzeug.utils import secure_filename
 # local imports
-import flaskr.validator
-import flaskr.validator_post_avvio
-from openpyxl import load_workbook
+import flaskr.validator as validator
+import flaskr.validator_post_avvio as validator_post_avvio
+#from openpyxl import load_workbook
 dir = os.path.dirname(__file__)
 DOWNLOAD_FOLDER = os.path.join(dir, 'uploads/')
 
@@ -52,8 +52,8 @@ def generate():
         print(excel_filename)
         file_path = app.config['DOWNLOAD_FOLDER']  + excel_filename
         #check_actionPA.initializer(file_path_rivisto, checked_dict)
-        check_action = validator.Check_action(configuration_file, file_path)
-        check_action.initializer(checked_dict)
+        check_action = validator.Check_action(configuration_file, file_path) #init class
+        check_action.initializer(checked_dict) #activate method
                                
         return send_file(file_path,as_attachment = True, attachment_filename=excel_filename), 200
     except Exception as e:

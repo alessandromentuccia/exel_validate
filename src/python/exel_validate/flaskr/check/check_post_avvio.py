@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
 import requests
@@ -7,6 +9,9 @@ import yaml
 import logging
 import re
 import openpyxl 
+
+load_dotenv()
+ALERT_COLUMN_RV=os.getenv("ALERT_COLUMN_RV")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -91,7 +96,7 @@ class Check_post_avvio():
         error_dict.update({
             'error_ck_'+element: [] })
 
-        alert_column = "CE"
+        alert_column = ALERT_COLUMN_RV
 
         xfile = openpyxl.load_workbook(self.file_rivisto) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.configurazione_rivisto["Sheet"])
