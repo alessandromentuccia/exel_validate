@@ -1,0 +1,52 @@
+
+error_QD_agenda: 
+
+error_QD_disciplina_agenda: 
+
+error_discipline_agende_diverse: 
+
+error_disciplina_mancante: 
+\error_QD_descrizione_disciplina_agenda: 
+
+Errori presenti nelle metodiche e riportate attraverso gli indici:
+
+error_metodica_caratteri_non_consentiti: 
+at index: 
+
+error_metodica_spazio_bordi: 
+at index: 
+
+error_metodica_spazio_internamente: 
+at index: 
+
+error_metodica_inprestazione: 
+
+error_distretti_caratteri_non_consentiti: 
+at index: 
+
+error_distretti_trovato_spazio: 
+at index: 
+
+error_distretti_inprestazione: 
+
+error_distretti_operatori_logici: 
+at index: 
+
+error_distretti_operatori_logici_mancante: 
+at index: 
+
+error_prime_visite: 
+at index: 
+
+error_controlli: 
+at index: 
+
+error_esami_strumentali: 
+at index: 
+
+error_casi_1n: 
+at index: 
+at index: 37, on agenda_prestazione: 050-1|088901.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 38, on agenda_prestazione: 050-1|088901.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 40, on agenda_prestazione: 050-1|08897.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
+at index: 41, on agenda_prestazione: 050-1|08897.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
