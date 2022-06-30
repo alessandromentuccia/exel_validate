@@ -46,7 +46,10 @@ class Check_action():
     controls_setted = {}
     catalogo = OrderedDict()
     flag_check_list = []
-    error_list = {}
+    error_generate_list = {
+        1 : "Lo Sheet indicato non è presente nel file .xlsx: ricontrollare il file di configurazione ed il file excel"
+    }
+    validation_results = ""
     output_message = ""
     
     work_sheet = "" #sheet di lavoro di df_mapping
@@ -147,6 +150,11 @@ class Check_action():
 
 
     def initializer(self, checked_dict):
+
+        print("FASE 0: precheck")
+        self.check_sheet_existance()
+        if self.validation_results != "":
+            return self.validation_results 
         #pd.set_option("display.max_rows", None, "display.max_columns", None)
         df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str, self.work_codice_metodica: str, self.work_codice_distretto: str}).replace(np.nan, '', regex=True)
         #print ("print JSON")
@@ -170,10 +178,10 @@ class Check_action():
 
         self.analizer(df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti)
 
-    def analizer(self, df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti):
+        return self.validation_result 
 
-        print("FASE 0: precheck")
-        self.check_column_name(df_mapping)
+
+    def analizer(self, df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti):
 
         print('Start analisys:\n', df_mapping)
         QD_error = {}
@@ -235,8 +243,17 @@ class Check_action():
 
         self._validation(error_dict)
 
-    def check_column_name(self, df_mapping):
+        
+
+    def check_sheet_existance(self):
         print("check the used column name of the excel file")
+        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
+        if self.work_sheet in xfile.sheetnames:
+            print('sheet exists')
+            self.validation_results = ""
+        else: 
+            self.validation_results = self.error_generate_list[1]
+
 
     def check_qd(self, df_mapping, sheet_QD):
         print("start checking QD") #Codice Quesito Diagnostico
@@ -351,7 +368,6 @@ class Check_action():
             xfile.save(self.file_data) 
         except:
             print("non esiste file o sheet")
-
         
         
 

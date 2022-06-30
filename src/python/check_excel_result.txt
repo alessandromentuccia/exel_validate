@@ -46,7 +46,3 @@ at index:
 
 error_casi_1n: 
 at index: 
-at index: 37, on agenda_prestazione: 050-1|088901.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
-at index: 38, on agenda_prestazione: 050-1|088901.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
-at index: 40, on agenda_prestazione: 050-1|08897.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 
-at index: 41, on agenda_prestazione: 050-1|08897.08 le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N, 

@@ -248,7 +248,7 @@ class Check_QD():
         out3 = ""
         for ind in error_dict['error_disciplina_mancante']:
             out3 = out3 + "at index: " + ind + "disciplina mancante, \n"
-            out_message = "__> Disciplina mancante per la seguente prestazione"
+            out_message = "__> Campo disciplina per Quesito Diagnostico non valorizzato"
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:

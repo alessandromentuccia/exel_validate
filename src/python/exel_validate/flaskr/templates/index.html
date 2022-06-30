@@ -3,6 +3,29 @@
 
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style_index.css') }}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!--<script> 
+      $(function () {
+          $('.checkConfiguration input[type=checkbox]').on('click', function () {
+              $(this).closest('.checkConfiguration').find('input[type=text]').prop('disabled', !$(this).is(':checked'));
+          });
+      });
+    </script>-->
+    <script language="Javascript">
+      function IsEmpty() {
+        if (document.getElementById('Quesiti').checked === false & 
+            document.getElementById('Metodiche').checked === false & 
+            document.getElementById('Distretti').checked === false & 
+            document.getElementById('Priorita').checked === false & 
+            document.getElementById('Prestazione').checked === false & 
+            document.getElementById('Canali').checked === false & 
+            document.getElementById('Inviante').checked === false
+            ) {
+          alert("Spunta i controlli che vuoi effettuare");
+          return false;
+        }
+      }
+    </script>
 </head>
 
 <body>
@@ -14,17 +37,24 @@
         
     
     <h3 style="text-align:center;">Controlla il tuo file di mapping inserendo gli opportuni file e premendo sul bottone della validazione voluta</h3>
-    <form method=post enctype=multipart/form-data> 
+    <form method=post name="FormStart" action="/generate" onsubmit="return IsEmpty();" enctype=multipart/form-data> 
         <fieldset>
             <legend><b>inserisci nel primo box il file di configurazione e nel secondo il file di mapping da validare</b></legend>
             <div>
-                <input type="file" name="file1" id="file1">
+                <input type="file" name="file1" id="file1" required>
                 <label for="file1">Carica file di configurazione</label>
             </div>
             <div>
-                <input type="file" name="file2" id="file2">
+                <input type="file" name="file2" id="file2" required>
                 <label for="file2">Carica file di mapping da validare</label>
             </div>
+            {% block content %}
+            {% for message in get_flashed_messages() %} 
+                {{ message }}
+            {% endfor %}
+
+            {% block page_content %}{% endblock %}
+            {% endblock %}
             <hr>
             <legend><b>seleziona i controlli che vuoi eseguire</b></legend>
             <div class="checkConfiguration">  
@@ -45,8 +75,8 @@
               </div>
               <hr>
             <div>
-                <button formaction="/generate">Avvio validazione</button>
-                <button formaction="/validate_agende_interne">Avvio validazione agende interne</button>
+                <button type="submit">Avvio validazione</button>
+                <!--<button formaction="/validate_agende_interne">Avvio validazione agende interne</button>-->
             </div>
         </fieldset>
     </form>

@@ -53,8 +53,9 @@ def generate():
         file_path = app.config['DOWNLOAD_FOLDER']  + excel_filename
         #check_actionPA.initializer(file_path_rivisto, checked_dict)
         check_action = validator.Check_action(configuration_file, file_path) #init class
-        check_action.initializer(checked_dict) #activate method
-                               
+        check_validation_results = check_action.initializer(checked_dict) #activate method
+        if check_validation_results != "":
+            return str(check_validation_results), 400
         return send_file(file_path,as_attachment = True, attachment_filename=excel_filename), 200
     except Exception as e:
         logger.error(e)
@@ -189,6 +190,7 @@ def _read_yml_file(request, extension):
 def _read_yml_file1(request, extension):
     if 'file1' not in request.files:
         raise ValueError('No file in the request')
+        #raise flash('No file in the request!')
     file = request.files['file1']
     template_file_dict = yaml.load(file, Loader=yaml.FullLoader)
     # if not __is_filename_allowed(file.filename, extension):
@@ -197,7 +199,8 @@ def _read_yml_file1(request, extension):
 
 def _read_yml_file2(request, name, extension):
     if request.files[name].filename == '':
-        raise ValueError('No file in the request')
+        raise ValueError('No file' + str(name) + 'in the request')
+        #raise flash('No file in the request!')
     #file = request.files['file2'].read()
     file = request.files[name]
     filename = secure_filename(file.filename)
