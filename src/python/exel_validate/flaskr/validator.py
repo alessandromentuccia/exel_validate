@@ -13,15 +13,15 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 
-from flaskr.Vale_validator_check.Vale_validator import Validator_v
 from flaskr.check.check_QD import Check_QD
-from flaskr.check.check_metodiche import Check_metodiche
+from flaskr.check.check_metodiche import Check_metodiche 
 from flaskr.check.check_distretti import Check_distretti
 from flaskr.check.check_priorita import Check_priorita
 from flaskr.check.check_prestazione import Check_prestazione
 from flaskr.check.check_canali import Check_canali
 from flaskr.check.check_agende_interne import Check_agende_interne
 from flaskr.check.check_inviante import Check_inviante
+from flaskr.report_creation.rep_creation import Report_Creation #rep_creation.
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -52,52 +52,52 @@ class Check_action():
     validation_results = ""
     output_message = ""
     
-    work_sheet = "" #sheet di lavoro di df_mapping
-    work_codice_prestazione_siss = ""
-    work_descrizione_prestazione_siss = ""
-    work_codice_agenda_siss = ""
-    work_casi_1_n = ""
-    work_abilitazione_esposizione_siss = ""
-    work_prenotabile_siss = ""
-    work_codici_disciplina_catalogo = ""
-    work_descrizione_disciplina_catalogo = ""
-    work_codice_QD = ""
-    work_descrizione_QD = ""
-    work_operatore_logico_QD = ""
-    work_codice_metodica = ""
-    work_descrizione_metodica = ""
-    work_codice_distretto = ""
-    work_descrizione_distretto = ""
-    work_operatore_logico_distretto = ""
-    work_priorita_U = ""
-    work_priorita_primo_accesso_D = ""
-    work_priorita_primo_accesso_P = ""
-    work_priorita_primo_accesso_B = ""
-    work_accesso_programmabile_ZP = ""
-    work_combinata = ""
-    work_codice_agenda_interno = ""
-    work_codice_prestazione_interno = ""
-    work_inviante = ""
-    work_accesso_farmacia = ""
-    work_accesso_CCR = ""
-    work_accesso_cittadino = ""
-    work_accesso_MMG = ""
-    work_accesso_amministrativo = ""
-    work_accesso_PAI = ""
-    work_gg_preparazione = ""
-    work_gg_refertazione = ""
-    work_nota_operatore = ""
+    #work_sheet = "" #sheet di lavoro di df_mapping
+    #work_codice_prestazione_siss = ""
+    #work_descrizione_prestazione_siss = ""
+    #work_codice_agenda_siss = ""
+    #work_casi_1_n = ""
+    #work_abilitazione_esposizione_siss = ""
+    #work_prenotabile_siss = ""
+    #work_codici_disciplina_catalogo = ""
+    #work_descrizione_disciplina_catalogo = ""
+    #work_codice_QD = ""
+    #work_descrizione_QD = ""
+    #work_operatore_logico_QD = ""
+    #work_codice_metodica = ""
+    #work_descrizione_metodica = ""
+    #work_codice_distretto = ""
+    #work_descrizione_distretto = ""
+    #work_operatore_logico_distretto = ""
+    #work_priorita_U = ""
+    #work_priorita_primo_accesso_D = ""
+    #work_priorita_primo_accesso_P = ""
+    #work_priorita_primo_accesso_B = ""
+    #work_accesso_programmabile_ZP = ""
+    #work_combinata = ""
+    #work_codice_agenda_interno = ""
+    #work_codice_prestazione_interno = ""
+    #work_inviante = ""
+    #work_accesso_farmacia = ""
+    #work_accesso_CCR = ""
+    #work_accesso_cittadino = ""
+    #work_accesso_MMG = ""
+    #work_accesso_amministrativo = ""
+    #work_accesso_PAI = ""
+    #work_gg_preparazione = ""
+    #work_gg_refertazione = ""
+    #work_nota_operatore = ""
 
-    work_index_codice_QD = 0
-    work_index_codice_SISS_agenda = 0
-    work_index_abilitazione_esposizione_SISS = 0
-    work_index_codice_prestazione_SISS = 0
-    work_index_operatore_logico_distretto = 0
-    work_index_codici_disciplina_catalogo = 0
-    work_index_operatore_logico_QD = 0
+    #work_index_codice_QD = 0
+    #work_index_codice_SISS_agenda = 0
+    #work_index_abilitazione_esposizione_SISS = 0
+    #work_index_codice_prestazione_SISS = 0
+    #work_index_operatore_logico_distretto = 0
+    #work_index_codici_disciplina_catalogo = 0
+    #work_index_operatore_logico_QD = 0
 
-    work_alert_column = ""
-    work_delimiter = ""
+    #work_alert_column = ""
+    #work_delimiter = ""
 
 
     def __init__(self, data, excel_file):
@@ -178,7 +178,7 @@ class Check_action():
 
         self.analizer(df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti)
 
-        return self.validation_result 
+        return self.validation_results 
 
 
     def analizer(self, df_mapping, sheet_QD, sheet_Metodiche, sheet_Distretti):
@@ -241,7 +241,7 @@ class Check_action():
             "inviante_error": inviante_error
         }
 
-        self._validation(error_dict)
+        self._validation(error_dict, df_mapping)
 
         
 
@@ -345,7 +345,7 @@ class Check_action():
 
         return error_dict
 
-    def _validation(self, error_dict):
+    def _validation(self, error_dict, df_mapping):
         print("questi sono gli errori indivuduati e separati per categoria:\n %s", error_dict)
         #self.output_message = self.output_message + "\n" + json.dumps(error_dict)
         '''df = pd.DataFrame(rows_list)
@@ -356,18 +356,59 @@ class Check_action():
         file.write(self.output_message)
         file.close() 
         try:
+            #Report_creation = Report_Creation()
+            Report_creation = Report_Creation(  df_mapping, 
+                                                self.file_data,
+                                                self.work_sheet,
+                                                self.work_codice_prestazione_siss,
+                                                self.work_descrizione_prestazione_siss,
+                                                self.work_codice_agenda_siss,
+                                                self.work_casi_1_n,
+                                                self.work_abilitazione_esposizione_siss,
+                                                self.work_prenotabile_siss,
+                                                self.work_codici_disciplina_catalogo,
+                                                self.work_descrizione_disciplina_catalogo,
+                                                self.work_codice_QD,
+                                                self.work_codice_metodica,
+                                                self.work_codice_distretto,
+                                                self.work_priorita_U,
+                                                self.work_priorita_primo_accesso_D,
+                                                self.work_priorita_primo_accesso_P,
+                                                self.work_priorita_primo_accesso_B,
+                                                self.work_accesso_programmabile_ZP,
+                                                self.work_combinata,
+                                                self.work_codice_agenda_interno,
+                                                self.work_codice_prestazione_interno,
+                                                self.work_inviante,
+                                                self.work_accesso_farmacia,
+                                                self.work_accesso_CCR,
+                                                self.work_accesso_cittadino,
+                                                self.work_accesso_MMG,
+                                                self.work_accesso_amministrativo,
+                                                self.work_accesso_PAI,
+                                                self.work_gg_preparazione,
+                                                self.work_gg_refertazione,
+                                                self.work_nota_operatore,
+                                                self.work_alert_column,
+                                                self.work_delimiter )
+            Report_creation.get_report()
+
+        except Exception as e:
+            logger.error('Failed to upload to ftp: '+ str(e))
+            print("Errore in Report Creation")
+        '''try:
             xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
-            sheet_mapping = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel mapping
+            #sheet_mapping = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel mapping
             try:
                 sheet_report = xfile.get_sheet_by_name('Report Validazione') #recupero sheet excel report validazione 
             except:
                 #creo Report Validazione se non esiste
                 sheet_report = xfile.create_sheet('Report Validazione')
             sheet_report["A1"] = "Report Validazione"
-            
+
             xfile.save(self.file_data) 
         except:
-            print("non esiste file o sheet")
+            print("non esiste file o sheet")'''
         
         
 

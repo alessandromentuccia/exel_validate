@@ -5,9 +5,11 @@ import json
 import yaml
 from time import sleep
 # third party import
-from flask import Flask, flash, request, redirect, url_for, jsonify, send_file, render_template
+from flask import Flask, flash, request, redirect, url_for, jsonify, send_file, render_template, session
 from flask import send_from_directory
 from werkzeug.utils import secure_filename
+#from flask.ext.session import Session
+from flask_session import Session 
 # local imports
 import flaskr.validator as validator
 import flaskr.validator_post_avvio as validator_post_avvio
@@ -21,6 +23,12 @@ app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 TEMPLATE_MINI_EXAMPLE = 'config_validator_SUZZARA.yml'
 TEMPLATE_WORK_EXAMPLE = 'working_example.json'
+
+# Session
+sess = Session()
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SECRET_KEY"] = "openspending rocks"
+sess.init_app(app)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -40,6 +48,7 @@ def upload_file():
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
+    #sess['_flashes'].clear()
     try:
         configuration_file = _read_yml_file1(request, 'yml')
         excel_filename = _read_yml_file2(request, 'file2', 'xlsx')
@@ -55,7 +64,10 @@ def generate():
         check_action = validator.Check_action(configuration_file, file_path) #init class
         check_validation_results = check_action.initializer(checked_dict) #activate method
         if check_validation_results != "":
-            return str(check_validation_results), 400
+            flash(str(check_validation_results))
+            return redirect(url_for('upload_file'))
+            #error_message = check_validation_results
+            #return error_message
         return send_file(file_path,as_attachment = True, attachment_filename=excel_filename), 200
     except Exception as e:
         logger.error(e)

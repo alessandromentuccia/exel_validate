@@ -2,12 +2,7 @@ html {
     font-family: sans-serif;
   }
 
-  .img {
-    height: auto; 
-    width: auto; 
-    max-width: 300px; 
-    max-height: 300px;
-  }
+  
 
   form {
     width: 800px;
@@ -17,4 +12,12 @@ html {
   fieldset {
     background: rgb(226, 228, 228);
     border: 5px solid rgb(1, 50, 32);
+  }
+
+  .close {
+    display: none;
+  }
+
+  .label_file {
+    width: 40px;
   }

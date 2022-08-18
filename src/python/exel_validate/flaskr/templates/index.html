@@ -12,102 +12,129 @@
       });
     </script>-->
     <script language="Javascript">
-      function IsEmpty() {
+      function ValidateSubmit(error_message) {
         if (document.getElementById('Quesiti').checked === false & 
             document.getElementById('Metodiche').checked === false & 
             document.getElementById('Distretti').checked === false & 
             document.getElementById('Priorita').checked === false & 
             document.getElementById('Prestazione').checked === false & 
             document.getElementById('Canali').checked === false & 
-            document.getElementById('Inviante').checked === false
-            ) {
+            document.getElementById('Inviante').checked === false) {
           alert("Spunta i controlli che vuoi effettuare");
           return false;
         }
-      }
+        if (error_message != ""){
+            alert(error_message);
+        }
+      };
+      function delete_flash(flash){
+        $(flash).parent().remove();
+        const div_flash = document.getElementById("div_flash");
+        if (div_flash.style.display !== "none") {
+            div_flash.style.display = "none";
+        } else {
+            div_flash.style.display = "block";
+        }
+    }
     </script>
 </head>
 
 <body>
     <title>Mapping checker</title>
-    <div>
-        <h2 style="text-align:center;">Controlla la coerenza del tuo file di mapping</h2>
-        <img src="{{ url_for('static', filename='images/ARIA_logo.jpg') }}" alt="Aria logo" class="img">
+    <div style=" display: inline-block; margin:0px auto; width: 100%;">
+        <div style="float: left; width: 30%;">
+            <img src="{{ url_for('static', filename='images/ARIA_logo.jpg') }}" alt="Aria logo" class="img"></div> 
+        <div style="text-align: left; float: right; margin-top: 3%; width: 70%;">
+            <h2>Controlla la coerenza del tuo file di mapping</h2></div>
     </div>
-        
     
-    <h3 style="text-align:center;">Controlla il tuo file di mapping inserendo gli opportuni file e premendo sul bottone della validazione voluta</h3>
-    <form method=post name="FormStart" action="/generate" onsubmit="return IsEmpty();" enctype=multipart/form-data> 
-        <fieldset>
-            <legend><b>inserisci nel primo box il file di configurazione e nel secondo il file di mapping da validare</b></legend>
-            <div>
-                <input type="file" name="file1" id="file1" required>
-                <label for="file1">Carica file di configurazione</label>
-            </div>
-            <div>
-                <input type="file" name="file2" id="file2" required>
-                <label for="file2">Carica file di mapping da validare</label>
-            </div>
-            {% block content %}
-            {% for message in get_flashed_messages() %} 
-                {{ message }}
-            {% endfor %}
+    {% block contents %}
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning" id="div_flash">
+            <button type="button" class="close" data-dismiss="alert" onclick="delete_flash();">&times;</button>
+            {{ message }}
+        </div>
+        {% endfor %}
 
-            {% block page_content %}{% endblock %}
-            {% endblock %}
-            <hr>
-            <legend><b>seleziona i controlli che vuoi eseguire</b></legend>
-            <div class="checkConfiguration">  
-                <input type="checkbox" id="Quesiti" name="check" value="Quesiti" checked>
-                <label for="Quesiti">Quesiti</label>
-                <input type="checkbox" id="Metodiche" name="check" value="Metodiche" checked>
-                <label for="Metodiche">Metodiche</label>
-                <input type="checkbox" id="Distretti" name="check" value="Distretti" checked>
-                <label for="Distretti">Distretti</label>
-                <input type="checkbox" id="Priorita" name="check" value="Priorita" checked>
-                <label for="Priorita">Priorit&agrave;</label>
-                <input type="checkbox" id="Prestazione" name="check" value="Prestazione" checked>
-                <label for="Prestazione">Prestazione</label>
-                <input type="checkbox" id="Canali" name="check" value="Canali" checked>
-                <label for="Canali">Canali</label>
-                <input type="checkbox" id="Inviante" name="check" value="Inviante"checked> 
-                <label for="Inviante">Inviante</label>
-              </div>
-              <hr>
-            <div>
-                <button type="submit">Avvio validazione</button>
-                <!--<button formaction="/validate_agende_interne">Avvio validazione agende interne</button>-->
-            </div>
-        </fieldset>
-    </form>
-    <h3 style="text-align:center;">Download template di esempio di un file di configurazione</h3>
-    <form method=post style="text-align:center;">
-        <button formaction="/send-example">Download template example</button>
-    </form>
-    <h3 style="text-align:center;">Servizio per i controlli post avvio</h3>
-    <form method=post style="text-align:center;">
-        <button formaction="/post-avvio-check">Apri servizio</button>
-    </form>
+        {% block page_contents %}{% endblock %}
+    </div>
+    {% endblock %}
+    <div>
+        <h3 style="text-align:center;">Controlla il tuo file di mapping inserendo gli opportuni file e premendo sul bottone della validazione voluta</h3>
+        <form method=post name="FormStart" action="/generate" onsubmit="return ValidateSubmit(error_message);" enctype=multipart/form-data> 
+            <fieldset>
+                <legend style="margin-bottom: 2%;"><b>inserisci nel primo box il file di configurazione e nel secondo il file di mapping da validare</b></legend>
+                <div style="margin-bottom: 7%; ">
+                    <div id="left_div" style="width: 40%; float:left; text-align:center;">
+                        <div><label class="label_file" for="file1">Carica file di configurazione</label></div>
+                        <div><label class="label_file" for="file2">Carica file di mapping da validare</label></div>
+                    </div>
+                    <div id="right_div" style="width: 60%; float:right; text-align:center;">
+                        <div><input type="file" name="file1" id="file1" required></div>
+                        <div><input type="file" name="file2" id="file2" required></div>
+                    </div>
+                </div>
+                <!--{% block content %}
+                {% for message in get_flashed_messages() %} 
+                    {{ message }}
+                {% endfor %}
 
-    <h3 style="text-align:center;">LOG</h3>
-    <pre id="output"></pre>
-    <script>
-        var output = document.getElementById('output');
+                {% block page_content %}{% endblock %}
+                {% endblock %}-->
+                <hr>
+                <legend style="margin-bottom: 2%;"><b>seleziona i controlli che vuoi eseguire</b></legend>
+                <div class="checkConfiguration" style="text-align: center;">  
+                    <input type="checkbox" id="Quesiti" name="check" value="Quesiti" checked>
+                    <label for="Quesiti">Quesiti</label>
+                    <input type="checkbox" id="Metodiche" name="check" value="Metodiche" checked>
+                    <label for="Metodiche">Metodiche</label>
+                    <input type="checkbox" id="Distretti" name="check" value="Distretti" checked>
+                    <label for="Distretti">Distretti</label>
+                    <input type="checkbox" id="Priorita" name="check" value="Priorita" checked>
+                    <label for="Priorita">Priorit&agrave;</label>
+                    <input type="checkbox" id="Prestazione" name="check" value="Prestazione" checked>
+                    <label for="Prestazione">Prestazione</label>
+                    <input type="checkbox" id="Canali" name="check" value="Canali" checked>
+                    <label for="Canali">Canali</label>
+                    <input type="checkbox" id="Inviante" name="check" value="Inviante"checked> 
+                    <label for="Inviante">Inviante</label>
+                </div>
+                <hr>
+                <div style="text-align: center;">
+                    <button type="submit">Avvio validazione</button>
+                    <!--<button formaction="/validate_agende_interne">Avvio validazione agende interne</button>-->
+                </div>
+            </fieldset>
+        </form>
+        <h3 style="text-align:center;">Download template di esempio di un file di configurazione</h3>
+        <form method=post style="text-align:center;">
+            <button formaction="/send-example">Download template example</button>
+        </form>
+        <h3 style="text-align:center;">Servizio per i controlli post avvio</h3>
+        <form method=post style="text-align:center;">
+            <button formaction="/post-avvio-check">Apri servizio</button>
+        </form>
 
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', '{{ url_for('stream') }}');
-        xhr.send();
+        <h3 style="text-align:center;">LOG</h3>
+        <pre id="output"></pre>
+        <script>
+            var output = document.getElementById('output');
 
-        setInterval(function () {
-            var lineBreak = "\n",
-            text = xhr.responseText
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '{{ url_for('stream') }}');
+            xhr.send();
 
-            text = text.split(lineBreak).reverse().join(lineBreak);
+            setInterval(function () {
+                var lineBreak = "\n",
+                text = xhr.responseText
 
-            output.textContent = text;
-        }, 1000);
-    </script>
+                text = text.split(lineBreak).reverse().join(lineBreak);
 
+                output.textContent = text;
+            }, 1000);
+        </script>
+    </div>
 </body>
 
 </html>
