@@ -223,7 +223,7 @@ class Check_action():
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
-            mapping_key = str(row[self.work_codice_agenda_siss].strip())+"|"+str(row[self.work_codice_prestazione_siss].strip())+"|"+str(row[self.work_codice_prestazione_interno].strip())
+            mapping_key = str(row[self.work_codice_agenda_siss]).strip()+"|"+str(row[self.work_codice_prestazione_siss]).strip()+"|"+str(row[self.work_codice_prestazione_interno]).strip()
             print("iterate mapping: " + mapping_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if mapping_key == key_rivisto and row[self.work_abilitazione_esposizione_siss] == "S":
@@ -250,7 +250,7 @@ class Check_action():
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
-            rivisto_key = str(row[self.configurazione_rivisto["Agenda"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]].strip())
+            rivisto_key = str(row[self.configurazione_rivisto["Agenda"]]).strip()+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]]).strip()+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]]).strip()
             print("iterate mapping: " + rivisto_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if rivisto_key == key_mapping:
@@ -278,7 +278,7 @@ class Check_action():
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
-            mapping_key = str(row[self.work_codice_agenda_siss].strip())+"|"+str(row[self.work_codice_prestazione_siss].strip())+"|"+str(row[self.work_codice_prestazione_interno].strip())
+            mapping_key = str(row[self.work_codice_agenda_siss]).strip()+"|"+str(row[self.work_codice_prestazione_siss]).strip()+"|"+str(row[self.work_codice_prestazione_interno]).strip()
             print("iterate mapping: " + mapping_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if mapping_key == key_rivisto and row[self.work_abilitazione_esposizione_siss] == "S":
@@ -311,7 +311,7 @@ class Check_action():
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
-            rivisto_key = str(row[self.configurazione_rivisto["Agenda"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]].strip())+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]].strip())
+            rivisto_key = str(row[self.configurazione_rivisto["Agenda"]]).strip()+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]]).strip()+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]]).strip()
             print("iterate mapping: " + rivisto_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if rivisto_key == key_mapping:
