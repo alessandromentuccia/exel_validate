@@ -12,6 +12,7 @@ import openpyxl
 
 load_dotenv()
 ALERT_COLUMN_RV=os.getenv("ALERT_COLUMN_RV")
+MAP_VALUE_COLUMN_RV=os.getenv("MAP_VALUE_COLUMN_RV")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -24,8 +25,9 @@ c_handler.setFormatter(formatter)
 logger.addHandler(f_handler)
 logger.addHandler(c_handler)
 
+'''La seguente classe permette di gestire i controlli che vengono effettuati tra rivisto e mapping e sui campi che vengono selezionati nel form'''
 class Check_post_avvio():
-    
+    '''Il metodo rileva i controlli che sono stati selezionati nella form e li manda in esecuzione, sia su rivisto che su mapping'''
     def ck_post_avvio(self, df_mapping, df_rivisto, error_dict):
         print("start checking post avvio")
         error_dict.update({'error_post_avvio': []})
@@ -85,18 +87,58 @@ class Check_post_avvio():
             error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "PAI", self.work_accesso_PAI, "string")
             error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "PAI", self.work_accesso_PAI, "string")
             #error_dict = Check_post_avvio.ck_PAI(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["NoteOperatore"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "NoteOperatore", self.work_nota_operatore, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "NoteOperatore", self.work_nota_operatore, "string")
+            #error_dict = Check_post_avvio.ck_NoteOperatore(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["NotePreparazione"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "NotePreparazione", self.work_nota_preparazione, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "NotePreparazione", self.work_nota_preparazione, "string")
+            #error_dict = Check_post_avvio.ck_NotePreparazione(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["NoteAmministrative"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "NoteAmministrative", self.work_nota_amministrativa, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "NoteAmministrative", self.work_nota_amministrativa, "string")
+            #error_dict = Check_post_avvio.ck_NoteAmministrative(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["NoteRevoca"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "NoteRevoca", self.work_nota_revoca, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "NoteRevoca", self.work_nota_revoca, "string")
+            #error_dict = Check_post_avvio.ck_NoteRevoca(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["PrioritaUrgenza"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "PrioritaUrgenza", self.work_priorita_U, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "PrioritaUrgenza", self.work_priorita_U, "string")
+            #error_dict = Check_post_avvio.ck_PrioritaUrgenza(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["PrioritaOB"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "PrioritaOB", self.work_priorita_primo_accesso_B, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "PrioritaOB", self.work_priorita_primo_accesso_B, "string")
+            #error_dict = Check_post_avvio.ck_PrioritaOB(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["PrioritaOD"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "PrioritaOD", self.work_priorita_primo_accesso_D, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "PrioritaOD", self.work_priorita_primo_accesso_D, "string")
+            #error_dict = Check_post_avvio.ck_PrioritaOD(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["PrioritaOP"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "PrioritaOP", self.work_priorita_primo_accesso_P, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "PrioritaOP", self.work_priorita_primo_accesso_P, "string")
+            #error_dict = Check_post_avvio.ck_PrioritaOP(self, df_mapping, df_rivisto, error_dict)
+        if self.configurazione_rivisto["AccessoProgrammabile"] != "":
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "AccessoProgrammabile", self.work_accesso_programmabile_ZP, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "AccessoProgrammabile", self.work_accesso_programmabile_ZP, "string")
+            #error_dict = Check_post_avvio.ck_AccessoProgrammabile(self, df_mapping, df_rivisto, error_dict)
+
+
 
         #creazione del messaggio di alert riportato nel file excel
         print("start definizione output controlli post avvio")
         return error_dict
 
-    '''metodo che controlla se gli attributi del rivisto sono configurati allo stesso modo anche nel mapping'''
+    '''Il metodo controlla se gli attributi del rivisto sono configurati allo stesso modo anche nel mapping,
+    il risultato sarà osservabile nel rivisto'''
     def ck_MAP(self, df_mapping, df_rivisto, error_dict, element, work_codice, flag_type):
-        print("start checking MAPPING")
+        print("start checking campo Rivisto in MAPPING")
         error_dict.update({
             'error_ck_'+element: [] })
 
         alert_column = ALERT_COLUMN_RV
+        map_value_column = MAP_VALUE_COLUMN_RV
 
         xfile = openpyxl.load_workbook(self.file_rivisto) #recupero file excel da file system
         sheet = xfile.get_sheet_by_name(self.configurazione_rivisto["Sheet"])
@@ -127,31 +169,36 @@ class Check_post_avvio():
                 print("coppia non trovata nel mapping: " +element)
                 out_message = "__> {}".format("Coppia prestazione/agenda non trovata in mapping")
                 if sheet[alert_column+str(int(index)+2)].value is not None:
-                    sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                    sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message 
                 else:
                     sheet[alert_column+str(int(index)+2)] = out_message
-            elif result_ == -1:
+            elif isinstance(result_, str):
                 error_dict["error_ck_"+element].append(str(int(index)+2))
-                print("trovato errore su "+element)
+                print("trovato errore su "+element+ " : " + result_)
                 out_message = "__> {}".format("Corrispondenza "+element+" non trovata in mapping")
                 if sheet[alert_column+str(int(index)+2)].value is not None:
-                    sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                    sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message 
                 else:
                     sheet[alert_column+str(int(index)+2)] = out_message
-            else:
+                if sheet[map_value_column+str(int(index)+2)].value is not None:
+                    sheet[map_value_column+str(int(index)+2)] = str(sheet[map_value_column+str(int(index)+2)].value) + "; \n" + result_ #modificare result_
+                else:
+                    sheet[map_value_column+str(int(index)+2)] = result_ #modificare result_   
+            elif result_ == -1:
                 print("trovata corrispondenza "+element)
-                out_message = "__> {}".format(element + " corrisponde in mapping")
+                '''out_message = "__> {}".format(element + " corrisponde in mapping")
                 if sheet[alert_column+str(int(index)+2)].value is not None:
                     sheet[alert_column+str(int(index)+2)] = str(sheet[alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
                 else:
-                    sheet[alert_column+str(int(index)+2)] = out_message
+                    sheet[alert_column+str(int(index)+2)] = out_message'''
                 
         xfile.save(self.file_rivisto)     
         return error_dict
     
-    '''Metodo che controlla se gli attributi del mapping sono anche sul rivisto'''
+    '''Metodo che controlla se gli attributi del mapping sono anche sul rivisto,
+        il risultato sarà osservabile nel mapping'''
     def ck_RIV(self, df_mapping, df_rivisto, error_dict, element, work_codice, flag_type):
-        print("start checking RIVISTO")
+        print("start checking campo Mapping in RIVISTO")
         error_dict.update({
             'error_ck_reverse_'+element: [] })
         
@@ -181,25 +228,30 @@ class Check_post_avvio():
                     print("Coppia prestazione/agenda non trovata in rivisto: " +element)
                     out_message = "__> {}".format("Coppia prestazione/agenda non trovata in rivisto")
                     if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
-                        sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                        sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message 
                     else:
                         sheet[self.work_alert_column+str(int(index)+2)] = out_message
-                elif result_ == -1:
+                elif isinstance(result_, str):
                     error_dict["error_ck_reverse_"+element].append(str(int(index)+2))
-                    print("trovato errore su "+element)
+                    print("trovato errore su "+element+ " : " + result_)
                     out_message = "__> {}".format("Corrispondenza "+element+" non trovata in rivisto")
                     if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
-                        sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
+                        sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message 
                     else:
                         sheet[self.work_alert_column+str(int(index)+2)] = out_message
-                else: 
+
+                    if sheet[self.work_map_value_column+str(int(index)+2)].value is not None:
+                        sheet[self.work_map_value_column+str(int(index)+2)] = str(sheet[self.work_map_value_column+str(int(index)+2)].value) + "; \n" + result_ 
+                    else:
+                        sheet[self.work_map_value_column+str(int(index)+2)] = result_
+                elif result_ == -1:
                     
                     print("trovata corrispondenza "+element)
-                    out_message = "__> {}".format(element + " corrisponde in rivisto")
+                    '''out_message = "__> {}".format(element + " corrisponde in rivisto")
                     if sheet[self.work_alert_column+str(int(index)+2)].value is not None:
                         sheet[self.work_alert_column+str(int(index)+2)] = str(sheet[self.work_alert_column+str(int(index)+2)].value) + "; \n" + out_message #modificare colonna alert
                     else:
-                        sheet[self.work_alert_column+str(int(index)+2)] = out_message
+                        sheet[self.work_alert_column+str(int(index)+2)] = out_message'''
                 
         xfile.save(self.file_data)     
         return error_dict

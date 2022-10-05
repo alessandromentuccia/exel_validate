@@ -183,7 +183,16 @@ def _get_form_checked_value(_list, request):
                     "Cittadino": "",
                     "MMG": "",
                     "Amministrativo": "",
-                    "PAI": ""
+                    "PAI": "",
+                    "NoteOperatore": "",
+                    "NotePreparazione": "",
+                    "NoteAmministrative": "",
+                    "NoteRevoca": "",
+                    "PrioritaUrgenza": "",
+                    "PrioritaOB": "",
+                    "PrioritaOD": "",
+                    "PrioritaOP": "",
+                    "AccessoProgrammabile": "",
                 }
     for element in _list:
         return_dict[element] = request.form[str(element)+'text']

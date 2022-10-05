@@ -85,6 +85,9 @@ class Check_action():
     work_gg_preparazione = ""
     work_gg_refertazione = ""
     work_nota_operatore = ""
+    work_nota_preparazione = ""
+    work_nota_amministrativa = ""
+    work_nota_revoca = ""
     work_risorsa = ""
 
     work_index_codice_QD = 0
@@ -139,9 +142,14 @@ class Check_action():
         self.work_gg_preparazione = data[0]["work_column"]["work_gg_preparazione"]
         self.work_gg_refertazione = data[0]["work_column"]["work_gg_refertazione"]
         self.work_nota_operatore = data[0]["work_column"]["work_nota_operatore"]
+        self.work_nota_preparazione = data[0]["work_column"]["work_nota_preparazione"]
+        self.work_nota_amministrativa = data[0]["work_column"]["work_nota_amministrativa"]
+        self.work_nota_revoca = data[0]["work_column"]["work_nota_revoca"]
+
         self.work_risorsa = data[0]["work_column"]["work_risorsa"]
 
         self.work_alert_column = data[1]["work_index"]["work_alert_column"]
+        self.work_map_value_column = data[1]["work_index"]["work_map_value_column"]
         try:
             self.work_delimiter = data[2]["work_separator"]["work_delimiter"]
         except:
@@ -153,8 +161,8 @@ class Check_action():
         self.file_rivisto = file_path_rivisto #file rivisto
         self.configurazione_rivisto = checked_dict #nomi colonne del rivisto
         print(checked_dict)
-        df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str, self.work_codice_agenda_siss: str, self.work_codice_prestazione_interno: str}).replace(np.nan, '', regex=True)
-        df_rivisto = pd.read_excel(self.file_rivisto, sheet_name=checked_dict["Sheet"], converters={"CD_AGENDA": str, "CD_PRESTAZIONE_SISS": str, "CD_INTERNO_PRESTAZIONE": str}).replace(np.nan, '', regex=True)
+        df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str, self.work_codice_agenda_siss: str, self.work_codice_prestazione_interno: str, self.work_combinata: str}).replace(np.nan, '', regex=True)
+        df_rivisto = pd.read_excel(self.file_rivisto, sheet_name=checked_dict["Sheet"], converters={"CD_AGENDA": str, "CD_PRESTAZIONE_SISS": str, "CD_INTERNO_PRESTAZIONE": str, "ID_COMBINATA": str}).replace(np.nan, '', regex=True)
         
         error = self.analizer(df_mapping, df_rivisto)
 
@@ -218,13 +226,13 @@ class Check_action():
         return result_coord#, result_value
 
     def findCell_dataframe_MAP_string(self, df, searchedValue, key_rivisto, column_name):
-        result_coord = []
+        result_coord = ""
         flag_find = False
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
             mapping_key = str(row[self.work_codice_agenda_siss]).strip()+"|"+str(row[self.work_codice_prestazione_siss]).strip()+"|"+str(row[self.work_codice_prestazione_interno]).strip()
-            print("iterate mapping: " + mapping_key)
+            #print("iterate mapping: " + mapping_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if mapping_key == key_rivisto and row[self.work_abilitazione_esposizione_siss] == "S":
                 #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
@@ -234,24 +242,26 @@ class Check_action():
                 #print("r_row_value", r_row_value)
                 flag_find = True
                 
-                if m_row_value == r_row_value: #check the two row
-                    result_coord.append(str(index) + "#" + column_name)
-                    print("trovata corripondenza valori")
+                if m_row_value != r_row_value: #check the two row
+                    #result_coord.append(column_name + ": " + str(row[column_name]))
+                    result_coord = column_name + ": " + str(row[column_name])
+                    print("errore corripondenza valori")
         
-        if flag_find == False:
+        if flag_find == False: #coppia non esistente in rivisto
             return -2
-        elif result_coord == []: #alert if doesn't exist a result
+        elif result_coord == "": #non c'è stata corrispondenza 
             return -1
-        return result_coord
+        return result_coord #nessun errore trovato, c'è stata corrispondenza
+
 
     def findCell_dataframe_RIV_string(self, df, searchedValue, key_mapping, column_name):
-        result_coord = []
+        result_coord = ""
         flag_find = False
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
             rivisto_key = str(row[self.configurazione_rivisto["Agenda"]]).strip()+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]]).strip()+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]]).strip()
-            print("iterate mapping: " + rivisto_key)
+            #print("iterate mapping: " + rivisto_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if rivisto_key == key_mapping:
                 #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
@@ -261,25 +271,26 @@ class Check_action():
                 #print("r_row_value", r_row_value)
                 flag_find = True
                 
-                if m_row_value == r_row_value: #check the two row
-                    result_coord.append(str(index) + "#" + column_name)
-                    print("trovata corripondenza valori")
+                if m_row_value != r_row_value: #check the two row
+                    #result_coord.append(column_name + ": " + str(row[column_name])) #modifico index con row[column_name]
+                    result_coord = column_name + ": " + str(row[column_name])
+                    print("errore corripondenza valori")
                 
-        if flag_find == False:
+        if flag_find == False: #coppia non esistente in rivisto
             return -2
-        elif result_coord == []: #alert if doesn't exist a result
+        elif result_coord == "": #non c'è stata corrispondenza 
             return -1
-        return result_coord
+        return result_coord #nessun errore trovato, c'è stata corrispondenza
 
 
     def findCell_dataframe_MAP(self, df, searchedValue, key_rivisto, column_name):
-        result_coord = []
+        result_coord = ""
         flag_find = False
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
             mapping_key = str(row[self.work_codice_agenda_siss]).strip()+"|"+str(row[self.work_codice_prestazione_siss]).strip()+"|"+str(row[self.work_codice_prestazione_interno]).strip()
-            print("iterate mapping: " + mapping_key)
+            #print("iterate mapping: " + mapping_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if mapping_key == key_rivisto and row[self.work_abilitazione_esposizione_siss] == "S":
                 #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
@@ -293,26 +304,28 @@ class Check_action():
                 
                 result1 =  all(elem in r_row_value  for elem in m_row_value) #check list1 in list2
                 result2 =  all(elem in m_row_value  for elem in r_row_value) #check list2 in list1
-                if result1 and result2 and len(m_row_value)==len(r_row_value): #check result and lenght
-                    result_coord.append(str(index) + "#" + column_name)
-                    print("trovata corripondenza valori")
+                if not result1 and not result2 and len(m_row_value)!=len(r_row_value): #check result and lenght
+                    #result_coord.append(column_name + ": " + str(row[column_name]))
+                    result_coord = column_name + ": " + str(row[column_name])
+                    print("errore corripondenza valori")
                     #print("m_row_value", m_row_value)
                     #print("r_row_value", r_row_value)
                 
-        if flag_find == False:
+        if flag_find == False: #coppia non esistente in rivisto
             return -2
-        elif result_coord == []: #alert if doesn't exist a result
+        elif result_coord == "": #non c'è stata corrispondenza 
             return -1
-        return result_coord
+        return result_coord #nessun errore trovato, c'è stata corrispondenza
+
 
     def findCell_dataframe_RIV(self, df, searchedValue, key_mapping, column_name):
-        result_coord = []
+        result_coord = ""
         flag_find = False
 
         #print("start findcell dataframe")
         for index, row in df.iterrows():
             rivisto_key = str(row[self.configurazione_rivisto["Agenda"]]).strip()+"|"+str(row[self.configurazione_rivisto["PrestazioneSISS"]]).strip()+"|"+str(row[self.configurazione_rivisto["PrestazioneInterna"]]).strip()
-            print("iterate mapping: " + rivisto_key)
+            #print("iterate mapping: " + rivisto_key)
             #print("trovata corrisponenza key: " + searchedValue)
             if rivisto_key == key_mapping:
                 #print("trovata corrisponenza key: " + row[column_name] + " e " + searchedValue)
@@ -324,19 +337,20 @@ class Check_action():
                 
                 result1 =  all(elem in m_row_value  for elem in r_row_value) #check list1 in list2
                 result2 =  all(elem in r_row_value  for elem in m_row_value) #check list2 in list1
-                if result1 and result2 and len(m_row_value)==len(r_row_value): #check result and lenght
-                    result_coord.append(str(index) + "#" + column_name)
-                    print("trovata corripondenza valori")
+                if not result1 and not result2 and len(m_row_value)!=len(r_row_value): #check result and lenght
+                    #result_coord.append(column_name + ": " + str(row[column_name]))
+                    result_coord = column_name + ": " + str(row[column_name])
+                    print("errore corripondenza valori")
                     #m_row_value = m_row_value.sort(key = str)
                     #r_row_value = r_row_value.sort(key = str)
                     #rint("m_row_value", m_row_value)
                     #print("r_row_value", r_row_value)
                 
-        if flag_find == False:
+        if flag_find == False: #coppia non esistente in rivisto
             return -2
-        elif result_coord == []: #alert if doesn't exist a result
+        elif result_coord == "": #non c'è stata corrispondenza 
             return -1
-        return result_coord
+        return result_coord #nessun errore trovato, c'è stata corrispondenza
 
     '''Metodo che aggiunge elemento in una lista esistente o crea la lista nel caso
     non fosse presente'''
