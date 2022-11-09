@@ -236,7 +236,7 @@ class Check_prestazione():
 
         
         for index, row in df_mapping.iterrows():
-            if row[self.work_codice_prestazione_siss] == "" and row[self.work_codice_agenda_siss] != "":
+            if row[self.work_codice_prestazione_siss].strip() == "" and row[self.work_codice_agenda_siss].strip() != "":
                 if row[self.work_abilitazione_esposizione_siss] == "S":
                     error_dict["error_prestazione_SISS_assente"].append(str(int(index)+2))
 

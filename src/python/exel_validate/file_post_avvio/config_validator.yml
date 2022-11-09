@@ -1,5 +1,5 @@
 - work_column:
-    work_sheet: "Sheet 1"
+    work_sheet: "Cunardo"
     work_codice_prestazione_siss: "CD_PRESTAZIONE_SISS"
     work_descrizione_prestazione_siss: "DS_ESTESA_PRESTAZIONE_SISS"
     work_codice_agenda_siss: "CD_AGENDA"
@@ -10,12 +10,12 @@
     work_descrizione_disciplina_catalogo: "CD_DISCIPLINA_AMM"
     work_codice_QD: "ID_QUESITO_DIAGNOSTICO"
     work_descrizione_QD: "Descrizione Quesiti"
-    work_operatore_logico_QD: "CD_OPERATORE_LOGICO_QD"
+    work_operatore_logico_QD: "CD_OPE_QD"
     work_codice_metodica: "ID_METODICA"
     work_descrizione_metodica: "Descrizione Metodiche"
     work_codice_distretto: "ID_DISTRETTO_ANATOMICO"
     work_descrizione_distretto: "Descrizione Distretti"
-    work_operatore_logico_distretto: "CD_OPERATORE_LOGICO_DISTRETTO"
+    work_operatore_logico_distretto: "CD_OPE_DS"
     work_priorita_U: "FL_URGENTE"
     work_priorita_primo_accesso_D: "FL_PRIORITA_OD"
     work_priorita_primo_accesso_P: "FL_PRIORITA_OP"
@@ -23,9 +23,9 @@
     work_accesso_programmabile_ZP: "FL_ACCESSO_PROGRAMMABILE"
     work_combinata: "ID_COMBINATA"
     work_codice_agenda_interno: "CD_AGENDA"
-    work_codice_prestazione_interno: "CD_PRESTAZIONE_SISS"
+    work_codice_prestazione_interno: "CD_INTERNO_PRESTAZIONE"
     work_inviante: "ID_INVIANTE"
-    work_risorsa: "New RISORSA"
+    work_risorsa: "ID_RISORSA"
     work_accesso_farmacia: "FARMACISTI"
     work_accesso_CCR: "CCR"
     work_accesso_cittadino: "CITTADINO"
@@ -40,8 +40,8 @@
     work_nota_revoca: "DS_NOTA_REVOCA"
 
 - work_index:
-    work_alert_column: "CH"
-    work_map_value_column: "CI"
+    work_alert_column: "CV"
+    work_map_value_column: "CW"
 
 - work_separator:
     work_delimiter: ","

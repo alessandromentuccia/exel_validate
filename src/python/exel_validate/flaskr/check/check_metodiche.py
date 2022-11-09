@@ -79,7 +79,7 @@ class Check_metodiche():
                 siss_flag = False
                 if Metodica_list is not None:
 
-                    cod_pre_siss = str(row[self.work_codice_prestazione_siss])
+                    cod_pre_siss = str(row[self.work_codice_prestazione_siss]).strip()
                     if cod_metodica_generale == Metodica_string.strip():
                         error_dict['error_metodica_generale_presente'].append(str(int(index)+2))
                     else:
@@ -107,7 +107,7 @@ class Check_metodiche():
                                         prestazioni_dict[str(int(index)+2)] = cod_pre_siss
                 if siss_flag == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
                     error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
-                siss = str(row[self.work_codice_prestazione_siss])
+                siss = str(row[self.work_codice_prestazione_siss]).strip()
 
             
         out1 = ""

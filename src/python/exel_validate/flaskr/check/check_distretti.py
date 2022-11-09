@@ -71,7 +71,7 @@ class Check_distretti():
                 siss = ""
                 siss_flag = False
                 if Distretto_string is not None:
-                    cod_pre_siss = str(row[self.work_codice_prestazione_siss])
+                    cod_pre_siss = str(row[self.work_codice_prestazione_siss]).strip()
                     for distretto in Distretto_string:
                         distretto = distretto.strip()
                         if distretto != "":
