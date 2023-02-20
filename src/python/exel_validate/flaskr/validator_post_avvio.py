@@ -86,7 +86,7 @@ class Check_action():
     work_gg_refertazione = ""
     work_nota_operatore = ""
     work_nota_preparazione = ""
-    work_nota_amministrativa = ""
+    work_nota_agenda = ""
     work_nota_revoca = ""
     work_risorsa = ""
 
@@ -143,7 +143,7 @@ class Check_action():
         self.work_gg_refertazione = data[0]["work_column"]["work_gg_refertazione"]
         self.work_nota_operatore = data[0]["work_column"]["work_nota_operatore"]
         self.work_nota_preparazione = data[0]["work_column"]["work_nota_preparazione"]
-        self.work_nota_amministrativa = data[0]["work_column"]["work_nota_amministrativa"]
+        self.work_nota_agenda = data[0]["work_column"]["work_nota_agenda"]
         self.work_nota_revoca = data[0]["work_column"]["work_nota_revoca"]
 
         self.work_risorsa = data[0]["work_column"]["work_risorsa"]

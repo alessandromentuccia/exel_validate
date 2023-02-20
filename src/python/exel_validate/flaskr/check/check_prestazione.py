@@ -128,17 +128,18 @@ class Check_prestazione():
                     #verifico se nei casi 1:N, i distretto non sono vuoti
                     #if split_district != '': #and self.list_duplicates(splitMD_list[0].split(self.work_delimiter)) != []: 
                         #contM = 0
-                    if split_district != "":
+                    if split_district == "": #errore se il distretto è vuoto
+                        print("d: " + split_district)
+                        if split_district == "": 
+                            flag_error1 = True
+                            error_1_list.append(indexAP[cont])
+                    else: #errore se i distretti usati sono ripetuti su più coppie
                         for distretto in split_district.split(self.work_delimiter):
-                            print("d: " + distretto)
-                            if distretto == "":
-                                flag_error1 = True
-                                error_1_list.append(indexAP[cont])
-                            elif distretto in distretti_list:
+                            if distretto in distretti_list and flag_error2 == False: 
                                 flag_error2 = True
                                 error_2_list.append(indexAP[cont])
-                                distretti_list.append(distretto)
-                            
+                            distretti_list.append(distretto)
+                    print("distretti_list: ", distretti_list)        
                     cont = cont + 1
                 
                 #verifico le occorrenze degli m_d
@@ -166,7 +167,7 @@ class Check_prestazione():
                             if v != "|": #se true allora ci sono metodiche o distretti
                                 fl_value_null = True
                         if fl_value_null == True:
-                            casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + " con metodica_distretto: " + ", ".join(value))
+                            casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + " sono presenti delle metodiche e/o distretti non univoci che per specializzare la coppia prestazione/agenda: " + ", ".join(value))
                         else:
                             casi_1n_dict_error = self.update_list_in_dict(casi_1n_dict_error, ind, key + " le metodiche e distretti non sono stati valorizzati per risolvere caso 1:N")
                         if ind not in error_dict["error_casi_1n"]:

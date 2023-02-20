@@ -96,8 +96,8 @@ class Check_post_avvio():
             error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "NotePreparazione", self.work_nota_preparazione, "string")
             #error_dict = Check_post_avvio.ck_NotePreparazione(self, df_mapping, df_rivisto, error_dict)
         if self.configurazione_rivisto["NoteAmministrative"] != "":
-            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "NoteAmministrative", self.work_nota_amministrativa, "string")
-            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "NoteAmministrative", self.work_nota_amministrativa, "string")
+            error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "NoteAmministrative", self.work_nota_agenda, "string")
+            error_dict = Check_post_avvio.ck_RIV(self, df_mapping, df_rivisto, error_dict, "NoteAmministrative", self.work_nota_agenda, "string")
             #error_dict = Check_post_avvio.ck_NoteAmministrative(self, df_mapping, df_rivisto, error_dict)
         if self.configurazione_rivisto["NoteRevoca"] != "":
             error_dict = Check_post_avvio.ck_MAP(self, df_mapping, df_rivisto, error_dict, "NoteRevoca", self.work_nota_revoca, "string")

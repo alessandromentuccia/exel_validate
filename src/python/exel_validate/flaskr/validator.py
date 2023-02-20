@@ -106,6 +106,10 @@ class Check_action():
         #    data = yaml.load(yamlfile, Loader=yaml.FullLoader)
         #logger.debug(data)
         self.work_sheet = data[0]["work_column"]["work_sheet"] 
+        self.work_N1 = data[0]["work_column"]["work_N1"] 
+        self.work_N2 = data[0]["work_column"]["work_N2"]
+        self.work_descrizione_N1 = data[0]["work_column"]["work_descrizione_N1"]
+        self.work_descrizione_N2 = data[0]["work_column"]["work_descrizione_N2"]
         self.work_codice_prestazione_siss = data[0]["work_column"]["work_codice_prestazione_siss"]
         self.work_descrizione_prestazione_siss = data[0]["work_column"]["work_descrizione_prestazione_siss"]
         self.work_codice_agenda_siss = data[0]["work_column"]["work_codice_agenda_siss"]
@@ -140,7 +144,13 @@ class Check_action():
         self.work_gg_preparazione = data[0]["work_column"]["work_gg_preparazione"]
         self.work_gg_refertazione = data[0]["work_column"]["work_gg_refertazione"]
         self.work_nota_operatore = data[0]["work_column"]["work_nota_operatore"]
-        
+        self.work_nota_agenda = data[0]["work_column"]["work_nota_agenda"]
+        self.work_nota_revoca = data[0]["work_column"]["work_nota_revoca"]
+        self.work_disciplina = data[0]["work_column"]["work_disciplina"]
+        self.work_sesso = data[0]["work_column"]["work_sesso"]
+        self.work_eta_min = data[0]["work_column"]["work_eta_min"]
+        self.work_eta_max = data[0]["work_column"]["work_eta_max"]
+
         self.work_alert_column = data[1]["work_index"]["work_alert_column"]
         try:
             self.work_delimiter = data[2]["work_separator"]["work_delimiter"]
@@ -360,6 +370,10 @@ class Check_action():
             Report_creation = Report_Creation(  df_mapping, 
                                                 self.file_data,
                                                 self.work_sheet,
+                                                self.work_N1,
+                                                self.work_N2,
+                                                self.work_descrizione_N1,
+                                                self.work_descrizione_N2,
                                                 self.work_codice_prestazione_siss,
                                                 self.work_descrizione_prestazione_siss,
                                                 self.work_codice_agenda_siss,
@@ -389,8 +403,15 @@ class Check_action():
                                                 self.work_gg_preparazione,
                                                 self.work_gg_refertazione,
                                                 self.work_nota_operatore,
+                                                self.work_nota_agenda,
+                                                self.work_nota_revoca,
+                                                self.work_disciplina,
+                                                self.work_sesso,
+                                                self.work_eta_min,
+                                                self.work_eta_max,
                                                 self.work_alert_column,
-                                                self.work_delimiter )
+                                                self.work_delimiter,
+                                                error_dict)
             Report_creation.get_report()
 
         except Exception as e:
