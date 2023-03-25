@@ -4,20 +4,34 @@ html {
 
   
 
-  form {
-    width: 800px;
-    margin: 0 auto;
-  } 
+form {
+  width: 800px;
+  margin: 0 auto;
+} 
 
-  fieldset {
-    background: rgb(226, 228, 228);
-    border: 5px solid rgb(1, 50, 32);
-  }
+fieldset {
+  background: rgb(226, 228, 228);
+  border: 5px solid rgb(1, 50, 32);
+}
 
-  .close {
-    display: none;
-  }
+.close {
+  display: none;
+}
 
-  .label_file {
-    width: 40px;
-  }
+.label_file {
+  width: 40px;
+}
+
+.img {
+  height: auto; 
+  width: auto; 
+  max-width: 30px; 
+  max-height: 30px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+#content {
+  position: relative;
+}

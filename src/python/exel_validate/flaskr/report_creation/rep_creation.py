@@ -126,8 +126,9 @@ class Report_Creation(): #Check_action
         self.count_ROW = 1
         self.count_COLUMN = "A"
         self.sheet_report = Any
+
+        #numero_agende = 0
         #super().__init__(self)
-        #self.codice_agenda_siss = self.work_codice_agenda_siss
 
     '''def __call__(self, df_mapping, file_data):
         self.get_report(self) 
@@ -168,7 +169,7 @@ class Report_Creation(): #Check_action
 
         self.get_Num_Prestazioni()
 
-        self.get_Num_Agende()
+        numero_agende = self.get_Num_Agende()
 
         self.get_Num_PA_Esposte()
 
@@ -183,6 +184,8 @@ class Report_Creation(): #Check_action
         self.get_Nota_Revoca()
         
         self.get_Discipline()
+
+        self.get_Agende_con_QD(numero_agende)
 
         self.get_Campi_Descrittivi() #Sesso, GG di prep, GG di ref, Età min ed Età max
 
@@ -274,7 +277,7 @@ class Report_Creation(): #Check_action
                 agende_list.append(row[self.work_codice_agenda_siss]) 
 
         self.write_row(self.count_COLUMN, "Numero di agende nell'offerta sanitaria: " + str(contatore), 1)
-
+        return contatore
 
     def get_Num_PA_Esposte(self):
         print("get Numero coppie PA esposte")
@@ -311,7 +314,7 @@ class Report_Creation(): #Check_action
         contatore = 0
 
         for index, row in self.df_mapping.iterrows():
-            if row[self.work_combinata] != "":
+            if row[self.work_combinata] != "" and row[self.work_combinata] != "N" and row[self.work_abilitazione_esposizione_siss] =="S":
                 contatore += 1
 
         self.write_row(self.count_COLUMN, "Numero di coppie prestazione/agenda in combinata: " + str(contatore), 1)
@@ -330,20 +333,23 @@ class Report_Creation(): #Check_action
 
     def get_Nota_Amministrativa(self):
         print("get Nota Amministrativa")
-
-        contatore = 0
+        #occorrenze_nota = 0
+        contatore = {}
         note_agenda_list = []
 
         for index, row in self.df_mapping.iterrows():
             if row[self.work_nota_agenda] not in note_agenda_list:
-                contatore += 1
+                contatore[row[self.work_nota_agenda]] = 1
                 note_agenda_list.append(row[self.work_nota_agenda]) 
+            else:
+                occorrenze_nota = contatore.get(row[self.work_nota_agenda])
+                contatore[row[self.work_nota_agenda]] = occorrenze_nota + 1
         
-        self.write_row(self.count_COLUMN, str(contatore) + " Note amministrative configurate: ", 1)
+        self.write_row(self.count_COLUMN, str(len(contatore)) + " Note amministrative configurate: ", 1)
 
-        for note in note_agenda_list:
+        for note, cont in contatore.items():
             #if contatore == 1:
-            self.write_row("B", str(note), 0)
+            self.write_row("B", " per " + str(cont) + " coppie prestazione/agenda è presente la nota: " + str(note), 0)
             #else:
             #    self.write_row("B", str(note), 0)
             #    contatore -= 1
@@ -378,6 +384,24 @@ class Report_Creation(): #Check_action
 
         self.write_row(self.count_COLUMN, "Discipline dell'offerta sanitaria: " + ", ".join(discipline_list), 1)
        
+    
+    def get_Agende_con_QD(self, num_agende):
+        print("get agende con QD")
+
+        list_agende = []
+        contatore = 0 #conta le agende con QD
+
+        for index, row in self.df_mapping.iterrows():
+            if row[self.work_abilitazione_esposizione_siss]=="S":
+                if str(row[self.work_codice_QD]) != "" and str(row[self.work_codice_agenda_siss]) not in list_agende:
+                    contatore += 1
+                    list_agende.append(str(row[self.work_codice_agenda_siss]))
+
+        contatore_agende_no_QD = num_agende - contatore
+
+        string_OUT = "Sono presenti " + str(contatore) + " AGENDE con QD configurati e " + str(contatore_agende_no_QD) + " AGENDE sprovviste di QD"
+        self.write_row(self.count_COLUMN, string_OUT, 1)
+
 
     def get_Campi_Descrittivi(self): #Sesso, GG di prep, GG di ref, Età min ed Età max
         print("get Sesso, GG di prep, GG di ref, Età min ed Età max")
@@ -387,6 +411,7 @@ class Report_Creation(): #Check_action
         gg_ref_list = []
         eta_min_list = []
         eta_max_list = []
+        eta_min_max_list = []
 
         for index, row in self.df_mapping.iterrows():
             if str(row[self.work_sesso]) not in sesso_list:
@@ -395,21 +420,27 @@ class Report_Creation(): #Check_action
                 gg_prep_list.append(str(row[self.work_gg_preparazione]))
             if str(row[self.work_gg_refertazione]) not in gg_ref_list:
                 gg_ref_list.append(str(row[self.work_gg_refertazione]))
-            if str(row[self.work_eta_min]) not in eta_min_list:
-                eta_min_list.append(str(row[self.work_eta_min]))
-            if str(row[self.work_eta_max]) not in eta_max_list:
-                eta_max_list.append(str(row[self.work_eta_max]))
+
+            eta_min_max = str(row[self.work_eta_min]) + " <->" + str(row[self.work_eta_max])
+            if eta_min_max not in eta_min_max_list:
+                eta_min_max_list.append(str(eta_min_max))
 
         self.write_row(self.count_COLUMN, "Sesso nell'offerta sanitaria: " + ", ".join(sesso_list), 1)
         self.write_row(self.count_COLUMN, "Giorni di preparazione definiti nell'offerta sanitaria: " + ", ".join(gg_prep_list))
         self.write_row(self.count_COLUMN, "Giorni di refertazione definiti nell'offerta sanitaria: " + ", ".join(gg_ref_list))
-        self.write_row(self.count_COLUMN, "Età minime definite nell'offerta sanitaria: " + ", ".join(eta_min_list))
-        self.write_row(self.count_COLUMN, "Età massime definite nell'offerta sanitaria: " + ", ".join(eta_max_list))
+        self.write_row(self.count_COLUMN, "Range di Età minime e massime definite nell'offerta sanitaria: " + ", ".join(eta_min_max_list))
+        #self.write_row(self.count_COLUMN, "Età massime definite nell'offerta sanitaria: " + ", ".join(eta_max_list))
 
     def get_Riassunto_Errori(self):
         print("get Riassunto errori rilevati")
         
-        self.write_row(self.count_COLUMN, "Errori trovati: " + ", ".join(self.error_dict), 1)
+        #self.write_row(self.count_COLUMN, "Errori trovati: " + ", ".join(self.error_dict), 1)
+        self.write_row(self.count_COLUMN, "Errori trovati: ", 1)
+        for key, value in self.error_dict.items():
+            print(key, ' : ', value)
+            self.write_row(self.count_COLUMN, key + ": ", 0)
+            for k, v in value.items():
+                self.write_row(self.count_COLUMN, k + ' : ' + ", ".join(v), 0)
 
     def write_row(self, column, message, row=0):
         self.count_ROW += row #lascio uno spazio dalla riga prima

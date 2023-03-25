@@ -1,4 +1,5 @@
 import os
+import json
 from distutils.log import error
 import logging
 from collections import OrderedDict
@@ -51,53 +52,6 @@ class Check_action():
     }
     validation_results = ""
     output_message = ""
-    
-    #work_sheet = "" #sheet di lavoro di df_mapping
-    #work_codice_prestazione_siss = ""
-    #work_descrizione_prestazione_siss = ""
-    #work_codice_agenda_siss = ""
-    #work_casi_1_n = ""
-    #work_abilitazione_esposizione_siss = ""
-    #work_prenotabile_siss = ""
-    #work_codici_disciplina_catalogo = ""
-    #work_descrizione_disciplina_catalogo = ""
-    #work_codice_QD = ""
-    #work_descrizione_QD = ""
-    #work_operatore_logico_QD = ""
-    #work_codice_metodica = ""
-    #work_descrizione_metodica = ""
-    #work_codice_distretto = ""
-    #work_descrizione_distretto = ""
-    #work_operatore_logico_distretto = ""
-    #work_priorita_U = ""
-    #work_priorita_primo_accesso_D = ""
-    #work_priorita_primo_accesso_P = ""
-    #work_priorita_primo_accesso_B = ""
-    #work_accesso_programmabile_ZP = ""
-    #work_combinata = ""
-    #work_codice_agenda_interno = ""
-    #work_codice_prestazione_interno = ""
-    #work_inviante = ""
-    #work_accesso_farmacia = ""
-    #work_accesso_CCR = ""
-    #work_accesso_cittadino = ""
-    #work_accesso_MMG = ""
-    #work_accesso_amministrativo = ""
-    #work_accesso_PAI = ""
-    #work_gg_preparazione = ""
-    #work_gg_refertazione = ""
-    #work_nota_operatore = ""
-
-    #work_index_codice_QD = 0
-    #work_index_codice_SISS_agenda = 0
-    #work_index_abilitazione_esposizione_SISS = 0
-    #work_index_codice_prestazione_SISS = 0
-    #work_index_operatore_logico_distretto = 0
-    #work_index_codici_disciplina_catalogo = 0
-    #work_index_operatore_logico_QD = 0
-
-    #work_alert_column = ""
-    #work_delimiter = ""
 
 
     def __init__(self, data, excel_file):
@@ -212,31 +166,17 @@ class Check_action():
             priorita_error = self.check_priorita(df_mapping)
         prestazione_error = {}
         if self.controls_setted["Prestazione"] == 1:
-            print("Fase 5: Controllo Prestazione selezionato") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI'
+            print("Fase 5: Controllo Prestazione selezionato") #FASE 5: CONTROLLO UNIVOCITA' PRESTAZIONI e CODICI'
             prestazione_error = self.check_prestazione(df_mapping)
         canali_error = {}
-        if self.controls_setted["Canali"] == 1:
+        if self.controls_setted["Canali"] == 1: #FASE 6: CONTROLLO CANALI DI PRENOTAZIONE
             print("Fase 6: Controllo Canali selezionato")
             canali_error = self.check_canali(df_mapping)
         inviante_error = {}
-        if self.controls_setted["Inviante"] == 1:
+        if self.controls_setted["Inviante"] == 1: #FASE 7: CONTROLLO INVIANTE
             print("Fase 7: Controllo Inviante selezionato")
             inviante_error = self.check_inviante(df_mapping)
-        print("Fase Vale Validator")
         
-        '''#catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_110322.xls')
-        catalogo_dir = os.path.join(ROOT_DIR, CAT_NAME)
-        wb = xlrd.open_workbook(catalogo_dir)
-        sheet_QD_OW = wb.sheet_by_index(1)
-        sheet_Metodiche_OW = wb.sheet_by_index(2)
-        sheet_Distretti_OW = wb.sheet_by_index(3)
-        QD_validator_error = {}
-        metodiche_validator_error = {}
-        distretti_validator_error = {}
-        #QD_validator_error = Validator_v.ck_QD_description(self, df_mapping, sheet_QD_OW)
-        #metodiche_validator_error = Validator_v.ck_metodiche_description(self, df_mapping, sheet_Metodiche_OW)
-        #distretti_validator_error = Validator_v.ck_distretti_description(self, df_mapping, sheet_Distretti_OW)'''
-
 
         error_dict = {
             "QD_error": QD_error,
@@ -244,19 +184,15 @@ class Check_action():
             "distretti_error": distretti_error,
             "priorita_error": priorita_error,    
             "prestazione_error": prestazione_error,
-            '''"QD_validator_error": QD_validator_error,
-            "metodiche_validator_error": metodiche_validator_error,
-            "distretti_validator_error": distretti_validator_error,'''
             "canali_error": canali_error,
             "inviante_error": inviante_error
         }
 
         self._validation(error_dict, df_mapping)
-
         
 
     def check_sheet_existance(self):
-        print("check the used column name of the excel file")
+        print("PRELIMINARE: check the used column name of the excel file")
         xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
         if self.work_sheet in xfile.sheetnames:
             print('sheet exists')
@@ -363,7 +299,7 @@ class Check_action():
             df.to_excel(writer, sheet_name='new_mapping', index=False)'''
         print("\nPer osservare i risultati ottenuti, controllare il file prodotto: check_excel_result.txt")
         file = open(RESULT_VALIDATION, "w") 
-        file.write(self.output_message)
+        file.write(self.output_message + "\n" + json.dumps(error_dict)) #self.output_message + "\n" + json.dumps(error_dict)
         file.close() 
         try:
             #Report_creation = Report_Creation()
