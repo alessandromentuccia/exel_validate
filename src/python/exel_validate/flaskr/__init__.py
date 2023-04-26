@@ -21,7 +21,7 @@ DOWNLOAD_FOLDER = os.path.join(dir, 'uploads/')
 app = Flask(__name__)
 app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-TEMPLATE_MINI_EXAMPLE = 'config_validator_SUZZARA.yml'
+TEMPLATE_MINI_EXAMPLE = 'config_validator_example.yml'
 TEMPLATE_WORK_EXAMPLE = 'working_example.json'
 
 # Session
@@ -93,7 +93,7 @@ def validate_agende_interne():
         logger.error(e)
         return str(e), 400
     
-@app.route('/sendexample', methods=['GET', 'POST'])
+@app.route('/send-example', methods=['GET', 'POST'])
 def send_example():
     try:
         return send_file(TEMPLATE_MINI_EXAMPLE,as_attachment = True, attachment_filename=TEMPLATE_MINI_EXAMPLE), 200

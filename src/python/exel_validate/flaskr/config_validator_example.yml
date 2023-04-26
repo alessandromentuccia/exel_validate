@@ -1,13 +1,18 @@
 - work_column:
-    work_sheet: "Tracciato Mapping 27 09 2021"
-    work_codice_prestazione_siss: "Codice Prestazione SISS"
+    work_sheet: "Worksheet"
+    work_N1: "Codice N1"
+    work_N2: "Codice N2"
+    work_descrizione_N1: "Descrizione N1"
+    work_descrizione_N2: "Descrizione N2"
+    work_codice_prestazione_siss: "Codice Prestazione SISS_senza_spazi"
     work_descrizione_prestazione_siss: "Descrizione Prestazione SISS"
     work_codice_agenda_siss: "Codice SISS Agenda"
-    work_casi_1_n: "CASI 1:N"
+    work_casi_1_n: "CASI 1_N"
     work_abilitazione_esposizione_siss: "Abilitazione Esposizione SISS"
+    work_prenotabile_siss: "Prenotabile SISS"
     work_codici_disciplina_catalogo: "Codici disciplina da catalogo"
     work_descrizione_disciplina_catalogo: "Descrizione disciplina da catalogo"
-    work_codice_QD: "CodiceQuesitoDiagnostico"
+    work_codice_QD: "Codice Quesito Diagnostico"
     work_descrizione_QD: "Descrizione Quesito Diagnostico"
     work_operatore_logico_QD: "Operatore Logico Quesito Diagnostico"
     work_codice_metodica: "Codice Metodica"
@@ -22,20 +27,27 @@
     work_accesso_programmabile_ZP: "Accesso Programmabile P"
     work_combinata: "Combinata"
     work_codice_agenda_interno: "Codice Interno Agenda"
-    work_codice_prestazione_interno: "Codice Prestazione Cup"
+    work_codice_prestazione_interno: "Codice Prestazione CUP"
+    work_inviante: "Inviante"
+    work_risorsa: "Risorsa"
+    work_accesso_farmacia: "Farmacisti"
+    work_accesso_CCR: "CCR"
+    work_accesso_cittadino: "Cittadino"
+    work_accesso_MMG: "MMG"
+    work_accesso_amministrativo: "Amministrativo Ente"
+    work_accesso_PAI: "PAI (Ex CreG)"
+    work_gg_preparazione: "Giorni di Preparazione"
+    work_gg_refertazione: "Giorni di Refertazione"
+    work_nota_operatore: "Nota Operatore"
+    work_nota_agenda: "Nota Amministrativa Agenda"
+    work_nota_revoca: "Nota Revoca"
+    work_disciplina: "Disciplina Agenda"
+    work_sesso: "Sesso"
+    work_eta_min: "Età Minima Prestazione"
+    work_eta_max: "Età Massima Prestazione"
 
 - work_index:
-    work_index_sheet: 2
-    work_index_codice_QD: 43
-    work_index_op_logic_distretto: 55
-    work_index_codice_SISS_agenda: 16
-    work_index_abilitazione_esposizione_SISS: 30
-    work_index_codice_prestazione_SISS: 27
-    work_index_operatore_logico_distretto: 55
-    work_index_codici_disciplina_catalogo: 41
-    work_index_codici_descri_disciplina_catalogo: 42
-    work_index_operatore_logico_QD: 45
-    work_alert_column: "CG"
+    work_alert_column: "BS"
 
 - work_separator:
     work_delimiter: ","
