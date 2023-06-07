@@ -48,7 +48,8 @@ class Check_action():
     catalogo = OrderedDict()
     flag_check_list = []
     error_generate_list = {
-        1 : "Lo Sheet indicato non è presente nel file .xlsx: ricontrollare il file di configurazione ed il file excel"
+        1 : "Lo Sheet indicato non è presente nel file .xlsx: ricontrollare il file di configurazione ed il file excel",
+        2 : "Nello Sheet indicato non è presente il campo "
     }
     validation_results = ""
     output_message = ""
@@ -113,17 +114,19 @@ class Check_action():
         self.file_data = excel_file
 
 
-    def initializer(self, checked_dict):
+    def initializer(self, checked_dict, data):
 
-        print("FASE 0: precheck")
-        self.check_sheet_existance()
-        if self.validation_results != "":
-            return self.validation_results 
         #pd.set_option("display.max_rows", None, "display.max_columns", None)
         df_mapping = pd.read_excel(self.file_data, sheet_name=self.work_sheet, converters={self.work_codici_disciplina_catalogo: str, self.work_codice_prestazione_siss: str, self.work_codice_metodica: str, self.work_codice_distretto: str}).replace(np.nan, '', regex=True)
+        
+        print("FASE 0: precheck")
+        self.check_sheet_existance()
+        self.check_sheet_fields(data, df_mapping)
+        if self.validation_results != "":
+            return self.validation_results 
         #print ("print JSON")
         #print(sh)
-        print(checked_dict)
+        #print(checked_dict)
         self.controls_setted = checked_dict
 
         #catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_110322.xlsx')
@@ -199,6 +202,22 @@ class Check_action():
             self.validation_results = ""
         else: 
             self.validation_results = self.error_generate_list[1]
+
+    def check_sheet_fields(self, data, df_mapping):
+        print("PRELIMINARE: check fields name's of the sheet")
+        field_in_error = []
+        column_headers = df_mapping.columns.values.tolist()
+        #print("The Column Header :", column_headers)
+        
+        cont = 0
+        for value in data[0]["work_column"].values():
+            cont += 1
+            #print("value: " + value)
+            if value not in column_headers and cont !=1:
+                field_in_error.append(value)
+
+        if field_in_error != []:
+            self.validation_results = self.validation_results + ",\n" + self.error_generate_list[2] + ", ".join(field_in_error)
 
 
     def check_qd(self, df_mapping, sheet_QD):
@@ -292,7 +311,7 @@ class Check_action():
         return error_dict
 
     def _validation(self, error_dict, df_mapping):
-        print("questi sono gli errori indivuduati e separati per categoria:\n %s", error_dict)
+        print("questi sono gli errori individuati e separati per categoria:\n %s", error_dict)
         #self.output_message = self.output_message + "\n" + json.dumps(error_dict)
         '''df = pd.DataFrame(rows_list)
         with pd.ExcelWriter(self.file_name, engine='openpyxl', mode='a') as writer:

@@ -61,8 +61,8 @@ def generate():
         print(excel_filename)
         file_path = app.config['DOWNLOAD_FOLDER']  + excel_filename
         #check_actionPA.initializer(file_path_rivisto, checked_dict)
-        check_action = validator.Check_action(configuration_file, file_path) #init class
-        check_validation_results = check_action.initializer(checked_dict) #activate method
+        check_action = validator.Check_action(configuration_file, file_path) #_init method
+        check_validation_results = check_action.initializer(checked_dict, configuration_file) #activate method
         if check_validation_results != "":
             flash(str(check_validation_results))
             return redirect(url_for('upload_file'))
