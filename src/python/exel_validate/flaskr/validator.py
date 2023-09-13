@@ -68,7 +68,7 @@ class Check_action():
         self.work_codice_prestazione_siss = data[0]["work_column"]["work_codice_prestazione_siss"]
         self.work_descrizione_prestazione_siss = data[0]["work_column"]["work_descrizione_prestazione_siss"]
         self.work_codice_agenda_siss = data[0]["work_column"]["work_codice_agenda_siss"]
-        self.work_casi_1_n = data[0]["work_column"]["work_casi_1_n"]
+        #self.work_casi_1_n = data[0]["work_column"]["work_casi_1_n"]
         self.work_abilitazione_esposizione_siss = data[0]["work_column"]["work_abilitazione_esposizione_siss"]
         self.work_prenotabile_siss = data[0]["work_column"]["work_prenotabile_siss"]
         self.work_codici_disciplina_catalogo = data[0]["work_column"]["work_codici_disciplina_catalogo"]
@@ -332,7 +332,7 @@ class Check_action():
                                                 self.work_codice_prestazione_siss,
                                                 self.work_descrizione_prestazione_siss,
                                                 self.work_codice_agenda_siss,
-                                                self.work_casi_1_n,
+                                                #self.work_casi_1_n,
                                                 self.work_abilitazione_esposizione_siss,
                                                 self.work_prenotabile_siss,
                                                 self.work_codici_disciplina_catalogo,
