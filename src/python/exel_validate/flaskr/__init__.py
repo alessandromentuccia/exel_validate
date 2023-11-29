@@ -68,7 +68,7 @@ def generate():
             return redirect(url_for('upload_file'))
             #error_message = check_validation_results
             #return error_message
-        return send_file(file_path,as_attachment = True, attachment_filename=excel_filename), 200
+        return send_file(file_path,as_attachment = True, download_name=excel_filename), 200
     except Exception as e:
         logger.error(e)
         return str(e), 400
@@ -88,7 +88,7 @@ def validate_agende_interne():
         check_action = validator.Check_action(configuration_file, file_path)
         check_action.initializer_check_agende_interne()
                                
-        return send_file(file_path,as_attachment = True, attachment_filename=excel_filename), 200
+        return send_file(file_path,as_attachment = True, download_name=excel_filename), 200
     except Exception as e:
         logger.error(e)
         return str(e), 400
@@ -96,7 +96,7 @@ def validate_agende_interne():
 @app.route('/send-example', methods=['GET', 'POST'])
 def send_example():
     try:
-        return send_file(TEMPLATE_MINI_EXAMPLE,as_attachment = True, attachment_filename=TEMPLATE_MINI_EXAMPLE), 200
+        return send_file(TEMPLATE_MINI_EXAMPLE,as_attachment = True, download_name=TEMPLATE_MINI_EXAMPLE), 200
     except FileNotFoundError as e:
         logger.error(e)
         return str(e), 400
@@ -131,7 +131,7 @@ def post_avvio_start_check():
         check_actionPA = validator_post_avvio.Check_action(configuration_file, file_path_mapping)
         check_actionPA.initializer(file_path_rivisto, checked_dict)
         #return "lista: " + ", ".join(_list), 200
-        return send_file(file_path_rivisto,as_attachment = True, attachment_filename=excel2_filename), 200
+        return send_file(file_path_rivisto,as_attachment = True, download_name=excel2_filename), 200
     except Exception as e:
         logger.error(e)
         return str(e), 400

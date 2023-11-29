@@ -53,7 +53,7 @@ class Check_action():
     }
     validation_results = ""
     output_message = ""
-
+ 
 
     def __init__(self, data, excel_file):
         #self.output_message = ""
@@ -130,6 +130,8 @@ class Check_action():
         self.controls_setted = checked_dict
 
         #catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_110322.xlsx')
+        print("ROOT_DIR:" + ROOT_DIR+"\n")
+        print("CAT_NAME:" + CAT_NAME+"\n")
         catalogo_dir = os.path.join(ROOT_DIR, CAT_NAME) #catalogo SISS
         
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
@@ -207,7 +209,7 @@ class Check_action():
         print("PRELIMINARE: check fields name's of the sheet")
         field_in_error = []
         column_headers = df_mapping.columns.values.tolist()
-        #print("The Column Header :", column_headers)
+        print("The Column Header :", column_headers)
         
         cont = 0
         for value in data[0]["work_column"].values():

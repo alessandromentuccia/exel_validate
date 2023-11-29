@@ -198,12 +198,17 @@ class Check_QD():
                                                 
                                                 if str(indice) not in agende_error_list:
                                                     agende_error_list.append(str(indice))
-                                                    QD_disci_dict_error[str(indice)] = "QD: "+ QD + " non appartiene alla disciplina: " + disciplina_mapping_row
+
+                                                    QD_disci_dict_error[str(indice)] = QD + " non appartiene alla disciplina: " + disciplina_mapping_row
                                                     #print("disciplina_mapping_row: " + disciplina_mapping_row + ", QD not in disciplina: " + QD)
-                                                    if str(indice) not in error_dict['error_QD_disciplina_agenda']:
-                                                        error_dict['error_QD_disciplina_agenda'].append(str(indice))
-                                            if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
                                                 
+                                                elif str(indice) in agende_error_list:
+                                                    QD_disci_dict_error[str(indice)] = QD + ", " + QD_disci_dict_error[str(indice)]
+                                                
+                                                if str(indice) not in error_dict['error_QD_disciplina_agenda']:
+                                                    error_dict['error_QD_disciplina_agenda'].append(str(indice))
+
+                                            if descrizione_disciplina_mapping_row not in short_sheet["Descrizione disciplina"].values:
                                                 if str(indice) not in descrizione_discipline_error_list:
                                                     descrizione_discipline_error_list.append(str(indice))
                                                     QD_descri_disci_dict_error[str(indice)] = "La descrizione disciplina: " + descrizione_disciplina_mapping_row + "non è presente sul catalogo attributi GP++"
@@ -230,7 +235,7 @@ class Check_QD():
         out_message = ""
         for ind in error_dict['error_QD_disciplina_agenda']:
             out1 = out1 + "at index: " + ind + ", error: " + QD_disci_dict_error[ind] + ", \n"
-            out_message = "__> {}".format(QD_disci_dict_error[ind])
+            out_message = "__> QD: {}".format(QD_disci_dict_error[ind])
             if sheet[self.work_alert_column+ind].value is not None:
                 sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
