@@ -23,15 +23,43 @@ at index:
 4, 
 5, 
 6, 
-13, 
-14, 
+7, 
+8, 
+9, 
+10, 
+15, 
+16, 
+17, 
+18, 
+19, 
+21, 
+24, 
+26, 
+27, 
+28, 
+29, 
 30, 
 31, 
 32, 
+33, 
+34, 
 35, 
+36, 
+37, 
+38, 
 39, 
+40, 
+41, 
+42, 
+43, 
+44, 
+45, 
+46, 
 47, 
 48, 
+49, 
+50, 
+51, 
 52, 
 53, 
 54, 
@@ -42,140 +70,77 @@ at index:
 59, 
 60, 
 61, 
+62, 
 63, 
+64, 
 65, 
 66, 
+67, 
+68, 
+69, 
 70, 
 71, 
-77, 
-80, 
-81, 
-82, 
-90, 
+74, 
+75, 
+76, 
+84, 
+85, 
+86, 
+87, 
+88, 
+89, 
 91, 
-93, 
-94, 
+92, 
 95, 
-96, 
-97, 
-98, 
-101, 
+103, 
+104, 
+105, 
+106, 
+107, 
+108, 
 110, 
 111, 
-112, 
-113, 
-114, 
 115, 
 116, 
 117, 
-118, 
-122, 
-123, 
 124, 
-131, 
-132, 
+125, 
+126, 
+128, 
+129, 
 133, 
 134, 
 135, 
-136, 
-140, 
-141, 
-142, 
-143
+136
 error_metodica_inprestazione: 
-at index: 5, on metodica: M00000, M00056, M00060, M00062, M00063, M00064, M00073, M00078, M00086, M00116, M00119, M00124, M00201, M00340, 
-at index: 6, on metodica: M00000, M00056, M00060, M00062, M00063, M00064, M00073, M00078, M00086, M00116, M00119, M00124, M00201, M00340, 
-at index: 14, on metodica: M00000, M00063, M00064, M00073, M00082, M00111, M00159, M00293, 
-at index: 47, on metodica: M00000, M00025, M00070, M00073, M00082, M00111, M00285, M00293, M00414, 
-at index: 66, on metodica: M00065, M00066, 
-at index: 77, on metodica: M00000, M00065, M00066, M00073, M00077, M00082, M00111, M00293, 
-at index: 7, metodica generale presente 
-at index: 8, metodica generale presente 
-at index: 9, metodica generale presente 
-at index: 10, metodica generale presente 
-at index: 11, metodica generale presente 
-at index: 12, metodica generale presente 
-at index: 15, metodica generale presente 
-at index: 16, metodica generale presente 
-at index: 17, metodica generale presente 
-at index: 18, metodica generale presente 
-at index: 19, metodica generale presente 
+at index: 11, metodica generale assente 
+at index: 14, metodica generale presente 
 at index: 20, metodica generale presente 
-at index: 21, metodica generale presente 
 at index: 22, metodica generale presente 
 at index: 23, metodica generale presente 
-at index: 24, metodica generale presente 
 at index: 25, metodica generale presente 
-at index: 26, metodica generale presente 
-at index: 27, metodica generale presente 
-at index: 28, metodica generale presente 
-at index: 29, metodica generale presente 
-at index: 33, metodica generale presente 
-at index: 34, metodica generale presente 
-at index: 36, metodica generale presente 
-at index: 37, metodica generale presente 
-at index: 38, metodica generale presente 
-at index: 40, metodica generale presente 
-at index: 41, metodica generale presente 
-at index: 42, metodica generale presente 
-at index: 43, metodica generale presente 
-at index: 44, metodica generale presente 
-at index: 45, metodica generale presente 
-at index: 46, metodica generale presente 
-at index: 49, metodica generale presente 
-at index: 50, metodica generale presente 
-at index: 51, metodica generale presente 
-at index: 62, metodica generale presente 
-at index: 67, metodica generale presente 
-at index: 68, metodica generale presente 
-at index: 69, metodica generale presente 
-at index: 72, metodica generale presente 
-at index: 73, metodica generale presente 
-at index: 74, metodica generale presente 
-at index: 75, metodica generale presente 
-at index: 76, metodica generale presente 
-at index: 86, metodica generale presente 
-at index: 87, metodica generale presente 
-at index: 88, metodica generale presente 
-at index: 89, metodica generale presente 
-at index: 92, metodica generale presente 
-at index: 99, metodica generale presente 
-at index: 100, metodica generale presente 
-at index: 102, metodica generale presente 
-at index: 106, metodica generale presente 
-at index: 107, metodica generale presente 
-at index: 108, metodica generale presente 
-at index: 109, metodica generale presente 
-at index: 119, metodica generale presente 
-at index: 120, metodica generale presente 
-at index: 127, metodica generale presente 
-at index: 128, metodica generale presente 
-at index: 129, metodica generale presente 
-at index: 130, metodica generale presente 
-at index: 137, metodica generale presente 
-at index: 138, metodica generale presente 
 
 error_distretti_caratteri_non_consentiti: 
 at index: 
 
 error_distretti_trovato_spazio: 
 at index: 
+83, 
+85, 
 89, 
+90, 
 91, 
-95, 
-96, 
-97, 
-109, 
+102, 
+103, 
+104, 
+108, 
 110, 
-111, 
-115, 
-117, 
-130, 
-131, 
-132, 
-133, 
-134, 
-135
+123, 
+124, 
+125, 
+126, 
+127, 
+128
 error_distretti_inprestazione: 
 
 error_distretti_operatori_logici: 
@@ -192,10 +157,8 @@ at index:
 
 error_esami_strumentali: 
 at index: 
-72, 
-73, 
-104
+
 error_casi_1n: 
 at index: 
 
-{"QD_error": {"error_QD_caratteri_non_consentiti": [], "error_QD_spazio_bordi": [], "error_QD_spazio_internamente": [], "error_QD_agenda": [], "error_QD_vuoto": [], "error_QD_disciplina_agenda": [], "error_QD_descrizione_disciplina_agenda": [], "error_disciplina_mancante": [], "error_discipline_agende_diverse": [], "error_QD_descrizione": [], "error_QD_descrizione_space_bordo": [], "error_QD_descrizione_space_interno": [], "error_QD_codice": [], "error_QD_operatori_logici": [], "error_QD_operatori_logici_mancante": []}, "metodiche_error": {"error_metodica_caratteri_non_consentiti": [], "error_metodica_spazio_bordi": [], "error_metodica_spazio_internamente": ["2", "3", "4", "5", "6", "13", "14", "30", "31", "32", "35", "39", "47", "48", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "63", "65", "66", "70", "71", "77", "80", "81", "82", "90", "91", "93", "94", "95", "96", "97", "98", "101", "110", "111", "112", "113", "114", "115", "116", "117", "118", "122", "123", "124", "131", "132", "133", "134", "135", "136", "140", "141", "142", "143"], "error_metodica_inprestazione": ["5", "6", "14", "47", "66", "77"], "error_metodica_generale_assente": [], "error_metodica_generale_presente": ["7", "8", "9", "10", "11", "12", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "33", "34", "36", "37", "38", "40", "41", "42", "43", "44", "45", "46", "49", "50", "51", "62", "67", "68", "69", "72", "73", "74", "75", "76", "86", "87", "88", "89", "92", "99", "100", "102", "106", "107", "108", "109", "119", "120", "127", "128", "129", "130", "137", "138"]}, "distretti_error": {"error_distretti_caratteri_non_consentiti": [], "error_distretti_trovato_spazio": ["89", "91", "95", "96", "97", "109", "110", "111", "115", "117", "130", "131", "132", "133", "134", "135"], "error_distretti_inprestazione": [], "error_distretti_operatori_logici_non_necessari": [], "error_distretti_operatori_logici_mancante": []}, "priorita_error": {"error_prime_visite": [], "error_controlli": [], "error_esami_strumentali": ["72", "73", "104"]}, "prestazione_error": {"error_casi_1n": [], "error_prestazione_SISS_assente": ["5", "6", "47", "72", "73", "77", "104"], "error_notaop_assente": [], "error_prenotabileflag_assente": []}, "canali_error": {"error_canali_vuoti": [], "error_canale_PAI": [], "error_canali_abilitati": []}, "inviante_error": {"error_invianti_vuoti": [], "error_inviante_controllo": []}}
+{"QD_error": {"error_QD_caratteri_non_consentiti": [], "error_QD_spazio_bordi": [], "error_QD_spazio_internamente": [], "error_QD_agenda": [], "error_QD_vuoto": [], "error_QD_disciplina_agenda": [], "error_QD_descrizione_disciplina_agenda": [], "error_disciplina_mancante": [], "error_discipline_agende_diverse": [], "error_QD_descrizione": [], "error_QD_descrizione_space_bordo": [], "error_QD_descrizione_space_interno": [], "error_QD_codice": [], "error_QD_operatori_logici": [], "error_QD_operatori_logici_mancante": []}, "metodiche_error": {"error_metodica_caratteri_non_consentiti": [], "error_metodica_spazio_bordi": [], "error_metodica_spazio_internamente": ["2", "3", "4", "5", "6", "7", "8", "9", "10", "15", "16", "17", "18", "19", "21", "24", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "74", "75", "76", "84", "85", "86", "87", "88", "89", "91", "92", "95", "103", "104", "105", "106", "107", "108", "110", "111", "115", "116", "117", "124", "125", "126", "128", "129", "133", "134", "135", "136"], "error_metodica_inprestazione": [], "error_metodica_generale_assente": ["11"], "error_metodica_generale_presente": ["14", "20", "22", "23", "25"]}, "distretti_error": {"error_distretti_caratteri_non_consentiti": [], "error_distretti_trovato_spazio": ["83", "85", "89", "90", "91", "102", "103", "104", "108", "110", "123", "124", "125", "126", "127", "128"], "error_distretti_inprestazione": [], "error_distretti_operatori_logici_non_necessari": [], "error_distretti_operatori_logici_mancante": []}, "priorita_error": {"error_prime_visite": [], "error_controlli": [], "error_esami_strumentali": []}, "prestazione_error": {"error_casi_1n": [], "error_prestazione_SISS_assente": [], "error_notaop_assente": [], "error_prenotabileflag_assente": []}, "canali_error": {"error_canali_vuoti": [], "error_canale_PAI": [], "error_canali_abilitati": []}, "inviante_error": {"error_invianti_vuoti": [], "error_inviante_controllo": []}}
