@@ -367,8 +367,8 @@ class Check_action():
                                                 self.work_eta_min,
                                                 self.work_eta_max,
                                                 self.work_alert_column,
-                                                self.work_delimiter,
-                                                error_dict)
+                                                self.work_delimiter)
+                                                #error_dict)
             Report_creation.get_report()
 
         except Exception as e:

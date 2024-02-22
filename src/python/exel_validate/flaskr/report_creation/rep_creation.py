@@ -38,7 +38,7 @@ class Report_Creation(): #Check_action
     work_codice_prestazione_siss = ""
     work_descrizione_prestazione_siss = ""
     work_codice_agenda_siss = ""
-    work_casi_1_n = ""
+    #work_casi_1_n = ""
     work_abilitazione_esposizione_siss = ""
     work_codici_disciplina_catalogo = ""
     work_descrizione_disciplina_catalogo = ""
@@ -64,7 +64,7 @@ class Report_Creation(): #Check_action
 
     def __init__(self,df_mapping, file_data, work_sheet, work_N1, work_N2, 
                   work_descrizione_N1, work_descrizione_N2, work_codice_prestazione_siss,
-                  work_descrizione_prestazione_siss, work_codice_agenda_siss, work_casi_1_n,         
+                  work_descrizione_prestazione_siss, work_codice_agenda_siss,         
                   work_abilitazione_esposizione_siss, work_prenotabile_siss, work_codici_disciplina_catalogo,         
                   work_descrizione_disciplina_catalogo, work_codice_QD, work_codice_metodica,   
                   work_codice_distretto, work_priorita_U, work_priorita_primo_accesso_D,       
@@ -74,8 +74,8 @@ class Report_Creation(): #Check_action
                   work_accesso_cittadino, work_accesso_MMG, work_accesso_amministrativo, 
                   work_accesso_PAI, work_gg_preparazione, work_gg_refertazione,            
                   work_nota_operatore, work_nota_agenda, work_nota_revoca, work_disciplina,
-                  work_sesso, work_eta_min, work_eta_max, work_alert_column, work_delimiter, error_dict):#                 
-                         
+                  work_sesso, work_eta_min, work_eta_max, work_alert_column, work_delimiter): #error_dict):    
+
                                   
         self.df_mapping = df_mapping
         self.file_data = file_data
@@ -87,7 +87,7 @@ class Report_Creation(): #Check_action
         self.work_codice_prestazione_siss = work_codice_prestazione_siss
         self.work_descrizione_prestazione_siss = work_descrizione_prestazione_siss
         self.work_codice_agenda_siss = work_codice_agenda_siss
-        self.work_casi_1_n = work_casi_1_n
+        #self.work_casi_1_n = work_casi_1_n
         self.work_abilitazione_esposizione_siss = work_abilitazione_esposizione_siss
         self.work_prenotabile_siss = work_prenotabile_siss
         self.work_codici_disciplina_catalogo = work_codici_disciplina_catalogo
@@ -121,7 +121,7 @@ class Report_Creation(): #Check_action
         self.work_eta_max = work_eta_max
         self.work_alert_column = work_alert_column
         self.work_delimiter = work_delimiter
-        self.error_dict = error_dict
+        #self.error_dict = error_dict
 
         self.count_ROW = 1
         self.count_COLUMN = "A"
@@ -189,7 +189,7 @@ class Report_Creation(): #Check_action
 
         self.get_Campi_Descrittivi() #Sesso, GG di prep, GG di ref, Età min ed Età max
 
-        self.get_Riassunto_Errori()
+        #self.get_Riassunto_Errori()
 
         xfile.save(self.file_data) 
 
@@ -420,18 +420,19 @@ class Report_Creation(): #Check_action
                 gg_prep_list.append(str(row[self.work_gg_preparazione]))
             if str(row[self.work_gg_refertazione]) not in gg_ref_list:
                 gg_ref_list.append(str(row[self.work_gg_refertazione]))
-
-            eta_min_max = str(row[self.work_eta_min]) + " <->" + str(row[self.work_eta_max])
-            if eta_min_max not in eta_min_max_list:
+            
+            eta_min_max = " da " + str(row[self.work_eta_min]) + " a " + str(row[self.work_eta_max])
+            if str(eta_min_max) not in eta_min_max_list:
                 eta_min_max_list.append(str(eta_min_max))
-
+        
         self.write_row(self.count_COLUMN, "Sesso nell'offerta sanitaria: " + ", ".join(sesso_list), 1)
         self.write_row(self.count_COLUMN, "Giorni di preparazione definiti nell'offerta sanitaria: " + ", ".join(gg_prep_list))
         self.write_row(self.count_COLUMN, "Giorni di refertazione definiti nell'offerta sanitaria: " + ", ".join(gg_ref_list))
         self.write_row(self.count_COLUMN, "Range di Età minime e massime definite nell'offerta sanitaria: " + ", ".join(eta_min_max_list))
+        
         #self.write_row(self.count_COLUMN, "Età massime definite nell'offerta sanitaria: " + ", ".join(eta_max_list))
 
-    def get_Riassunto_Errori(self):
+    '''def get_Riassunto_Errori(self):
         print("get Riassunto errori rilevati")
         
         #self.write_row(self.count_COLUMN, "Errori trovati: " + ", ".join(self.error_dict), 1)
@@ -440,7 +441,7 @@ class Report_Creation(): #Check_action
             print(key, ' : ', value)
             self.write_row(self.count_COLUMN, key + ": ", 0)
             for k, v in value.items():
-                self.write_row(self.count_COLUMN, k + ' : ' + ", ".join(v), 0)
+                self.write_row(self.count_COLUMN, k + ' : ' + ", ".join(v), 0)'''
 
     def write_row(self, column, message, row=0):
         self.count_ROW += row #lascio uno spazio dalla riga prima
