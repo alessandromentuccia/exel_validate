@@ -1,3 +1,4 @@
+import sys
 from itertools import count
 from ntpath import join
 from typing import Any
@@ -21,43 +22,7 @@ c_handler.setFormatter(formatter)
 logger.addHandler(f_handler)
 logger.addHandler(c_handler)
 
-class Report_Creation(): #Check_action
-
-    file_name = ""
-    output_message = ""
-    error_list = {}
-    file_data = {}
-
-    work_N1 = ""
-    work_N2 = ""
-    work_descrizione_N1 = ""
-    work_descrizione_N2 = ""
-    work_nota_agenda = ""
-
-    work_sheet = "" #sheet di lavoro di df_mapping
-    work_codice_prestazione_siss = ""
-    work_descrizione_prestazione_siss = ""
-    work_codice_agenda_siss = ""
-    #work_casi_1_n = ""
-    work_abilitazione_esposizione_siss = ""
-    work_codici_disciplina_catalogo = ""
-    work_descrizione_disciplina_catalogo = ""
-    work_codice_QD = ""
-    work_descrizione_QD = ""
-    work_operatore_logico_QD = ""
-    work_codice_metodica = ""
-    work_descrizione_metodica = ""
-    work_codice_distretto = ""
-    work_descrizione_distretto = ""
-    work_operatore_logico_distretto = ""
-    work_priorita_U = ""
-    work_priorita_primo_accesso_D = ""
-    work_priorita_primo_accesso_P = ""
-    work_priorita_primo_accesso_B = ""
-    work_accesso_programmabile_ZP = ""
-
-    #df_mapping = pd.DataFrame
-    #xfile = openpyxl.Workbook
+class Report_Creation: #Check_action
     
     #count_ROW = 1
     #count_COLUMN = "A"
@@ -74,7 +39,7 @@ class Report_Creation(): #Check_action
                   work_accesso_cittadino, work_accesso_MMG, work_accesso_amministrativo, 
                   work_accesso_PAI, work_gg_preparazione, work_gg_refertazione,            
                   work_nota_operatore, work_nota_agenda, work_nota_revoca, work_disciplina,
-                  work_sesso, work_eta_min, work_eta_max, work_alert_column, work_delimiter): #error_dict):    
+                  work_sesso, work_eta_min, work_eta_max, work_alert_column, work_delimiter, error_dict):    
 
                                   
         self.df_mapping = df_mapping
@@ -121,7 +86,7 @@ class Report_Creation(): #Check_action
         self.work_eta_max = work_eta_max
         self.work_alert_column = work_alert_column
         self.work_delimiter = work_delimiter
-        #self.error_dict = error_dict
+        self.error_dict = error_dict
 
         self.count_ROW = 1
         self.count_COLUMN = "A"
@@ -129,11 +94,6 @@ class Report_Creation(): #Check_action
 
         #numero_agende = 0
         #super().__init__(self)
-
-    '''def __call__(self, df_mapping, file_data):
-        self.get_report(self) 
-        self.df_mapping = df_mapping
-        self.file_data = file_data'''
 
     def get_report(self):
         print("start Validation Report")
@@ -145,7 +105,7 @@ class Report_Creation(): #Check_action
             print("1")
             #sheet_mapping = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel mapping
             try:
-                self.sheet_report = xfile.get_sheet_by_name('Report Validazione') #recupero sheet excel report validazione 
+                self.sheet_report = xfile['Report Validazione'] #recupero sheet excel report validazione 
             except:
                 #creo Report Validazione se non esiste
                 print("1.1: Non esiste sheet Validazione - creazione sheet")
@@ -161,7 +121,7 @@ class Report_Creation(): #Check_action
             self.write_row(self.count_COLUMN, "Report Validazione")
             
             print("4")
-        except:
+        except ImportError:
             print("non esiste file o sheet")
 
 
@@ -189,9 +149,9 @@ class Report_Creation(): #Check_action
 
         self.get_Campi_Descrittivi() #Sesso, GG di prep, GG di ref, Età min ed Età max
 
-        #self.get_Riassunto_Errori()
+        self.get_Riassunto_Errori()
 
-        xfile.save(self.file_data) 
+        xfile.save(self.file_data)
 
         '''
         #for index, row in df_mapping.iterrows():
@@ -236,15 +196,15 @@ class Report_Creation(): #Check_action
                     desc_N1.append(str(row[DESCRIZIONE_N1]))
                 if str(row[DESCRIZIONE_N2]) not in desc_N2:
                     desc_N2.append(str(row[DESCRIZIONE_N2]))
-        except Exception as e:
-            logger.error('Failed to get N1 and N2: '+ str(e))
-            if cod_N1 == []:
+        except ValueError as e:
+            logger.error("Failed to get N1 and N2: %s", str(e))
+            if not cod_N1:
                 cod_N1.append("valore assente")
-            if cod_N2 == []:
+            if not cod_N2:
                 cod_N2.append("valore assente")
-            if desc_N1 == []:
+            if not desc_N1:
                 desc_N1.append("valore assente")
-            if desc_N2 == []:
+            if not desc_N2:
                 desc_N2.append("valore assente")
 
         self.write_row(self.count_COLUMN, "N1: " + ", ".join(cod_N1), 1) #lascio uno spazio dalla riga precedente
@@ -291,7 +251,9 @@ class Report_Creation(): #Check_action
             if row[col_abilitazione] == "S":
                 contatore += 1
 
-        self.write_row(self.count_COLUMN, "Numero di coppie prestazione/agenda abilitate all'esposizione: " + str(contatore) + " su " + str(contatore2), 1)
+        self.write_row(self.count_COLUMN,
+                       "Numero di coppie prestazione/agenda abilitate all'esposizione: " + str(contatore) + " su " + str(contatore2), 1)
+                          
 
     def get_Num_PA_Prenotabili(self):
         print("get Numero coppie PA esposte e prenotabili")
@@ -321,15 +283,15 @@ class Report_Creation(): #Check_action
 
     def get_Raggruppate(self):
         print("get Numero coppie PA raggruppate")
-    '''
-        contatore = 0
+    
+        """contatore = 0
 
         for index, row in self.df_mapping.iterrows():
             if row[self.work_ragg] != "":
                 contatore += 1
 
-        self.write_row(self.count_COLUMN, "Numero di coppie prestazione/agenda in combinata: " + str(contatore), 1)
-    '''
+        self.write_row(self.count_COLUMN, "Numero di coppie prestazione/agenda in combinata: " + str(contatore), 1)"""
+    
 
     def get_Nota_Amministrativa(self):
         print("get Nota Amministrativa")
@@ -409,8 +371,6 @@ class Report_Creation(): #Check_action
         sesso_list = []
         gg_prep_list = []
         gg_ref_list = []
-        eta_min_list = []
-        eta_max_list = []
         eta_min_max_list = []
 
         for index, row in self.df_mapping.iterrows():
@@ -420,28 +380,32 @@ class Report_Creation(): #Check_action
                 gg_prep_list.append(str(row[self.work_gg_preparazione]))
             if str(row[self.work_gg_refertazione]) not in gg_ref_list:
                 gg_ref_list.append(str(row[self.work_gg_refertazione]))
-            
+
             eta_min_max = " da " + str(row[self.work_eta_min]) + " a " + str(row[self.work_eta_max])
             if str(eta_min_max) not in eta_min_max_list:
                 eta_min_max_list.append(str(eta_min_max))
         
-        self.write_row(self.count_COLUMN, "Sesso nell'offerta sanitaria: " + ", ".join(sesso_list), 1)
-        self.write_row(self.count_COLUMN, "Giorni di preparazione definiti nell'offerta sanitaria: " + ", ".join(gg_prep_list))
-        self.write_row(self.count_COLUMN, "Giorni di refertazione definiti nell'offerta sanitaria: " + ", ".join(gg_ref_list))
-        self.write_row(self.count_COLUMN, "Range di Età minime e massime definite nell'offerta sanitaria: " + ", ".join(eta_min_max_list))
+        self.write_row(self.count_COLUMN, "Sesso nell'offerta sanitaria: "
+                       + ", ".join(sesso_list), 1)
+        self.write_row(self.count_COLUMN, "Giorni di preparazione definiti nell'offerta sanitaria: "
+                       + ", ".join(gg_prep_list))
+        self.write_row(self.count_COLUMN, "Giorni di refertazione definiti nell'offerta sanitaria: "
+                       + ", ".join(gg_ref_list))
+        self.write_row(self.count_COLUMN, "Range di Età minime e massime definite nell'offerta sanitaria: "
+                       + ", ".join(eta_min_max_list))
         
         #self.write_row(self.count_COLUMN, "Età massime definite nell'offerta sanitaria: " + ", ".join(eta_max_list))
 
-    '''def get_Riassunto_Errori(self):
+    def get_Riassunto_Errori(self):
         print("get Riassunto errori rilevati")
-        
+
         #self.write_row(self.count_COLUMN, "Errori trovati: " + ", ".join(self.error_dict), 1)
         self.write_row(self.count_COLUMN, "Errori trovati: ", 1)
         for key, value in self.error_dict.items():
             print(key, ' : ', value)
             self.write_row(self.count_COLUMN, key + ": ", 0)
             for k, v in value.items():
-                self.write_row(self.count_COLUMN, k + ' : ' + ", ".join(v), 0)'''
+                self.write_row(self.count_COLUMN, k + ' : ' + ", ".join(v), 0)
 
     def write_row(self, column, message, row=0):
         self.count_ROW += row #lascio uno spazio dalla riga prima

@@ -1,17 +1,16 @@
 import os
 import json
-from distutils.log import error
+#from distutils.log import error
 import logging
 from collections import OrderedDict
-from functools import reduce
-from pathlib import Path
-from typing import Dict, List
+#from functools import reduce
+#from pathlib import Path
+#from typing import Dict, List
 import pandas as pd
 import numpy as np
-import xlrd
+#import xlrd
 import openpyxl
-from xlsxwriter.utility import xl_rowcol_to_cell
-import matplotlib.pyplot as plt
+#from xlsxwriter.utility import xl_rowcol_to_cell
 from dotenv import load_dotenv
 
 from flaskr.check.check_QD import Check_QD
@@ -130,8 +129,8 @@ class Check_action():
         self.controls_setted = checked_dict
 
         #catalogo_dir = os.path.join(ROOT_DIR, 'CCR-BO-CATGP#01_Codifiche attributi catalogo GP++_110322.xlsx')
-        print("ROOT_DIR:" + ROOT_DIR+"\n")
-        print("CAT_NAME:" + CAT_NAME+"\n")
+        print("ROOT_DIR: " + ROOT_DIR+"\n")
+        print("CAT_NAME: " + str(CAT_NAME)+"\n")
         catalogo_dir = os.path.join(ROOT_DIR, CAT_NAME) #catalogo SISS
         
         sheet_QD = pd.read_excel(catalogo_dir, sheet_name='QD', converters={"Cod Disciplina": str})
@@ -367,8 +366,8 @@ class Check_action():
                                                 self.work_eta_min,
                                                 self.work_eta_max,
                                                 self.work_alert_column,
-                                                self.work_delimiter)
-                                                #error_dict)
+                                                self.work_delimiter,
+                                                error_dict)
             Report_creation.get_report()
 
         except Exception as e:
@@ -449,7 +448,7 @@ class Check_action():
         return dictio
 
     '''Metodo per controllare il tipo di una colonna excel'''
-    def column_validator():
+    def column_validator(self):
         return ""
 
     def list_duplicates(self, seq):
@@ -467,7 +466,7 @@ class Check_action():
         error_dict = {
             "error_Aagende_interne": error
         }
-        self._validation(error_dict)
+        self._validation(error_dict, df_mapping)
 
     def analizer_agende_interne(self, df_mapping):
         Agende_interne_error = Check_agende_interne.ck_agende_interne(self, df_mapping, {})
