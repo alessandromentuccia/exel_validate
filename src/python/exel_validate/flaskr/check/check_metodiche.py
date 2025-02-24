@@ -6,7 +6,8 @@ from xlsxwriter.utility import xl_rowcol_to_cell
 import yaml
 import logging
 import re
-import openpyxl 
+import openpyxl
+from flaskr.check_action import Check_action
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -19,33 +20,11 @@ c_handler.setFormatter(formatter)
 logger.addHandler(f_handler)
 logger.addHandler(c_handler)
 
-class Check_metodiche():
+class Check_metodiche(Check_action):
 
-    file_name = ""
+    #file_name = ""
     output_message = ""
     error_list = {}
-
-    work_sheet = "" #sheet di lavoro di df_mapping
-    work_codice_prestazione_siss = ""
-    work_descrizione_prestazione_siss = ""
-    work_codice_agenda_siss = ""
-    work_casi_1_n = ""
-    work_abilitazione_esposizione_siss = ""
-    work_codici_disciplina_catalogo = ""
-    work_descrizione_disciplina_catalogo = ""
-    work_codice_QD = ""
-    work_descrizione_QD = ""
-    work_operatore_logico_QD = ""
-    work_codice_metodica = ""
-    work_descrizione_metodica = ""
-    work_codice_distretto = ""
-    work_descrizione_distretto = ""
-    work_operatore_logico_distretto = ""
-    work_priorita_U = ""
-    work_priorita_primo_accesso_D = ""
-    work_priorita_primo_accesso_P = ""
-    work_priorita_primo_accesso_B = ""
-    work_accesso_programmabile_ZP = ""
 
     work_index_codice_QD = 0
     work_index_codice_SISS_agenda = 0
@@ -54,32 +33,36 @@ class Check_metodiche():
     work_index_operatore_logico_distretto = 0
     work_index_codici_disciplina_catalogo = 0
 
+    def __init__(self, file):
+        super().__init__(file)
+        self.file = file
+
     
-    def ck_metodica_inprestazione(self, df_mapping, sheet_Metodiche, error_dict):
+    def ck_metodica_inprestazione(self, error_dict):
         print("start checking if metodica are correct")
         error_dict.update({'error_metodica_inprestazione': [],
                            'error_metodica_generale_assente': [],
                            'error_metodica_generale_presente': []})
         #self.output_message = self.output_message + "\nerror_metodica_inprestazione: "
         
-        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
-        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
+        xfile = openpyxl.load_workbook(self.file.file_data) #recupero file excel da file system
+        sheet = xfile[self.file.work_sheet] #recupero sheet excel
         
         cod_metodica_generale = "M00000"
 
         metodica_dict_error = {}
         prestazioni_dict = {}
-        for index, row in df_mapping.iterrows():
-            if row[self.work_abilitazione_esposizione_siss] == "S":
-                Metodica_string = row[self.work_codice_metodica]
-                Metodica_list = Metodica_string.split(self.work_delimiter)
+        for index, row in self.file.df_mapping.iterrows():
+            if row[self.file.work_abilitazione_esposizione_siss] == "S":
+                Metodica_string = row[self.file.work_codice_metodica]
+                Metodica_list = Metodica_string.split(self.file.work_delimiter)
 
 
                 siss = "" 
                 siss_flag = False
                 if Metodica_list is not None:
 
-                    cod_pre_siss = str(row[self.work_codice_prestazione_siss]).strip()
+                    cod_pre_siss = str(row[self.file.work_codice_prestazione_siss]).strip()
                     if cod_metodica_generale == Metodica_string.strip():
                         error_dict['error_metodica_generale_presente'].append(str(int(index)+2))
                     else:
@@ -90,7 +73,7 @@ class Check_metodiche():
                         for metodica in Metodica_list:
                             metodica = metodica.strip()
                             if metodica != "":
-                                short_sheet = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                      
+                                short_sheet = self.file.sheet_Metodiche.loc[self.file.sheet_Metodiche["Codice Metodica"] == metodica]                      
                                 
                                 print("prestazione della metodica in mapping:" + cod_pre_siss + " + " + siss)
                                 
@@ -107,7 +90,7 @@ class Check_metodiche():
                                         prestazioni_dict[str(int(index)+2)] = cod_pre_siss
                 if siss_flag == True: #se durante il mapping con la sua disciplina, questa non viene rilevata, allora è errore
                     error_dict['error_metodica_inprestazione'].append(str(int(index)+2))
-                siss = str(row[self.work_codice_prestazione_siss]).strip()
+                siss = str(row[self.file.work_codice_prestazione_siss]).strip()
 
             
         out1 = ""
@@ -115,34 +98,34 @@ class Check_metodiche():
         for ind in error_dict['error_metodica_inprestazione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
             out_message = "__> Metodiche: '{}' non previste per la prestazione: '{}'".format(", ".join(metodica_dict_error[ind]), prestazioni_dict[ind])
-            if sheet[self.work_alert_column+ind].value is not None:
-                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.file.work_alert_column+ind].value is not None:
+                sheet[self.file.work_alert_column+ind] = str(sheet[self.file.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet[self.work_alert_column+ind] = out_message
+                sheet[self.file.work_alert_column+ind] = out_message
         for ind in error_dict['error_metodica_generale_assente']:
             out1 = out1 + "at index: " + ind + ", metodica generale assente \n"
             out_message = "__> Alert: si consiglia di verificare la METODICA GENERALE non configurata per la prestazione"
-            if sheet[self.work_alert_column+ind].value is not None:
-                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.file.work_alert_column+ind].value is not None:
+                sheet[self.file.work_alert_column+ind] = str(sheet[self.file.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet[self.work_alert_column+ind] = out_message
+                sheet[self.file.work_alert_column+ind] = out_message
         for ind in error_dict['error_metodica_generale_presente']:
             out1 = out1 + "at index: " + ind + ", metodica generale presente \n"
             out_message = "__> Alert: METODICA GENERALE configurata da sola - Si consiglia di lasciare vuoto il campo poichè è sottintesa"
-            if sheet[self.work_alert_column+ind].value is not None:
-                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.file.work_alert_column+ind].value is not None:
+                sheet[self.file.work_alert_column+ind] = str(sheet[self.file.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet[self.work_alert_column+ind] = out_message
+                sheet[self.file.work_alert_column+ind] = out_message
         
 
         self.output_message = self.output_message + "\nerror_metodica_inprestazione: \n" + out1
 
         
 
-        xfile.save(self.file_data)    
+        xfile.save(self.file.file_data)
         return error_dict
 
-    def ck_metodica_sintassi(self, df_mapping, error_dict):
+    def ck_metodica_sintassi(self, error_dict):
         print("start checking if there is ',' separator between each metodiche defined")
         error_dict.update({
             'error_metodica_caratteri_non_consentiti': [],
@@ -151,30 +134,30 @@ class Check_metodiche():
         })
         string_check = re.compile('1234567890,M')
 
-        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
-        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
+        xfile = openpyxl.load_workbook(self.file.file_data) #recupero file excel da file system
+        sheet = xfile[self.file.work_sheet] #recupero sheet excel
 
-        for index, row in df_mapping.iterrows():
-            if row[self.work_abilitazione_esposizione_siss] == "S":
-                print("Metodica: " + row[self.work_codice_metodica])
+        for index, row in self.file.df_mapping.iterrows():
+            if row[self.file.work_abilitazione_esposizione_siss] == "S":
+                print("Metodica: " + row[self.file.work_codice_metodica])
                 #flag_error = False
-                if row[self.work_codice_metodica] is not None:
+                if row[self.file.work_codice_metodica] is not None:
                     
-                    #row_replace = row[self.work_codice_metodica].replace(" ", "")
-                    if " " in row[self.work_codice_metodica]:
-                        if row[self.work_codice_metodica] != row[self.work_codice_metodica].strip():
+                    #row_replace = row[self.file.work_codice_metodica].replace(" ", "")
+                    if " " in row[self.file.work_codice_metodica]:
+                        if row[self.file.work_codice_metodica] != row[self.file.work_codice_metodica].strip():
                             print("string contain space in the border")
                             error_dict['error_metodica_spazio_bordi'].append(str(int(index)+2))
-                        r = row[self.work_codice_metodica].strip()
+                        r = row[self.file.work_codice_metodica].strip()
                         if " " in r:
                             print("string contain space inside the string")
                             error_dict['error_metodica_spazio_internamente'].append(str(int(index)+2))
-                        row_replace = row[self.work_codice_metodica].replace(" ", "")
-                        if(string_check.search(row_replace) != None):
+                        row_replace = row[self.file.work_codice_metodica].replace(" ", "")
+                        if(string_check.search(row_replace) is not None): #!=
                             print("String contains other Characters.")
                             error_dict['error_metodica_caratteri_non_consentiti'].append(str(int(index)+2))
 
-                    '''if " " in row[self.work_codice_metodica]:
+                    '''if " " in row[self.file.work_codice_metodica]:
                         if " " in row_replace.strip():
                             print("string contain space inside the string")
                             error_dict['error_metodica_spazio_internamente'].append(str(int(index)+2))
@@ -198,49 +181,49 @@ class Check_metodiche():
         out_message = ""
         for ind in error_dict['error_metodica_caratteri_non_consentiti']:
             out_message = "__> Metodiche presentano errori di sintassi: rilevati caratteri non consentiti"
-            if sheet[self.work_alert_column+ind].value is not None:
-                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.file.work_alert_column+ind].value is not None:
+                sheet[self.file.work_alert_column+ind] = str(sheet[self.file.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet[self.work_alert_column+ind] = out_message
+                sheet[self.file.work_alert_column+ind] = out_message
         for ind in error_dict['error_metodica_spazio_bordi']:
             out_message = "__> Metodiche presentano errori di sintassi: rilevati degli spazi alle estremità del contenuto della cella"
-            if sheet[self.work_alert_column+ind].value is not None:
-                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.file.work_alert_column+ind].value is not None:
+                sheet[self.file.work_alert_column+ind] = str(sheet[self.file.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet[self.work_alert_column+ind] = out_message
+                sheet[self.file.work_alert_column+ind] = out_message
         for ind in error_dict['error_metodica_spazio_internamente']:
             out_message = "__> Metodiche presentano errori di sintassi: rilevati degli spazi all'interno del contenuto della cella"
-            if sheet[self.work_alert_column+ind].value is not None:
-                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.file.work_alert_column+ind].value is not None:
+                sheet[self.file.work_alert_column+ind] = str(sheet[self.file.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet[self.work_alert_column+ind] = out_message
+                sheet[self.file.work_alert_column+ind] = out_message
 
-        xfile.save(self.file_data) 
+        xfile.save(self.file.file_data) 
         return error_dict #da eliminare
     
-    def ck_metodica_descrizione(self, df_mapping, sheet_Metodiche, error_dict):
+    def ck_metodica_descrizione(self, error_dict):
         print("start checking if metodica have the correct description")
         error_dict.update({
             'error_metodica_descrizione': [],
             'error_metodica_separatore': []
             })
 
-        xfile = openpyxl.load_workbook(self.file_data) #recupero file excel da file system
-        sheet = xfile.get_sheet_by_name(self.work_sheet) #recupero sheet excel
+        xfile = openpyxl.load_workbook(self.file.file_data) #recupero file excel da file system
+        sheet = xfile[self.file.work_sheet] #recupero sheet excel
 
         metodica_dict_error = {}
         
-        for index, row in df_mapping.iterrows():
-            if row[self.work_abilitazione_esposizione_siss] == "S":
-                Metodica_string = row[self.work_codice_metodica].split(self.work_delimiter)
-                Description_list = row[self.work_descrizione_metodica].split(self.work_delimiter)
+        for index, row in self.file.df_mapping.iterrows():
+            if row[self.file.work_abilitazione_esposizione_siss] == "S":
+                Metodica_string = row[self.file.work_codice_metodica].split(self.file.work_delimiter)
+                Description_list = row[self.file.work_descrizione_metodica].split(self.file.work_delimiter)
                 flag_error = False
                 
                 if Metodica_string is not None:
                     for metodica in Metodica_string:
                         metodica = metodica.strip()
                         if metodica != "":
-                            metodica_catalogo = sheet_Metodiche.loc[sheet_Metodiche["Codice Metodica"] == metodica]                    
+                            metodica_catalogo = self.file.sheet_Metodiche.loc[self.file.sheet_Metodiche["Codice Metodica"] == metodica]                    
                             
                             try:
                                 if metodica_catalogo["Metodica Rilevata"].values[0] not in Description_list:
@@ -262,19 +245,19 @@ class Check_metodiche():
         for ind in error_dict['error_metodica_descrizione']:
             out1 = out1 + "at index: " + ind + ", on metodica: " + ", ".join(metodica_dict_error[ind]) + ", \n"
             out_message = "__> Metodiche: '{}' presentano errori nella descrizione".format(", ".join(metodica_dict_error[ind]))
-            if sheet[self.work_alert_column+ind].value is not None:
-                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.file.work_alert_column+ind].value is not None:
+                sheet[self.file.work_alert_column+ind] = str(sheet[self.file.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet[self.work_alert_column+ind] = out_message
+                sheet[self.file.work_alert_column+ind] = out_message
         self.output_message = self.output_message + "\nerror_metodica_descrizione: \n" + out1
         for ind in error_dict['error_metodica_separatore']:
             out_message = "__> Le descrizioni metodiche presentano errori col separatore ','"
-            if sheet[self.work_alert_column+ind].value is not None:
-                sheet[self.work_alert_column+ind] = str(sheet[self.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
+            if sheet[self.file.work_alert_column+ind].value is not None:
+                sheet[self.file.work_alert_column+ind] = str(sheet[self.file.work_alert_column+ind].value) + "; \n" + out_message #modificare colonna alert
             else:
-                sheet[self.work_alert_column+ind] = out_message
+                sheet[self.file.work_alert_column+ind] = out_message
         out2 = ", \n".join(error_dict['error_metodica_separatore'])
         self.output_message = self.output_message + "\nerror_metodica_separatore: \n" + out2
 
-        xfile.save(self.file_data) 
+        xfile.save(self.file.file_data)
         return error_dict

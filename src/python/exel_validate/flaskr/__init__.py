@@ -61,8 +61,9 @@ def generate():
         print(excel_filename)
         file_path = app.config['DOWNLOAD_FOLDER']  + excel_filename
         #check_actionPA.initializer(file_path_rivisto, checked_dict)
-        check_action = validator.Check_action(configuration_file, file_path) #_init method
-        check_validation_results = check_action.initializer(checked_dict, configuration_file) #activate method
+        check_validation_results = validator.inizializer(checked_dict, configuration_file, file_path)
+        #check_action = validator.Check_action(configuration_file, file_path) #_init method
+        #check_validation_results = check_action.initializer(checked_dict, configuration_file) #activate method
         if check_validation_results != "":
             flash(str(check_validation_results))
             return redirect(url_for('upload_file'))
@@ -85,8 +86,8 @@ def validate_agende_interne():
     try:
         print(excel_filename)
         file_path = app.config['DOWNLOAD_FOLDER']  + excel_filename
-        check_action = validator.Check_action(configuration_file, file_path)
-        check_action.initializer_check_agende_interne()
+        #check_action = validator.initializer_check_agende_interne(configuration_file, file_path)
+        #check_action.()
                                
         return send_file(file_path,as_attachment = True, download_name=excel_filename), 200
     except Exception as e:
